@@ -113,41 +113,18 @@ signal uart_adr : std_logic_vector(7 downto 0);
 signal irq_i : std_logic_vector(7 downto 0);
 
 
---signal instr_ram_adr, data_ram_adr : std_logic_vector(ram_adr_width-1 downto 0);
-
-         
-         
-   COMPONENT lxp32u_top
-    PORT(
-        clk_i : IN std_logic;
-        rst_i : IN std_logic;
-        lli_dat_i : IN std_logic_vector(31 downto 0);
-        lli_busy_i : IN std_logic;
-        dbus_ack_i : IN std_logic;
-        dbus_dat_i : IN std_logic_vector(31 downto 0);
-        irq_i : IN std_logic_vector(7 downto 0);          
-        lli_re_o : OUT std_logic;
-        lli_adr_o : OUT std_logic_vector(29 downto 0);
-        dbus_cyc_o : OUT std_logic;
-        dbus_stb_o : OUT std_logic;
-        dbus_we_o : OUT std_logic;
-        dbus_sel_o : OUT std_logic_vector(3 downto 0);
-        dbus_adr_o : OUT std_logic_vector(31 downto 2);
-        dbus_dat_o : OUT std_logic_vector(31 downto 0)
-        );
-    END COMPONENT;       
-         
-
 begin
  
    irq_i <= (others=>'0'); -- currently no interrupts
-   
-	-- temporary init until implementation.
---	uart0_txd<='1';
    led1<='1';	
     
     
-    Inst_lxp32u_top: lxp32u_top PORT MAP(
+    Inst_lxp32u_top: entity  work.lxp32u_top 
+	 GENERIC MAP (
+	   USE_RISCV=>true
+	 )	
+	 
+	 PORT MAP(
         clk_i => clk,
         rst_i => reset,
         lli_re_o => ib_rden,
@@ -168,9 +145,9 @@ begin
      
    Inst_memory_interface:  entity work.memory_interface 
     GENERIC MAP (
-       ram_adr_width => ram_adr_width,
+        ram_adr_width => ram_adr_width,
         ram_size => ram_size,
-		  RamFileName => "uart.hex",
+		  RamFileName => "branch.hex",
         mode => "H"		 
     )
     
