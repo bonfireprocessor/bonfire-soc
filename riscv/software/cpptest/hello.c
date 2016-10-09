@@ -7,6 +7,7 @@ int main(int argc,char ** argv) {
 volatile int counter =0;
 
     while(1) {
+	
         *gpioadr= (counter++ >> 20) & 0x0f;
    }
 

@@ -12,10 +12,11 @@ SECTIONS
   .text : { 
     *(.init)
     *(.text.*)
-
+   
    } > RAM
    
   .data  ALIGN(4) : { 
+     *(.rodata.*) 
      *(.sdata)
      *(.data)     
      *(.bss)

@@ -41,7 +41,7 @@ entity toplevel is
 
         -- UART0 signals:
         uart0_txd : out std_logic;
-        uart0_rxd : in  std_logic;
+        uart0_rxd : in  std_logic :='1';
         
         -- LED on Papilio Pro Board
         led1 : out std_logic
@@ -113,17 +113,19 @@ signal uart_adr : std_logic_vector(7 downto 0);
 signal irq_i : std_logic_vector(7 downto 0);
 
 
+
 begin
  
    irq_i <= (others=>'0'); -- currently no interrupts
    led1<='1';	
     
     
-    Inst_lxp32u_top: entity  work.lxp32u_top 
-	 GENERIC MAP (
-	   USE_RISCV=>true
-	 )	
-	 
+
+    Inst_lxp32u_top: entity work.lxp32u_top 
+	 generic map (
+	    USE_RISCV => true
+	 )
+
 	 PORT MAP(
         clk_i => clk,
         rst_i => reset,
@@ -147,7 +149,10 @@ begin
     GENERIC MAP (
         ram_adr_width => ram_adr_width,
         ram_size => ram_size,
-		  RamFileName => "branch.hex",
+		--  RamFileName => "../../lxp32soc/riscv/software/cpptest/hello.hex",
+        --RamFileName => "../../lxp32-cpu/riscv_test/mult.hex",
+        RamFileName => "../../lxp32soc/riscv/software/cpptest/uart.hex",
+
         mode => "H"		 
     )
     

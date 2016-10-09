@@ -4,4 +4,4 @@
 
 _start:
 li sp,0x03FF0 // set SP to end of RAM
-j main
+jal main

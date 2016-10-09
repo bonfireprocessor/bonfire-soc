@@ -4,3 +4,4 @@
 *.elf
 *.dmp
 *.lst
+/riscv/software/cpptest/hello

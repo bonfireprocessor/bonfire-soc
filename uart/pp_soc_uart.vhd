@@ -63,6 +63,8 @@ end entity pp_soc_uart;
 architecture behaviour of pp_soc_uart is
 
 	subtype bitnumber is natural range 0 to 7; --! Type representing the index of a bit.
+   
+   signal init : std_logic := '0';  -- TH, init marker
 
 	-- UART sample clock signals:
 	signal sample_clk         : std_logic;
@@ -121,7 +123,7 @@ begin
 	uart_receive: process(clk)
 	begin
 		if rising_edge(clk) then
-			if reset = '1' then
+			if reset = '1' or init='0' then
 				rx_state <= IDLE;
 				recv_buffer_push <= '0';
 			else
@@ -173,7 +175,7 @@ begin
 	sample_counter: process(clk)
 	begin
 		if rising_edge(clk) then
-			if reset = '1' then
+			if reset = '1' or init='0' then
 				rx_sample_counter <= 0;
 			elsif sample_clk = '1' then
 				if rx_sample_counter = 15 then
@@ -192,7 +194,7 @@ begin
 	uart_transmit: process(clk)
 	begin
 		if rising_edge(clk) then
-			if reset = '1' then
+			if reset = '1' or init='0' then
 				txd <= '1';
 				tx_state <= IDLE;
 				send_buffer_pop <= '0';
@@ -231,7 +233,7 @@ begin
 	uart_tx_clock_generator: process(clk)
 	begin
 		if rising_edge(clk) then
-			if reset = '1' then
+			if reset = '1' or init='0' then
 				uart_tx_counter <= 0;
 				uart_tx_clk <= '0';
 			else
@@ -255,7 +257,7 @@ begin
 	sample_clock_generator: process(clk)
 	begin
 		if rising_edge(clk) then
-			if reset = '1' then
+			if reset = '1' or init='0' then
 				sample_clk_counter <= (others => '0');
 				sample_clk <= '0';
 			else
@@ -311,7 +313,7 @@ begin
 	wishbone: process(clk)
 	begin
 		if rising_edge(clk) then
-			if reset = '1' then
+			if reset = '1' or init='0' then
 				wb_ack <= '0';
 				wb_state <= IDLE;
 				send_buffer_push <= '0';
@@ -380,5 +382,13 @@ begin
 			end if;
 		end if;
 	end process wishbone;
-
+   
+   init_set: process(clk) begin
+     if rising_edge(clk) then
+        if init='0' then -- self init when there is no reset 
+          init<='1';
+        end if;  
+     end if;
+  end process;
+  
 end architecture behaviour;

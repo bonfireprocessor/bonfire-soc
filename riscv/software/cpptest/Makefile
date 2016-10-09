@@ -8,7 +8,7 @@ TARGET_SIZE := $(TARGET_PREFIX)-size
 TARGET_OBJCOPY := $(TARGET_PREFIX)-objcopy
 HEXDUMP ?= hexdump
 
-TARGET_CFLAGS += -m32 -march=RV32I -Wall -Os -fomit-frame-pointer \
+TARGET_CFLAGS += -m32 -march=RV32IM -Wall -Os -fomit-frame-pointer \
           -msoft-float\
 	-ffreestanding -fno-builtin  \
 	-Wall -Werror=implicit-function-declaration
@@ -17,8 +17,8 @@ TARGET_LDFLAGS += -m32 -march=RV32I -nostartfiles \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-Tlxp.ld \
 	-Wl,--gc-sections
 
-all:
-	hello.hex mult.hex
+all: hello.hex mult.hex uart.hex
+	
 
 
 %.o : %.S
@@ -45,4 +45,6 @@ hello.elf: start.o hello.o
 mult.elf: start.o mult.o
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o mult.o
 
+uart.elf: start.o uart.o
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o uart.o
 	
