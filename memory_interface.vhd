@@ -34,7 +34,8 @@ generic (
      ram_adr_width : natural;
      ram_size : natural;
 	  RamFileName : string := "meminit.ram";
-	  mode : string := "B"
+	  mode : string := "B";
+     UseBRAMPrmitives : boolean := TRUE
 	 );
 port(
 		clk_i: in std_logic;
@@ -90,27 +91,53 @@ begin
 	                           else '0';
   end generate;	
    
-   Inst_MainMemory: entity work.MainMemory 
-     generic map (
-        ADDR_WIDTH =>ram_adr_width,
-        SIZE => ram_size,
-        RamFileName => RamFileName,
-        mode => mode		  
-     )
-        
-   PORT MAP(
-		DBOut =>wbs_dat_o,
-		DBIn => wbs_dat_i,
-		AdrBus => data_ram_adr,
-		ENA => wbs_cyc_i,
-		WREN => ram_a_we,
-		CLK => clk_i,
-		CLKB =>clk_i ,
-		ENB =>lli_re_i ,
-		AdrBusB =>instr_ram_adr,
-		DBOutB => lli_dat_o
-	);
+   
+   genericMainMemory: if not UseBRAMPrmitives generate
+   
+      Inst_MainMemory: entity work.MainMemory 
+        generic map (
+           ADDR_WIDTH =>ram_adr_width,
+           SIZE => ram_size,
+           RamFileName => RamFileName,
+           mode => mode		  
+        )
+           
+      PORT MAP(
+         DBOut =>wbs_dat_o,
+         DBIn => wbs_dat_i,
+         AdrBus => data_ram_adr,
+         ENA => wbs_cyc_i,
+         WREN => ram_a_we,
+         CLK => clk_i,
+         CLKB =>clk_i ,
+         ENB =>lli_re_i ,
+         AdrBusB =>instr_ram_adr,
+         DBOutB => lli_dat_o
+      );
+  end generate;
+  
+  spartanMainMemory: if UseBRAMPrmitives generate
+    Inst_MainMemory: entity work.MainMemorySpartan6 
+        generic map (
+           NUMBANKS => 2	  
+        )
+           
+      PORT MAP(
+         DBOut =>wbs_dat_o,
+         DBIn => wbs_dat_i,
+         AdrBus => data_ram_adr,
+         ENA => wbs_cyc_i,
+         WREN => ram_a_we,
+         CLK => clk_i,
+         CLKB =>clk_i ,
+         ENB =>lli_re_i ,
+         AdrBusB =>instr_ram_adr,
+         DBOutB => lli_dat_o
+      );
 
-
+  end generate;
+  
+  
+  
 end Behavioral;
 
