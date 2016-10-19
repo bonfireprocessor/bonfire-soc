@@ -43,9 +43,9 @@ ARCHITECTURE behavior OF tb_soc IS
      generic (
      -- generics are set by the simulator only, when instaniating from a testbench
      -- when Design is physically build than the defaults are used
-     UseBRAMPrimitives : boolean; -- Synthesize Boot RAM with BRAM primitives for Data2Mem tool
      RamFileName : string;-- only used when UseBRAMPrimitives is false
-	  mode : string       -- only used when UseBRAMPrimitives is false
+	  mode : string;       -- only used when UseBRAMPrimitives is false
+     Swapbytes : boolean := true -- SWAP Bytes in RAM word in low byte first order to use data2mem
      );
     PORT(
          sysclk_32m : IN  std_logic;
@@ -77,9 +77,9 @@ BEGIN
 	-- Instantiate the Unit Under Test (UUT)
    uut: toplevel 
      generic map (
-        UseBRAMPrimitives => false,
-        RamFileName => "../../lxp32soc/riscv/software/cpptest/uart.hex",
-        mode=>"H"
+        RamFileName => "../../lxp32soc/riscv/software/cpptest/ledsim.hex",
+        mode=>"H",
+        Swapbytes=>false
      )     
    
      PORT MAP (

@@ -35,7 +35,8 @@ generic (
      ram_size : natural;
 	  RamFileName : string := "meminit.ram";
 	  mode : string := "B";
-     UseBRAMPrimitives : boolean := TRUE
+     Swapbytes : boolean := true -- SWAP Bytes in RAM word in low byte first order to use data2mem  
+--     UseBRAMPrimitives : boolean := TRUE
 	 );
 port(
 		clk_i: in std_logic;
@@ -92,14 +93,15 @@ begin
   end generate;	
    
    
-   genericMainMemory: if not UseBRAMPrimitives generate
+ --  genericMainMemory: if not UseBRAMPrimitives generate
    
-      Inst_MainMemory: entity work.MainMemory 
+      ram: entity work.MainMemory 
         generic map (
            ADDR_WIDTH =>ram_adr_width,
            SIZE => ram_size,
            RamFileName => RamFileName,
-           mode => mode		  
+           mode => mode,
+           Swapbytes => Swapbytes            
         )
            
       PORT MAP(
@@ -114,29 +116,29 @@ begin
          AdrBusB =>instr_ram_adr,
          DBOutB => lli_dat_o
       );
-  end generate;
+  --end generate;
   
-  spartanMainMemory: if UseBRAMPrimitives generate
-    mem: entity work.MainMemorySpartan6 
-        generic map (
-           NUMBANKS => 2	  
-        )
-           
-      PORT MAP(
-         DBOut =>wbs_dat_o,
-         DBIn => wbs_dat_i,
-         AdrBus => data_ram_adr,
-         ENA => wbs_cyc_i,
-         WREN => ram_a_we,
-         CLK => clk_i,
-         CLKB =>clk_i ,
-         ENB =>lli_re_i ,
-         AdrBusB =>instr_ram_adr,
-         DBOutB => lli_dat_o
-      );
-
-  end generate;
-  
+--  spartanMainMemory: if UseBRAMPrimitives generate
+--    mem: entity work.MainMemorySpartan6 
+--        generic map (
+--           NUMBANKS => 2	  
+--        )
+--           
+--      PORT MAP(
+--         DBOut =>wbs_dat_o,
+--         DBIn => wbs_dat_i,
+--         AdrBus => data_ram_adr,
+--         ENA => wbs_cyc_i,
+--         WREN => ram_a_we,
+--         CLK => clk_i,
+--         CLKB =>clk_i ,
+--         ENB =>lli_re_i ,
+--         AdrBusB =>instr_ram_adr,
+--         DBOutB => lli_dat_o
+--      );
+--
+--  end generate;
+--  
   
   
 end Behavioral;

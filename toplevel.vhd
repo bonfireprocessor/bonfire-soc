@@ -33,9 +33,9 @@ entity toplevel is
    generic (
      -- generics are set by the simulator only, when instaniating from a testbench
      -- when Design is physically build than the defaults are used
-     UseBRAMPrimitives : boolean := false; -- Synthesize Boot RAM with BRAM primitives for Data2Mem tool
      RamFileName : string := ""; -- only used when UseBRAMPrimitives is false
-	  mode : string := "H"       -- only used when UseBRAMPrimitives is false
+	  mode : string := "H";       -- only used when UseBRAMPrimitives is false
+     Swapbytes : boolean := true -- SWAP Bytes in RAM word in low byte first order to use data2mem
    );
    port(
         sysclk_32m  : in  std_logic;
@@ -165,7 +165,8 @@ begin
         ram_size => ram_size,
         RamFileName => RamFileName,
         mode => mode,
-        UseBRAMPrimitives=>UseBRAMPrimitives
+        Swapbytes => Swapbytes
+       
     )
     
     PORT MAP(
@@ -191,8 +192,7 @@ begin
         ram_adr_width => ram_adr_width,
         ram_size => ram_size,		
         RamFileName => RamFileName,
-        mode => mode,
-        UseBRAMPrimitives=>true
+        mode => mode        
     )
     
     PORT MAP(

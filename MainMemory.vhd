@@ -21,7 +21,8 @@ entity MainMemory is
     generic (RamFileName : string := "meminit.ram";
 	          mode : string := "B";
              ADDR_WIDTH: integer;
-             SIZE : integer
+             SIZE : integer;
+             Swapbytes : boolean := true -- SWAP Bytes in RAM word in low byte first order to use data2mem  
             );
     Port ( DBOut : out  STD_LOGIC_VECTOR (31 downto 0);
            DBIn : in  STD_LOGIC_VECTOR (31 downto 0);
@@ -41,10 +42,21 @@ end MainMemory;
 architecture Behavioral of MainMemory is
 
 type tRam is array (0 to SIZE) of STD_LOGIC_VECTOR (31 downto 0);
-
+subtype tWord is std_logic_vector(31 downto 0);
 
 
 signal b0,b1,b2,b3 : STD_LOGIC_VECTOR(7 downto 0); -- bytes 
+
+signal DOA,DOB,DIA : tWord;
+signal WEA : STD_LOGIC_VECTOR (3 downto 0);  
+
+
+function doSwapBytes(d : tWord) return tWord is
+begin
+  
+    return d(7 downto 0)&d(15 downto 8)&d(23 downto 16)&d(31 downto 24);
+  
+end;
 
 
 -- Design time code...
@@ -52,7 +64,7 @@ signal b0,b1,b2,b3 : STD_LOGIC_VECTOR(7 downto 0); -- bytes
 impure function InitFromFile  return tRam is
 FILE RamFile : text is in RamFileName;
 variable RamFileLine : line;
-variable word : STD_LOGIC_VECTOR(31 downto 0);
+variable word : tWord;
 variable r : tRam;
 
 begin
@@ -64,8 +76,11 @@ begin
 		else  	
          read(RamFileLine,word);  -- Binary read
       end if;		  
-      
-       r(I) :=  word;
+       if SwapBytes then 
+         r(I) :=  DoSwapBytes(word);
+       else
+         r(I) := word;
+       end if;         
      else
        r(I) := (others=>'0'); 
     end if;     
@@ -75,40 +90,66 @@ end function;
 
 signal ram : tRam:= InitFromFile;
 
-begin
 
-  process(WREN,DBIn,ram,AdrBus) begin
-    if wren(0) = '1' then
-         b0 <= DBIn(7 downto 0);
+
+
+begin
+   swap: if SwapBytes generate
+     DIA<=DoSwapBytes(DBIn);
+     DBOut<=DoSwapBytes(DOA);
+     DBOutB<=DoSwapBytes(DOB);
+     WEA(0)<=WREN(3);
+     WEA(1)<=WREN(2);
+     WEA(2)<=WREN(1);
+     WEA(3)<=WREN(0);
+     
+   end generate;   
+
+   noswap: if not SwapBytes generate
+     DIA<=DBIn;
+     DBOut<=DOA;
+     DBOutB<=DOB;
+     WEA<=WREN;
+   end generate;   
+
+
+
+  process(WEA,DIA,ram,AdrBus) 
+  
+  
+  begin
+    if WEA(0) = '1' then
+         b0 <= DIA(7 downto 0);
      else
          b0 <= ram(to_integer(unsigned(AdrBus)))(7 downto 0);
     end if;     
 
-    if wren(1) = '1' then
-           b1 <= DBIn(15 downto 8);
+    if WEA(1) = '1' then
+           b1 <= DIA(15 downto 8);
      else
             b1 <= ram(to_integer(unsigned(AdrBus)))(15 downto 8);
     end if;      
 
-    if wren(2) = '1' then
-        b2 <= DBIn(23 downto 16);
+    if WEA(2) = '1' then
+        b2 <= DIA(23 downto 16);
      else
         b2 <= ram(to_integer(unsigned(AdrBus)))(23 downto 16);
     end if; 
      
-    if wren(3) = '1' then
-        b3 <= DBIn(31 downto 24);
+    if WEA(3) = '1' then
+        b3 <= DIA(31 downto 24);
      else
         b3 <= ram(to_integer(unsigned(AdrBus)))(31 downto 24);
     end if;      
   end process;
   
 
-  process(clk) begin
+  process(clk) 
+  begin
     if rising_edge(clk) then 
-        if ena = '1' then
-          ram(to_integer(unsigned(AdrBus))) <= b3 & b2 & b1 & b0;
-           DBOut <= ram(to_integer(unsigned(AdrBus)));
+        if ena = '1' then         
+           ram(to_integer(unsigned(AdrBus))) <= b3 & b2 & b1 & b0;                      
+           DOA <= ram(to_integer(unsigned(AdrBus)));
          end if;    
      end if;
   
@@ -117,7 +158,7 @@ begin
   process(clkb) begin
      if rising_edge(clkb) then
          if ENB='1' then
-            DBOutB <= ram(to_integer(unsigned(AdrBusB)));
+            DOB <= ram(to_integer(unsigned(AdrBusB)));
           end if;    
       end if;
   end process;
