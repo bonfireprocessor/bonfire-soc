@@ -62,7 +62,7 @@ begin
 		if mode="H" then 
 		   hread (RamFileLine, word); -- alternative: HEX read 
 		else  	
-        read(RamFileLine,word);  -- Binary read
+         read(RamFileLine,word);  -- Binary read
       end if;		  
       
        r(I) :=  word;

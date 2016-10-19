@@ -32,7 +32,7 @@ use work.util.all;
 
 entity MainMemorySpartan6 is
   generic (
-             NUMBANKS: integer:=1 -- number of RAM16B Banks, each Bank has 4*2K*8 BRAMS
+             NUMBANKS: natural:=1 -- number of RAM16B Banks, each Bank has 4*2K*8 BRAMS
              
             );
     Port ( DBOut : out  STD_LOGIC_VECTOR (31 downto 0);

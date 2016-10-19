@@ -17,7 +17,7 @@ TARGET_LDFLAGS += -m32 -march=RV32I -nostartfiles \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-Tlxp.ld \
 	-Wl,--gc-sections
 
-all: hello.hex mult.hex uart.hex
+all: hello.hex mult.hex counter.hex memtest.hex
 	
 
 
@@ -45,6 +45,9 @@ hello.elf: start.o hello.o
 mult.elf: start.o mult.o
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o mult.o
 
-uart.elf: start.o uart.o
-	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o uart.o
+counter.elf: start.o uart.o counter.o
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o counter.o uart.o
+	
+memtest.elf: start.o memtest.o uart.o 
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o memtest.o uart.o	
 	

@@ -57,11 +57,26 @@ signal WEA,WEB : std_logic_vector(3 downto 0);
 
 begin
 
- DIPA<=(others=>'0');
- DIPB<=(others=>'0');
+  DIPA<=(others=>'0');
+  DIPB<=(others=>'0');
+ 
+  DIA<= X"000000"&DinA;
+  DIB<= (others => '0');
+  
+  ADDRA<=AdrA&"000";
+  ADDRB<=AdrB&"000";
+  
+  DOutA<= DOA(7 downto 0);
+  DoutB<= DOB(7 downto 0);
+  
+  wegen: for i in WEA'range generate
+      WEA(i)<=WRENA;
+      WEB(i)<='0';
+  end generate;
 
- RAMB16BWER_inst : RAMB16BWER
-   generic map (
+
+  RAMB16BWER_inst : RAMB16BWER
+    generic map (
       -- DATA_WIDTH_A/DATA_WIDTH_B: 0, 1, 2, 4, 9, 18, or 36
       DATA_WIDTH_A => 9,
       DATA_WIDTH_B => 9,
@@ -120,20 +135,7 @@ begin
   
 
 
-  DIA<= X"000000"&DinA;
-  DIB<= (others => '0');
-  
-  ADDRA<=AdrA&"000";
-  ADDRB<=AdrB&"000";
-  
-  DOutA<= DOA(7 downto 0);
-  DoutB<= DOB(7 downto 0);
-  
-  wegen: for i in WEA'range generate
-      WEA(i)<=WRENA;
-      WEB(i)<='0';
-  end generate;
-
+ 
 
 end Behavioral;
 

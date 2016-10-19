@@ -40,6 +40,13 @@ ARCHITECTURE behavior OF tb_soc IS
     -- Component Declaration for the Unit Under Test (UUT)
  
     COMPONENT toplevel
+     generic (
+     -- generics are set by the simulator only, when instaniating from a testbench
+     -- when Design is physically build than the defaults are used
+     UseBRAMPrimitives : boolean; -- Synthesize Boot RAM with BRAM primitives for Data2Mem tool
+     RamFileName : string;-- only used when UseBRAMPrimitives is false
+	  mode : string       -- only used when UseBRAMPrimitives is false
+     );
     PORT(
          sysclk_32m : IN  std_logic;
          I_RESET : IN  std_logic;
@@ -68,7 +75,14 @@ ARCHITECTURE behavior OF tb_soc IS
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: toplevel PORT MAP (
+   uut: toplevel 
+     generic map (
+        UseBRAMPrimitives => false,
+        RamFileName => "../../lxp32soc/riscv/software/cpptest/uart.hex",
+        mode=>"H"
+     )     
+   
+     PORT MAP (
           sysclk_32m => sysclk_32m,
           I_RESET => I_RESET,
           leds => leds,

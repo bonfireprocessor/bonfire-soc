@@ -25,7 +25,7 @@
 
 volatile uint8_t *uartadr=(uint8_t *)UART_BASE;
 
-char *Welcome = "Hello World \r\n";
+
 
 
 void writechar(char c)
@@ -61,20 +61,11 @@ char c;
 	   c=(char)(nibble-10+'A');
 	       
      writechar(c); 	   
-   }
-   writestr("\r\n");	   	
+   }   	
 }	
 
-
-int main() {
-uint32_t counter=0;   
-
-    uartadr[UART_DIVISOR]=16; // Set Baudrate divisor
-    
-    writestr(Welcome);
-    while(1) {
-	  writeHex(counter++); 	  
-	}	
-};
-
+void setDivisor(uint32_t divisor)
+{
+	uartadr[UART_DIVISOR]=divisor; // Set Baudrate divisor
+}
 	

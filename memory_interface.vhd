@@ -35,7 +35,7 @@ generic (
      ram_size : natural;
 	  RamFileName : string := "meminit.ram";
 	  mode : string := "B";
-     UseBRAMPrmitives : boolean := TRUE
+     UseBRAMPrimitives : boolean := TRUE
 	 );
 port(
 		clk_i: in std_logic;
@@ -92,7 +92,7 @@ begin
   end generate;	
    
    
-   genericMainMemory: if not UseBRAMPrmitives generate
+   genericMainMemory: if not UseBRAMPrimitives generate
    
       Inst_MainMemory: entity work.MainMemory 
         generic map (
@@ -116,8 +116,8 @@ begin
       );
   end generate;
   
-  spartanMainMemory: if UseBRAMPrmitives generate
-    Inst_MainMemory: entity work.MainMemorySpartan6 
+  spartanMainMemory: if UseBRAMPrimitives generate
+    mem: entity work.MainMemorySpartan6 
         generic map (
            NUMBANKS => 2	  
         )

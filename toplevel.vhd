@@ -30,6 +30,13 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 entity toplevel is
+   generic (
+     -- generics are set by the simulator only, when instaniating from a testbench
+     -- when Design is physically build than the defaults are used
+     UseBRAMPrimitives : boolean := false; -- Synthesize Boot RAM with BRAM primitives for Data2Mem tool
+     RamFileName : string := ""; -- only used when UseBRAMPrimitives is false
+	  mode : string := "H"       -- only used when UseBRAMPrimitives is false
+   );
    port(
         sysclk_32m  : in  std_logic;
         I_RESET   : in  std_logic;
@@ -86,6 +93,13 @@ signal mem_cyc,mem_stb,mem_we,mem_ack : std_logic;
 signal mem_sel :  std_logic_vector(3 downto 0);
 signal mem_dat_rd,mem_dat_wr : std_logic_vector(31 downto 0);
 signal mem_adr : std_logic_vector(27 downto 2);
+
+
+-- Memory 2 bus
+signal mem2_cyc,mem2_stb,mem2_we,mem2_ack : std_logic;
+signal mem2_sel :  std_logic_vector(3 downto 0);
+signal mem2_dat_rd,mem2_dat_wr : std_logic_vector(31 downto 0);
+signal mem2_adr : std_logic_vector(27 downto 2);
 
 -- gpio bus
 signal gpio_cyc,gpio_stb,gpio_we,gpio_ack : std_logic;
@@ -145,15 +159,13 @@ begin
     );
     
      
-   Inst_memory_interface:  entity work.memory_interface 
+   Firmware:  entity work.memory_interface 
     GENERIC MAP (
         ram_adr_width => ram_adr_width,
         ram_size => ram_size,
-		--  RamFileName => "../../lxp32soc/riscv/software/cpptest/hello.hex",
-        --RamFileName => "../../lxp32-cpu/riscv_test/mult.hex",
-        RamFileName => "../../lxp32soc/riscv/software/cpptest/uart.hex",
-
-        mode => "H"		 
+        RamFileName => RamFileName,
+        mode => mode,
+        UseBRAMPrimitives=>UseBRAMPrimitives
     )
     
     PORT MAP(
@@ -171,6 +183,33 @@ begin
         lli_adr_i =>  ib_adr,
         lli_dat_o =>   ib_data,
         lli_busy_o =>  ib_busy
+    );  
+    
+    
+    BRAM:  entity work.memory_interface 
+    GENERIC MAP (
+        ram_adr_width => ram_adr_width,
+        ram_size => ram_size,		
+        RamFileName => RamFileName,
+        mode => mode,
+        UseBRAMPrimitives=>true
+    )
+    
+    PORT MAP(
+        clk_i =>clk ,
+        rst_i => reset,
+        wbs_cyc_i =>  mem2_cyc,
+        wbs_stb_i =>  mem2_stb,
+        wbs_we_i =>    mem2_we,
+        wbs_sel_i =>  mem2_sel,
+        wbs_ack_o =>  mem2_ack,
+        wbs_adr_i =>  mem2_adr,
+        wbs_dat_i =>  mem2_dat_wr,
+        wbs_dat_o =>  mem2_dat_rd,
+        lli_re_i =>    '0',
+        lli_adr_i =>  ib_adr,
+        lli_dat_o =>   open,
+        lli_busy_o =>  open
     );  
 	 
 	 
@@ -280,7 +319,16 @@ begin
         m2_ack_i =>  lpc_ack,
         m2_adr_o => lpc_adr,
         m2_dat_o =>  lpc_dat_wr,
-        m2_dat_i => lpc_dat_rd
+        m2_dat_i => lpc_dat_rd,
+          -- Memory at Adress 3XXXXXXX
+        m3_cyc_o =>  mem2_cyc,
+        m3_stb_o =>  mem2_stb,
+        m3_we_o =>   mem2_we,
+        m3_sel_o =>  mem2_sel,
+        m3_ack_i =>  mem2_ack,
+        m3_adr_o =>  mem2_adr,
+        m3_dat_o =>  mem2_dat_wr,
+        m3_dat_i =>  mem2_dat_rd
     );
 
 
