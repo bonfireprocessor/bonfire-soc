@@ -30,21 +30,27 @@ volatile uint8_t *uartadr=(uint8_t *)UART_BASE;
 
 void writechar(char c)
 {
-  while ((uartadr[UART_STATUS] & 0x08)==0x08); // Wait for transmit buffer free
-  uartadr[UART_TX]=(uint8_t)c; 
-	
-}	
+  while (uartadr[UART_STATUS] & 0x08); // Wait while transmit buffer full
+  uartadr[UART_TX]=(uint8_t)c;
+
+}
+
+char readchar()
+{
+  while (uartadr[UART_STATUS] & 0x01); // Wait while receive buffer empty
+  return uartadr[UART_RECV];
+}
 
 
 void writestr(char *p)
 {
   while (*p) {
-	writechar(*p); 
-	p++;  	
-  }		
-	
-	
-}	
+    writechar(*p);
+    p++;
+  }
+
+
+}
 
 void writeHex(uint32_t v)
 {
@@ -54,18 +60,28 @@ char c;
 
 
    for(i=7;i>=0;i--) {
-	 nibble = (v >> (i*4)) & 0x0f;
-	 if (nibble<=9) 
-	   c=(char)(nibble + '0');
-	 else
-	   c=(char)(nibble-10+'A');
-	       
-     writechar(c); 	   
-   }   	
-}	
+     nibble = (v >> (i*4)) & 0x0f;
+     if (nibble<=9)
+       c=(char)(nibble + '0');
+     else
+       c=(char)(nibble-10+'A');
+
+     writechar(c);
+   }
+}
+
+
+void wait()
+{
+static volatile int c;
+
+  c=0;
+  while (c++ < 1000000);
+}
 
 void setDivisor(uint32_t divisor)
 {
-	uartadr[UART_DIVISOR]=divisor; // Set Baudrate divisor
+    uartadr[UART_DIVISOR]=divisor; // Set Baudrate divisor
+    wait();
 }
-	
+
