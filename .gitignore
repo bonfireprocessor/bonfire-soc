@@ -5,3 +5,8 @@
 *.dmp
 *.lst
 /riscv/software/cpptest/hello
+*.bit
+*.txt
+*.mem
+*.bak
+/spartan9/soc_bd.bmm

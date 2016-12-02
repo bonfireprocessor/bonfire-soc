@@ -77,7 +77,11 @@ BEGIN
 	-- Instantiate the Unit Under Test (UUT)
    uut: toplevel 
      generic map (
-        RamFileName => "../../lxp32soc/riscv/software/cpptest/ledsim.hex",
+        --RamFileName => "../../lxp32soc/riscv/software/cpptest/ledsim.hex",
+        --RamFileName => "../../lxp32soc/riscv/software/cpptest/counter.hex",
+         --RamFileName => "../../lxp32-cpu/riscv_test/branch.hex",
+        --RamFileName => "../../lxp32-cpu/riscv_test/trap01.hex",
+        RamFileName => "../../lxp32-cpu/riscv_test/mult.hex",
         mode=>"H",
         Swapbytes=>false
      )     

@@ -137,7 +137,8 @@ begin
 
     Inst_lxp32u_top: entity work.lxp32u_top 
 	 generic map (
-	    USE_RISCV => true
+	    USE_RISCV => true,
+       MUL_ARCH => "spartandsp"
 	 )
 
 	 PORT MAP(

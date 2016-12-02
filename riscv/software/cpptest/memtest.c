@@ -1,3 +1,4 @@
+#include "wildfire.h"
 #include "uart.h"
 
 char *pRAM = (char*)0x30000000; // Memory address
@@ -35,7 +36,9 @@ uint32_t *memptr=0;
 char c;
 
    setDivisor(16);
-   writestr("Memory dump program 1.0\r\n");
+   writestr("Memory dump program 1.0\r\nProcessor ID: ");
+   writeHex(get_impid());
+   writestr("\r\n");
    while(1) {
 
      HexDump(memptr,64);
