@@ -30,6 +30,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity gpio is
+generic(
+    wbs_adr_high : natural := 27
+);    
 port(
       -- output
 		
@@ -44,7 +47,7 @@ port(
 		wbs_we_i: in std_logic;
 		wbs_sel_i: in std_logic_vector(3 downto 0);
 		wbs_ack_o: out std_logic;
-		wbs_adr_i: in std_logic_vector(27 downto 2);
+		wbs_adr_i: in std_logic_vector(wbs_adr_high downto 2);
 		wbs_dat_i: in std_logic_vector(31 downto 0);
 		wbs_dat_o: out std_logic_vector(31 downto 0)
 	);	

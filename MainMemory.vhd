@@ -22,7 +22,7 @@ entity MainMemory is
 	          mode : string := "B";
              ADDR_WIDTH: integer;
              SIZE : integer;
-             Swapbytes : boolean := true -- SWAP Bytes in RAM word in low byte first order to use data2mem  
+             Swapbytes : boolean -- SWAP Bytes in RAM word in low byte first order to use data2mem  
             );
     Port ( DBOut : out  STD_LOGIC_VECTOR (31 downto 0);
            DBIn : in  STD_LOGIC_VECTOR (31 downto 0);

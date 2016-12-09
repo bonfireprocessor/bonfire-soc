@@ -22,14 +22,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity memory_interface is
+entity wbs_memory_interface is
 generic (
      ram_adr_width : natural;
      ram_size : natural;
@@ -51,41 +51,72 @@ port(
 		wbs_adr_i: in std_logic_vector(wbs_adr_high downto 2);
 		wbs_dat_i: in std_logic_vector(31 downto 0);
 		wbs_dat_o: out std_logic_vector(31 downto 0);
-  
+      wbs_cti_i: in std_logic_vector(2 downto 0)
 		
-		lli_re_i: in std_logic;
-		lli_adr_i: in std_logic_vector(29 downto 0);
-		lli_dat_o: out std_logic_vector(31 downto 0);
-		lli_busy_o: out std_logic
 	);
-end memory_interface;
+end wbs_memory_interface;
 
-architecture Behavioral of memory_interface is
+architecture Behavioral of wbs_memory_interface is
 
 constant slave_adr_high : natural := 29; 
 -- Slaves
 -- RAM
-signal  instr_ram_adr,data_ram_adr : std_logic_vector(ram_adr_width-1 downto 0);
+signal ram_adr,ram_adr_o : std_logic_vector(ram_adr_width-1 downto 0);
 signal ram_a_we: std_logic_vector(3 downto 0);
-signal ack_read, ack_write : std_logic;
+signal is_read,ack_read, ack_write : std_logic;
+
+signal adr_reg : std_logic_vector(ram_adr_width-1 downto 0); -- for Burst mode support
 
 begin
 
-    instr_ram_adr <= lli_adr_i(ram_adr_width-1  downto 0);
-    data_ram_adr <=    wbs_adr_i(ram_adr_width+1  downto 2);
-	
-    lli_busy_o <= '0';
+   
+    ram_adr <= wbs_adr_i(ram_adr_width+1  downto 2);
+	 
+    is_read <= wbs_cyc_i and wbs_stb_i and not wbs_we_i;
   
   -- Wishbone ACK 
   process (clk_i) is
   begin
-	if rising_edge(clk_i) then     
-		ack_read<=wbs_cyc_i and wbs_stb_i and not wbs_we_i;
+	if rising_edge(clk_i) then  
+      if ack_read='1' and wbs_cti_i="111" then -- clear ack at enf of burst
+        ack_read <= '0';
+      else        
+		  ack_read<= is_read;
+      end if;  
 	end if;
   end process;
+  
 
    ack_write<=wbs_cyc_i and wbs_stb_i and wbs_we_i;
    wbs_ack_o<=ack_read or ack_write;
+
+
+-- Burst Mode support
+
+   process(clk_i) is
+   begin
+     if rising_edge(clk_i) then  
+        if is_read='1' and wbs_cti_i="010" then  -- burst cycle ??
+          if ack_read='0' then -- begin of new cycle
+            adr_reg <= std_logic_vector(unsigned(ram_adr)+1);
+          else
+             adr_reg <= std_logic_vector(unsigned(adr_reg)+1); 
+          end if;             
+        end if;
+	end if;
+   
+   end process;
+
+
+   -- adr multiplexer
+   process(ram_adr,adr_reg,is_read,ack_read,wbs_cti_i) is
+   begin
+     if is_read='1' and ack_read='1' and (wbs_cti_i="010" or wbs_cti_i="111") then
+       ram_adr_o <=  adr_reg;
+     else
+        ram_adr_o <=  ram_adr;   
+     end if;        
+   end process;
 
    
      -- RAM WREN Signals   
@@ -109,38 +140,16 @@ begin
       PORT MAP(
          DBOut =>wbs_dat_o,
          DBIn => wbs_dat_i,
-         AdrBus => data_ram_adr,
+         AdrBus => ram_adr_o,
          ENA => wbs_cyc_i,
          WREN => ram_a_we,
          CLK => clk_i,
          CLKB =>clk_i ,
-         ENB =>lli_re_i ,
-         AdrBusB =>instr_ram_adr,
-         DBOutB => lli_dat_o
+         ENB =>'0' ,
+         AdrBusB =>(others=>'0'),
+         DBOutB => open
       );
-  --end generate;
-  
---  spartanMainMemory: if UseBRAMPrimitives generate
---    mem: entity work.MainMemorySpartan6 
---        generic map (
---           NUMBANKS => 2	  
---        )
---           
---      PORT MAP(
---         DBOut =>wbs_dat_o,
---         DBIn => wbs_dat_i,
---         AdrBus => data_ram_adr,
---         ENA => wbs_cyc_i,
---         WREN => ram_a_we,
---         CLK => clk_i,
---         CLKB =>clk_i ,
---         ENB =>lli_re_i ,
---         AdrBusB =>instr_ram_adr,
---         DBOutB => lli_dat_o
---      );
---
---  end generate;
---  
+ 
   
   
 end Behavioral;

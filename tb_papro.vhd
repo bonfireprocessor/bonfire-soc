@@ -2,15 +2,15 @@
 -- Company: 
 -- Engineer:
 --
--- Create Date:   00:33:00 09/05/2016
+-- Create Date:   21:21:25 12/06/2016
 -- Design Name:   
--- Module Name:   C:/daten/development/fpga/lxp32proj/lxp32_soc/tb_soc.vhd
--- Project Name:  lxp32_01
+-- Module Name:   /home/thomas/riscv/lxp32soc/tb_papro.vhd
+-- Project Name:  lxp32riscv
 -- Target Device:  
 -- Tool versions:  
 -- Description:   
 -- 
--- VHDL Test Bench Created by ISE for module: toplevel
+-- VHDL Test Bench Created by ISE for module: papilio_pro_dram_toplevel
 -- 
 -- Dependencies:
 -- 
@@ -32,14 +32,14 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY tb_soc IS
-END tb_soc;
+ENTITY tb_papro IS
+END tb_papro;
  
-ARCHITECTURE behavior OF tb_soc IS 
+ARCHITECTURE behavior OF tb_papro IS 
  
-    -- Component Declaration for the Unit Under Test (UUT)
+   -- Component Declaration for the Unit Under Test (UUT)
  
-    COMPONENT toplevel
+    COMPONENT papilio_pro_dram_toplevel
      generic (
      -- generics are set by the simulator only, when instaniating from a testbench
      -- when Design is physically build than the defaults are used
@@ -75,12 +75,12 @@ ARCHITECTURE behavior OF tb_soc IS
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: toplevel 
+   uut: papilio_pro_dram_toplevel 
      generic map (
-        --RamFileName => "../../lxp32soc/riscv/software/cpptest/ledsim.hex",
+        RamFileName => "../../lxp32soc/software/wildfire/test/ledsim.hex",
         --RamFileName => "../../lxp32soc/riscv/software/cpptest/counter.hex",
          --RamFileName => "../../lxp32-cpu/riscv_test/branch.hex",
-        RamFileName => "../../lxp32-cpu/riscv_test/trap01.hex",
+        --RamFileName => "../../lxp32-cpu/riscv_test/trap01.hex",
         --RamFileName => "../../lxp32-cpu/riscv_test/mult.hex",
         mode=>"H",
         Swapbytes=>false
@@ -117,5 +117,6 @@ BEGIN
 
       wait;
    end process;
+
 
 END;

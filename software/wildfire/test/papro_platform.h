@@ -1,0 +1,8 @@
+#ifndef PAPRO_PLATFORM_H
+#define PAPRO_PLATFORM_H
+
+
+#define UART_BASE 0x08000000
+#define GPIO_BASE 0x04000000
+
+#endif

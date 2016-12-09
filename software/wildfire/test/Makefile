@@ -1,6 +1,9 @@
 
 .PHONY: all clean
 
+PLATFORM=PAPRO
+LINKDEF=wildfboot.ld
+
 TARGET_PREFIX ?= riscv32-unknown-elf
 TARGET_CC := $(TARGET_PREFIX)-gcc
 TARGET_LD := $(TARGET_PREFIX)-gcc
@@ -8,13 +11,15 @@ TARGET_SIZE := $(TARGET_PREFIX)-size
 TARGET_OBJCOPY := $(TARGET_PREFIX)-objcopy
 HEXDUMP ?= hexdump
 
+
 TARGET_CFLAGS += -m32 -march=RV32IM -Wall -Os -g  -fomit-frame-pointer \
           -msoft-float\
 	-ffreestanding -fno-builtin  \
-	-Wall -Werror=implicit-function-declaration
+	-Wall -Werror=implicit-function-declaration \
+	-D$(PLATFORM)
 
 TARGET_LDFLAGS += -m32 -march=RV32I -nostartfiles  \
-	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-Tlxp.ld \
+	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-T$(LINKDEF) \
 	-Wl,--gc-sections
 
 all: ledslow.hex counter.hex memtest.hex ledsim.hex mult.hex
