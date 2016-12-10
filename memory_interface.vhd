@@ -103,7 +103,8 @@ begin
            SIZE => ram_size,
            RamFileName => RamFileName,
            mode => mode,
-           Swapbytes => Swapbytes            
+           Swapbytes =>  Swapbytes   
+                      
         )
            
       PORT MAP(

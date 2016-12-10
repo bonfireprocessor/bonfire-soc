@@ -1,3 +1,8 @@
+-- Memory module to be synthesized as block RAM
+-- can be initalized with a file 
+
+-- New "single process" version as recommended by Xilinx XST user guide
+
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -22,7 +27,8 @@ entity MainMemory is
 	          mode : string := "B";
              ADDR_WIDTH: integer;
              SIZE : integer;
-             Swapbytes : boolean -- SWAP Bytes in RAM word in low byte first order to use data2mem  
+             Swapbytes : boolean; -- SWAP Bytes in RAM word in low byte first order to use data2mem  
+             EnableSecondPort : boolean := true -- enable inference of the second port 
             );
     Port ( DBOut : out  STD_LOGIC_VECTOR (31 downto 0);
            DBIn : in  STD_LOGIC_VECTOR (31 downto 0);
@@ -39,13 +45,16 @@ entity MainMemory is
               );
 end MainMemory;
 
+
 architecture Behavioral of MainMemory is
 
-type tRam is array (0 to SIZE) of STD_LOGIC_VECTOR (31 downto 0);
+--attribute keep_hierarchy : string;
+--attribute keep_hierarchy of Behavioral: architecture is "TRUE";
+
+
+type tRam is array (0 to SIZE-1) of STD_LOGIC_VECTOR (31 downto 0);
 subtype tWord is std_logic_vector(31 downto 0);
 
-
-signal b0,b1,b2,b3 : STD_LOGIC_VECTOR(7 downto 0); -- bytes 
 
 signal DOA,DOB,DIA : tWord;
 signal WEA : STD_LOGIC_VECTOR (3 downto 0);  
@@ -60,6 +69,8 @@ end;
 
 
 -- Design time code...
+-- Initalizes block RAM form memory file
+-- The file does either contain hex values (mode = 'H') or binary values
  
 impure function InitFromFile  return tRam is
 FILE RamFile : text is in RamFileName;
@@ -90,12 +101,34 @@ end function;
 
 signal ram : tRam:= InitFromFile;
 
+attribute ram_style: string; -- for Xilinx
+attribute ram_style of ram: signal is "block";
+
+
+-- helper component
+-- for byte swapping 
+COMPONENT byte_swapper
+	PORT(
+		din : IN std_logic_vector(31 downto 0);          
+		dout : OUT std_logic_vector(31 downto 0)
+		);
+	END COMPONENT;
 
 
 
 begin
+   
    swap: if SwapBytes generate
-     DIA<=DoSwapBytes(DBIn);
+     -- The Data input bus is swapped with the helper component to avoid
+     -- confusing the xilinx synthesis tools which sometimes infer distributed
+     -- instead of block RAM
+     -- It is important that the byte swapper component has set the keep_hierarchy attribute to TRUE
+     -- this will make the byte swap of the input bus invisble for the RAM inference      
+     bs: byte_swapper PORT MAP(
+		din => DBIn,
+		dout => DIA
+	  );
+          
      DBOut<=DoSwapBytes(DOA);
      DBOutB<=DoSwapBytes(DOB);
      WEA(0)<=WREN(3);
@@ -113,55 +146,39 @@ begin
    end generate;   
 
 
-
-  process(WEA,DIA,ram,AdrBus) 
-  
-  
-  begin
-    if WEA(0) = '1' then
-         b0 <= DIA(7 downto 0);
-     else
-         b0 <= ram(to_integer(unsigned(AdrBus)))(7 downto 0);
-    end if;     
-
-    if WEA(1) = '1' then
-           b1 <= DIA(15 downto 8);
-     else
-            b1 <= ram(to_integer(unsigned(AdrBus)))(15 downto 8);
-    end if;      
-
-    if WEA(2) = '1' then
-        b2 <= DIA(23 downto 16);
-     else
-        b2 <= ram(to_integer(unsigned(AdrBus)))(23 downto 16);
-    end if; 
-     
-    if WEA(3) = '1' then
-        b3 <= DIA(31 downto 24);
-     else
-        b3 <= ram(to_integer(unsigned(AdrBus)))(31 downto 24);
-    end if;      
-  end process;
   
 
   process(clk) 
+  variable adr : integer;
   begin
     if rising_edge(clk) then 
-        if ena = '1' then         
-           ram(to_integer(unsigned(AdrBus))) <= b3 & b2 & b1 & b0;                      
-           DOA <= ram(to_integer(unsigned(AdrBus)));
+        if ena = '1' then
+           adr :=  to_integer(unsigned(AdrBus));       
+
+           for i in 0 to 3 loop
+             if WEA(i) = '1' then
+                ram(adr)((i+1)*8-1 downto i*8)<= DIA((i+1)*8-1 downto i*8);
+             end if;
+           end loop;
+                         
+           DOA <= ram(adr);
+                    
          end if;    
      end if;
   
   end process;
   
-  process(clkb) begin
-     if rising_edge(clkb) then
-         if ENB='1' then
-            DOB <= ram(to_integer(unsigned(AdrBusB)));
-          end if;    
-      end if;
-  end process;
+  portb:  if EnableSecondPort generate
   
+     process(clkb) begin
+        if rising_edge(clkb) then
+            if ENB='1' then
+               DOB <= ram(to_integer(unsigned(AdrBusB)));
+             end if;    
+         end if;
+     end process;
+     
+  end generate;
    
 end Behavioral;
+
