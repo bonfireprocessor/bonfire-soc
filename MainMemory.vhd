@@ -48,8 +48,8 @@ end MainMemory;
 
 architecture Behavioral of MainMemory is
 
---attribute keep_hierarchy : string;
---attribute keep_hierarchy of Behavioral: architecture is "TRUE";
+attribute keep_hierarchy : string;
+attribute keep_hierarchy of Behavioral: architecture is "TRUE";
 
 
 type tRam is array (0 to SIZE-1) of STD_LOGIC_VECTOR (31 downto 0);

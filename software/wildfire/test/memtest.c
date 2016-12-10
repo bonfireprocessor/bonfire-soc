@@ -1,7 +1,9 @@
 #include "wildfire.h"
 #include "uart.h"
 
-char *pRAM = (char*)0x30000000; // Memory address
+//char *pRAM = (char*)0x30000000; // Memory address
+
+extern void* _rombase;
 
 #define MEMSIZE 4096*4; // Mem Size in Bytes
 
@@ -32,7 +34,7 @@ int i;
 
 int main()
 {
-uint32_t *memptr=0;
+uint32_t *memptr= &_rombase;
 char c;
 
    setDivisor(16);
@@ -45,7 +47,7 @@ char c;
      writestr("\r\npress r to restart with address 0, any other key to continue\r\n");
      c=readchar();
      if ( (c=='r') || (c=='R'))
-       memptr=0;
+       memptr= &_rombase;
      else
        memptr+=64;
    }

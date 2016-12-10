@@ -10,3 +10,9 @@
 *.mem
 *.bak
 /spartan9/soc_bd.bmm
+/platform/wildfire_papro/soc_bd.bmm
+/spartan9/memtest.vhd
+/platform/wildfire_papro/wf_ledslow.vhd
+/platform/wildfire_papro/wf_memtest.vhd
+/platform/wildfire_papro/wf_mult.vhd
+/platform/wildfire_papro/ledslow.vhd

@@ -6,14 +6,15 @@ MEMORY
 
 ENTRY(_start)
 
+
 SECTIONS
 {
+  _rombase = 0x0C000000;
   
   . = 0x0;
-  rombase = .;
+  
   .text : {
     *(.init)
-    . = 0x100;
     *(.text.*)
 
    } > RAM
@@ -26,6 +27,6 @@ SECTIONS
      end = .; _end = .; __end = .;
       
  } > RAM
-  stacktop = 0x0C003ff0; 
+  _stacktop = 0x0C003ff0; 
 
 }

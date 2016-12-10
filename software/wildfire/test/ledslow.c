@@ -1,8 +1,8 @@
 #include <stdint.h>
-
+#include "platform.h"
 // Test program intented for work on real hardware
 
-volatile uint8_t *gpioadr=(uint8_t *)0x10000000;
+volatile uint8_t *gpioadr=(uint8_t *)GPIO_BASE;
 
 int main(int argc,char ** argv) {
 

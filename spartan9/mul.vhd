@@ -5,7 +5,7 @@
 --
 -- Command: data2mem -bm soc_bd.bmm -bd ../riscv/software/cpptest/mult.elf -bt /home/thomas/riscv/ise/lxp32riscv/toplevel.bit -o hb mul
 --
--- Created on Sunday December 04, 2016 - 07:13:59 pm, from:
+-- Created on Saturday December 10, 2016 - 12:59:10 am, from:
 --
 --     Map file     - soc_bd.bmm
 --     Data file(s) - ../riscv/software/cpptest/mult.elf
@@ -20,7 +20,7 @@ use ieee.std_logic_1164;
 package mul_pkg_ram is
 
 -- BRAM 0 in address space [0x00000000:0x000007FF], bit lane [31:0]
--- INST Firmware/ram/Mram_ram1 LOC = RAMB16_X0Y14;
+-- INST Firmware/ram/Mram_ram1 LOC = RAMB16_X0Y12;
 	constant Firmware_ram_Mram_ram1_INIT_00  : bit_vector(0 to 255) := x"06112E2301000513F801011300008067F130257300C000EFFF01011300004137";
 	constant Firmware_ram_Mram_ram1_INIT_01  : bit_vector(0 to 255) := x"00001537188000EF290000EF06912A2307412423073126230721282306812C23";
 	constant Firmware_ram_Mram_ram1_INIT_02  : bit_vector(0 to 255) := x"000019B700B0041316C000EF00001A371F0000EFFC5FF0EF1C4000EFA8050513";
@@ -87,7 +87,7 @@ package mul_pkg_ram is
 	constant Firmware_ram_Mram_ram1_INIT_3F  : bit_vector(0 to 255) := x"00054C630005CA63000082930002806740A00533F89FF0EF0000829340B005B3";
 
 -- BRAM 0 in address space [0x00000800:0x00000FFF], bit lane [31:0]
--- INST Firmware/ram/Mram_ram2 LOC = RAMB16_X0Y18;
+-- INST Firmware/ram/Mram_ram2 LOC = RAMB16_X0Y16;
 	constant Firmware_ram_Mram_ram2_INIT_00  : bit_vector(0 to 255) := x"40B00533F61FF0EF40A00533FE0558E340B005B30002806700058513F79FF0EF";
 	constant Firmware_ram_Mram_ram2_INIT_01  : bit_vector(0 to 255) := x"000000180000002800020D1B01017C0100527A01000000000000001000028067";
 	constant Firmware_ram_Mram_ram2_INIT_02  : bit_vector(0 to 255) := x"0A98099708960795069464059304920389028850400E4400000000F0FFFFF890";
@@ -154,7 +154,7 @@ package mul_pkg_ram is
 	constant Firmware_ram_Mram_ram2_INIT_3F  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 
 -- BRAM 0 in address space [0x00001000:0x000017FF], bit lane [31:0]
--- INST Firmware/ram/Mram_ram3 LOC = RAMB16_X0Y20;
+-- INST Firmware/ram/Mram_ram3 LOC = RAMB16_X0Y10;
 	constant Firmware_ram_Mram_ram3_INIT_00  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram3_INIT_01  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram3_INIT_02  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
@@ -221,7 +221,7 @@ package mul_pkg_ram is
 	constant Firmware_ram_Mram_ram3_INIT_3F  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 
 -- BRAM 0 in address space [0x00001800:0x00001FFF], bit lane [31:0]
--- INST Firmware/ram/Mram_ram4 LOC = RAMB16_X0Y12;
+-- INST Firmware/ram/Mram_ram4 LOC = RAMB16_X1Y12;
 	constant Firmware_ram_Mram_ram4_INIT_00  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram4_INIT_01  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram4_INIT_02  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
@@ -288,7 +288,7 @@ package mul_pkg_ram is
 	constant Firmware_ram_Mram_ram4_INIT_3F  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 
 -- BRAM 0 in address space [0x00002000:0x000027FF], bit lane [31:0]
--- INST Firmware/ram/Mram_ram5 LOC = RAMB16_X0Y26;
+-- INST Firmware/ram/Mram_ram5 LOC = RAMB16_X0Y8;
 	constant Firmware_ram_Mram_ram5_INIT_00  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram5_INIT_01  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram5_INIT_02  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
@@ -355,7 +355,7 @@ package mul_pkg_ram is
 	constant Firmware_ram_Mram_ram5_INIT_3F  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 
 -- BRAM 0 in address space [0x00002800:0x00002FFF], bit lane [31:0]
--- INST Firmware/ram/Mram_ram6 LOC = RAMB16_X0Y22;
+-- INST Firmware/ram/Mram_ram6 LOC = RAMB16_X0Y20;
 	constant Firmware_ram_Mram_ram6_INIT_00  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram6_INIT_01  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram6_INIT_02  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
@@ -422,7 +422,7 @@ package mul_pkg_ram is
 	constant Firmware_ram_Mram_ram6_INIT_3F  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 
 -- BRAM 0 in address space [0x00003000:0x000037FF], bit lane [31:0]
--- INST Firmware/ram/Mram_ram7 LOC = RAMB16_X0Y24;
+-- INST Firmware/ram/Mram_ram7 LOC = RAMB16_X0Y14;
 	constant Firmware_ram_Mram_ram7_INIT_00  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram7_INIT_01  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram7_INIT_02  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
@@ -489,7 +489,7 @@ package mul_pkg_ram is
 	constant Firmware_ram_Mram_ram7_INIT_3F  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 
 -- BRAM 0 in address space [0x00003800:0x00003FFF], bit lane [31:0]
--- INST Firmware/ram/Mram_ram8 LOC = RAMB16_X0Y16;
+-- INST Firmware/ram/Mram_ram8 LOC = RAMB16_X0Y18;
 	constant Firmware_ram_Mram_ram8_INIT_00  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram8_INIT_01  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";
 	constant Firmware_ram_Mram_ram8_INIT_02  : bit_vector(0 to 255) := x"0000000000000000000000000000000000000000000000000000000000000000";

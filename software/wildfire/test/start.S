@@ -2,10 +2,10 @@
 .global _start
 .global get_impid
 .extern main
-.extern stacktop
+.extern _stacktop
 
 _start:
-la sp,stacktop // set SP to end of RAM
+la sp,_stacktop // set SP to end of RAM
 jal main
 
 

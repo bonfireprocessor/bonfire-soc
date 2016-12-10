@@ -61,7 +61,7 @@ ARCHITECTURE behavior OF tb_papro IS
    --Inputs
    signal sysclk_32m : std_logic := '0';
    signal I_RESET : std_logic := '0';
-   signal uart0_rxd : std_logic := '0';
+   signal uart0_rxd : std_logic := '1';
 
  	--Outputs
    signal leds : std_logic_vector(3 downto 0);
@@ -77,7 +77,8 @@ BEGIN
 	-- Instantiate the Unit Under Test (UUT)
    uut: papilio_pro_dram_toplevel 
      generic map (
-        RamFileName => "../../lxp32soc/software/wildfire/test/ledsim.hex",
+        --RamFileName => "../../lxp32soc/software/wildfire/test/ledsim.hex",
+        RamFileName => "../../lxp32soc/software/wildfire/test/memtest.hex",
         --RamFileName => "../../lxp32soc/riscv/software/cpptest/counter.hex",
          --RamFileName => "../../lxp32-cpu/riscv_test/branch.hex",
         --RamFileName => "../../lxp32-cpu/riscv_test/trap01.hex",

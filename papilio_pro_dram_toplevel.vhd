@@ -147,7 +147,7 @@ begin
 
 
 
-    Inst_lxp32u_top: entity work.lxp32c_top
+    cpu_top: entity work.lxp32c_top
      generic map (
        USE_RISCV => true,
        MUL_ARCH => "spartandsp",
@@ -207,6 +207,11 @@ begin
         wbs_dat_o =>  mem_dat_rd,
         wbs_cti_i => ibus_cti_o
         
+--        lli_re_i => '0',
+--		  lli_adr_i => (others => '0'),
+--		  lli_dat_o => open,
+--		  lli_busy_o => open
+        
     );
 
 
@@ -235,7 +240,12 @@ begin
         wbs_adr_i =>  mem2_adr,
         wbs_dat_i =>  mem2_dat_wr,
         wbs_dat_o =>  mem2_dat_rd,
-        wbs_cti_i => ibus_cti_o        
+       wbs_cti_i => ibus_cti_o 
+        
+   --    lli_re_i => '0',
+	--	  lli_adr_i => (others => '0'),
+	--	  lli_dat_o => open,
+	--	  lli_busy_o => open        
     );
 
 
@@ -344,14 +354,14 @@ begin
 
 
           -- DRAM at address   0x00000000-0x03FFFFFF
-        m0_cyc_o =>  mem_cyc,
-        m0_stb_o =>  mem_stb,
-        m0_we_o =>    mem_we,
-        m0_sel_o =>  mem_sel,
-        m0_ack_i =>  mem_ack,
-        m0_adr_o =>  mem_adr,
-        m0_dat_o =>  mem_dat_wr,
-        m0_dat_i =>  mem_dat_rd,
+        m0_cyc_o =>  mem2_cyc,
+        m0_stb_o =>  mem2_stb,
+        m0_we_o =>    mem2_we,
+        m0_sel_o =>  mem2_sel,
+        m0_ack_i =>  mem2_ack,
+        m0_adr_o =>  mem2_adr,
+        m0_dat_o =>  mem2_dat_wr,
+        m0_dat_i =>  mem2_dat_rd,
         --IO Space 1: 0x04000000-0x07FFFFF (Decode 0000 01)
         m1_cyc_o => gpio_cyc,
         m1_stb_o => gpio_stb,
@@ -373,14 +383,14 @@ begin
         m2_dat_i => lpc_dat_rd,   
         
          --ROM/Block RAM: 0x0C000000-0x0FFFFFFF
-        m3_cyc_o =>  mem2_cyc,
-        m3_stb_o =>  mem2_stb,
-        m3_we_o =>   mem2_we,
-        m3_sel_o =>  mem2_sel,
-        m3_ack_i =>  mem2_ack,
-        m3_adr_o =>  mem2_adr,
-        m3_dat_o =>  mem2_dat_wr,
-        m3_dat_i =>  mem2_dat_rd           
+        m3_cyc_o =>  mem_cyc,
+        m3_stb_o =>  mem_stb,
+        m3_we_o =>   mem_we,
+        m3_sel_o =>  mem_sel,
+        m3_ack_i =>  mem_ack,
+        m3_adr_o =>  mem_adr,
+        m3_dat_o =>  mem_dat_wr,
+        m3_dat_i =>  mem_dat_rd           
     );
 
 
