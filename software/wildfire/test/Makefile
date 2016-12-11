@@ -22,7 +22,7 @@ TARGET_LDFLAGS += -m32 -march=RV32I -nostartfiles  \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-T$(LINKDEF) \
 	-Wl,--gc-sections
 
-all: ledslow.hex counter.hex memtest.hex ledsim.hex mult.hex
+all: ledslow.hex counter.hex memtest.hex ledsim.hex mult.hex memsim.hex sim_hello.hex
 
 
 
@@ -53,10 +53,15 @@ ledsim.elf: start.o ledsim.o
 counter.elf: start.o uart.o counter.o
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o counter.o uart.o
 
-memtest.elf: start.o memtest.o uart.o
-	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o memtest.o uart.o
+memtest.elf: start.o memtest.o uart.o mempattern.o
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o memtest.o uart.o mempattern.o
 
 mult.elf : start.o mult.o uart.o
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o mult.o uart.o
-
+	
+memsim.elf: start.o memsim.o  mempattern.o
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o memsim.o  mempattern.o
+	
+sim_hello.elf: start.o uart.o sim_hello.o
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o uart.o sim_hello.o
 

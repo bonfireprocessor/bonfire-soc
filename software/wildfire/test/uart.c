@@ -79,9 +79,27 @@ static volatile int c;
   while (c++ < 1000000);
 }
 
+
+void _setDivisor(uint32_t divisor){
+    
+   uartadr[UART_DIVISOR]=divisor; // Set Baudrate divisor  
+}
+
 void setDivisor(uint32_t divisor)
 {
-    uartadr[UART_DIVISOR]=divisor; // Set Baudrate divisor
+    _setDivisor(divisor);   
     wait();
+}
+
+uint32_t getDivisor()
+{
+  return uartadr[UART_DIVISOR];    
+}
+
+void setBaudRate(int baudrate) {
+// sample_clk = (f_clk / (baudrate * 16)) - 1
+// (96.000.000 / (115200*16))-1 = 51,08    
+    
+   setDivisor(SYSCLK / (baudrate*16) -1); 
 }
 

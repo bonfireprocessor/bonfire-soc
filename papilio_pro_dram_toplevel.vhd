@@ -35,7 +35,8 @@ generic (
      -- when Design is physically build than the defaults are used
      RamFileName : string := ""; -- only used when UseBRAMPrimitives is false
       mode : string := "H";       -- only used when UseBRAMPrimitives is false
-     Swapbytes : boolean := true -- SWAP Bytes in RAM word in low byte first order to use data2mem
+     Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
+     FakeDRAM : boolean := false -- Use Block RAM instead of DRAM
    );
    port(
         sysclk_32m  : in  std_logic;
@@ -52,10 +53,17 @@ generic (
 
         -- LED on Papilio Pro Board
         led1 : out std_logic
-
-        -- UART1 signals:
-        --uart1_txd : out std_logic;
-        --uart1_rxd : in  std_logic
+        -- DRAM
+--        DRAM_ADDR   : OUT   STD_LOGIC_VECTOR (12 downto 0);
+--        DRAM_BA      : OUT   STD_LOGIC_VECTOR (1 downto 0);
+--        DRAM_CAS_N   : OUT   STD_LOGIC;
+--        DRAM_CKE      : OUT   STD_LOGIC;
+--        DRAM_CLK      : OUT   STD_LOGIC;
+--        DRAM_CS_N   : OUT   STD_LOGIC;
+--        DRAM_DQ      : INOUT STD_LOGIC_VECTOR(15 downto 0);
+--        DRAM_DQM      : OUT   STD_LOGIC_VECTOR(1 downto 0);
+--        DRAM_RAS_N   : OUT   STD_LOGIC;
+--        DRAM_WE_N    : OUT   STD_LOGIC  
     );
 end papilio_pro_dram_toplevel;
 
@@ -68,9 +76,12 @@ architecture Behavioral of papilio_pro_dram_toplevel is
 
 
 signal clk32Mhz,   -- buffered osc clock
-       clk : std_logic;  -- logical CPU clock
+       clk,        -- logical CPU clock
+       
+       uart_clk    : std_logic;  
+       
 
-signal reset,res1  : std_logic;
+signal reset,res1,res2  : std_logic;
 
 -- Instruction Bus
 --signal  ib_data : std_logic_vector(31 downto 0);
@@ -137,6 +148,20 @@ signal uart_dat_rd,uart_dat_wr : std_logic_vector(7 downto 0);
 signal uart_adr : std_logic_vector(7 downto 0);
 
 signal irq_i : std_logic_vector(7 downto 0);
+
+  COMPONENT clkgen
+	PORT(
+		clkin : IN std_logic;
+		rstin : IN std_logic;          
+		clkout : OUT std_logic;
+		clkout1 : OUT std_logic;
+		clkout2 : OUT std_logic;
+		clk32Mhz_out : OUT std_logic;
+		rstout : OUT std_logic
+		);
+	END COMPONENT;
+  
+ signal sysclk_sram_we, sysclk_sram_wen, clkgen_rst: std_logic;  
 
 
 
@@ -219,7 +244,9 @@ begin
 -- Will later be the DRAM
 -- for the moment we just use also block RAM here 
 
-    DRAM_fake:  entity work.wbs_memory_interface
+sram: if FakeDRAM generate
+
+    DRAM:  entity work.wbs_memory_interface
     GENERIC MAP (
         ram_adr_width => ram_adr_width,
         ram_size => ram_size,
@@ -241,13 +268,10 @@ begin
         wbs_dat_i =>  mem2_dat_wr,
         wbs_dat_o =>  mem2_dat_rd,
        wbs_cti_i => ibus_cti_o 
-        
-   --    lli_re_i => '0',
-	--	  lli_adr_i => (others => '0'),
-	--	  lli_dat_o => open,
-	--	  lli_busy_o => open        
+               
     );
 
+end generate;
 
      Inst_gpio: entity work.gpio 
      
@@ -394,7 +418,20 @@ begin
     );
 
 
--- Clock Buffer
+-- Clock
+
+ clkgen_inst: clkgen
+  port map (
+    clkin   => clk32Mhz,
+    rstin   => '0'  ,
+    clkout  => clk,
+    clkout1  => sysclk_sram_we,
+    clkout2  => sysclk_sram_wen,
+	 clk32Mhz_out => uart_clk,
+    rstout  => clkgen_rst
+  );
+
+
 
  -- Input buffering
   --------------------------------------
@@ -404,17 +441,18 @@ begin
     I => sysclk_32m);
 
 
-    clk<=clk32Mhz; -- for the moment we set the CPU clock to the OSC.
+ --   clk<=clk32Mhz; -- for the moment we set the CPU clock to the OSC.
 
 
     process(clk) begin
       if rising_edge(clk) then
          res1<= I_RESET;
-         reset <= res1;
+         res2 <= res1;
       end if;
 
     end process;
 
+    reset <= res2 or clkgen_rst;
 
 end Behavioral;
 

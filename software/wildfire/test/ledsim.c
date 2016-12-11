@@ -1,6 +1,5 @@
-#include <stdint.h>
 
-#include "platform.h"
+#include "wildfire.h"
 
 // GPIO Test Program intented for use with the simulator
 

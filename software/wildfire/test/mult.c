@@ -38,7 +38,8 @@ int main() {
 char buff[80];
 int x,y;
 
-  setDivisor(16);
+  //setDivisor(16);
+  setBaudRate(115200);
   newline();
   writestr("Processor ID: ");
   writeHex(get_impid());

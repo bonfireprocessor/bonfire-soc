@@ -78,7 +78,8 @@ BEGIN
    uut: papilio_pro_dram_toplevel 
      generic map (
         --RamFileName => "../../lxp32soc/software/wildfire/test/ledsim.hex",
-        RamFileName => "../../lxp32soc/software/wildfire/test/memtest.hex",
+        --RamFileName => "../../lxp32soc/software/wildfire/test/memtest.hex",
+        RamFileName => "../../lxp32soc/software/wildfire/test/sim_hello.hex",
         --RamFileName => "../../lxp32soc/riscv/software/cpptest/counter.hex",
          --RamFileName => "../../lxp32-cpu/riscv_test/branch.hex",
         --RamFileName => "../../lxp32-cpu/riscv_test/trap01.hex",
