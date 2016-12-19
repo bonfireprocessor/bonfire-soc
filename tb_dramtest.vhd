@@ -2,10 +2,10 @@
 -- Company: 
 -- Engineer:
 --
--- Create Date:   21:21:25 12/06/2016
+-- Create Date:   23:29:26 12/18/2016
 -- Design Name:   
--- Module Name:   /home/thomas/riscv/lxp32soc/tb_papro.vhd
--- Project Name:  lxp32riscv
+-- Module Name:   /home/thomas/riscv/lxp32soc/tb_dramtest.vhd
+-- Project Name:  wildfire
 -- Target Device:  
 -- Tool versions:  
 -- Description:   
@@ -32,12 +32,12 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY tb_papro IS
-END tb_papro;
+ENTITY tb_dramtest IS
+END tb_dramtest;
  
-ARCHITECTURE behavior OF tb_papro IS 
+ARCHITECTURE behavior OF tb_dramtest IS 
  
-   -- Component Declaration for the Unit Under Test (UUT)
+    -- Component Declaration for the Unit Under Test (UUT)
  
     COMPONENT papilio_pro_dram_toplevel
      generic (
@@ -54,30 +54,67 @@ ARCHITECTURE behavior OF tb_papro IS
          leds : OUT  std_logic_vector(3 downto 0);
          uart0_txd : OUT  std_logic;
          uart0_rxd : IN  std_logic;
-         led1 : OUT  std_logic
+         led1 : OUT  std_logic;
+         SDRAM_CLK : OUT  std_logic;
+         SDRAM_CKE : OUT  std_logic;
+         SDRAM_CS : OUT  std_logic;
+         SDRAM_RAS : OUT  std_logic;
+         SDRAM_CAS : OUT  std_logic;
+         SDRAM_WE : OUT  std_logic;
+         SDRAM_DQM : OUT  std_logic_vector(1 downto 0);
+         SDRAM_ADDR : OUT  std_logic_vector(12 downto 0);
+         SDRAM_BA : OUT  std_logic_vector(1 downto 0);
+         SDRAM_DATA : INOUT  std_logic_vector(15 downto 0)
         );
     END COMPONENT;
+    
+   COMPONENT sdram_model
+	PORT(
+		CLK : IN std_logic;
+		CKE : IN std_logic;
+		CS_N : IN std_logic;
+		RAS_N : IN std_logic;
+		CAS_N : IN std_logic;
+		WE_N : IN std_logic;
+		BA : IN std_logic_vector(1 downto 0);
+		DQM : IN std_logic_vector(1 downto 0);
+		ADDR : IN std_logic_vector(12 downto 0);       
+		DQ : INOUT std_logic_vector(15 downto 0)
+		);
+	END COMPONENT;
     
 
    --Inputs
    signal sysclk_32m : std_logic := '0';
    signal I_RESET : std_logic := '0';
-   signal uart0_rxd : std_logic := '1';
+   signal uart0_rxd : std_logic := '0';
+
+	--BiDirs
+   signal SDRAM_DATA : std_logic_vector(15 downto 0);
 
  	--Outputs
    signal leds : std_logic_vector(3 downto 0);
    signal uart0_txd : std_logic;
    signal led1 : std_logic;
-   -- No clocks detected in port list. Replace <clock> below with 
-   -- appropriate port name 
- 
-   constant clock_period : time := 31.25ns;
+   signal SDRAM_CLK : std_logic;
+   signal SDRAM_CKE : std_logic;
+   signal SDRAM_CS : std_logic;
+   signal SDRAM_RAS : std_logic;
+   signal SDRAM_CAS : std_logic;
+   signal SDRAM_WE : std_logic;
+   signal SDRAM_DQM : std_logic_vector(1 downto 0);
+   signal SDRAM_ADDR : std_logic_vector(12 downto 0);
+   signal SDRAM_BA : std_logic_vector(1 downto 0);
+
+   -- Clock period definitions
+  constant clock_period : time := 31.25ns;
  
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
    uut: papilio_pro_dram_toplevel 
-     generic map (
+   
+    generic map (
         --RamFileName => "../../lxp32soc/software/wildfire/test/ledsim.hex",
         RamFileName => "../../lxp32soc/software/wildfire/test/memsim.hex",
         --RamFileName => "../../lxp32soc/software/wildfire/test/sim_hello.hex",
@@ -86,20 +123,46 @@ BEGIN
         --RamFileName => "../../lxp32-cpu/riscv_test/trap01.hex",
         --RamFileName => "../../lxp32-cpu/riscv_test/mult.hex",
         mode=>"H",
-        FakeDRAM=>true,
+        FakeDRAM=>false,
         Swapbytes=>false
      )     
    
-     PORT MAP (
+   
+   PORT MAP (
           sysclk_32m => sysclk_32m,
           I_RESET => I_RESET,
           leds => leds,
           uart0_txd => uart0_txd,
           uart0_rxd => uart0_rxd,
-          led1 => led1
+          led1 => led1,
+          SDRAM_CLK => SDRAM_CLK,
+          SDRAM_CKE => SDRAM_CKE,
+          SDRAM_CS => SDRAM_CS,
+          SDRAM_RAS => SDRAM_RAS,
+          SDRAM_CAS => SDRAM_CAS,
+          SDRAM_WE => SDRAM_WE,
+          SDRAM_DQM => SDRAM_DQM,
+          SDRAM_ADDR => SDRAM_ADDR,
+          SDRAM_BA => SDRAM_BA,
+          SDRAM_DATA => SDRAM_DATA
         );
+        
+        
+  Inst_sdram_model: sdram_model 
+    PORT MAP(
+		CLK => SDRAM_CLK,
+		CKE => SDRAM_CKE,
+		CS_N => SDRAM_CS,
+		RAS_N => SDRAM_RAS,
+		CAS_N => SDRAM_CAS,
+		WE_N => SDRAM_WE,
+		BA => SDRAM_BA,
+		DQM => SDRAM_DQM,
+		ADDR => SDRAM_ADDR,
+		DQ => SDRAM_DATA
+	);        
 
-   -- Clock process definitions
+    -- Clock process definitions
    clock_process :process
    begin
 		sysclk_32m <= '0';
@@ -121,6 +184,5 @@ BEGIN
 
       wait;
    end process;
-
 
 END;

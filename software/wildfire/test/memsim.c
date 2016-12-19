@@ -6,7 +6,8 @@ int main()
 {
    while(1) {
     
-     writepattern(DRAM_BASE,4096);    
+     writepattern(DRAM_BASE,8);
+     verifypattern(DRAM_BASE,8);    
     
    } 
     

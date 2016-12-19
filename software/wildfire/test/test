@@ -28,16 +28,14 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=4
-FILE_NAME_0=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.c;0;4
-FILE_NAME_1=585;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
-FILE_NAME_2=349;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fwildfboot.ld;0;4
-FILE_NAME_3=209;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fledsim.c;0;4
-FILE_NAME_4=285;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fledsim.lst;0;4
-FILE_NAME_5=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fledsim.dmp;0;4
-FILE_NAME_6=136;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fstart.S;0;4
-FILE_NAME_7=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fledsim.hex;0;4
-FILE_NAME_8=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fpapro_platform.h;0;4
+current_page=6
+FILE_NAME_0=672;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
+FILE_NAME_1=47;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fwildfboot.ld;0;4
+FILE_NAME_2=484;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.c;0;4
+FILE_NAME_3=840;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fuart.c;0;4
+FILE_NAME_4=180;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fpapro_platform.h;0;4
+FILE_NAME_5=980;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmemtest.c;0;4
+FILE_NAME_6=122;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmemtest.lst;0;4
 
 [VTE]
 last_dir=/home/thomas/riscv/lxp32-cpu/riscv_test

@@ -52,18 +52,19 @@ generic (
         uart0_rxd : in  std_logic :='1';
 
         -- LED on Papilio Pro Board
-        led1 : out std_logic
-        -- DRAM
---        DRAM_ADDR   : OUT   STD_LOGIC_VECTOR (12 downto 0);
---        DRAM_BA      : OUT   STD_LOGIC_VECTOR (1 downto 0);
---        DRAM_CAS_N   : OUT   STD_LOGIC;
---        DRAM_CKE      : OUT   STD_LOGIC;
---        DRAM_CLK      : OUT   STD_LOGIC;
---        DRAM_CS_N   : OUT   STD_LOGIC;
---        DRAM_DQ      : INOUT STD_LOGIC_VECTOR(15 downto 0);
---        DRAM_DQM      : OUT   STD_LOGIC_VECTOR(1 downto 0);
---        DRAM_RAS_N   : OUT   STD_LOGIC;
---        DRAM_WE_N    : OUT   STD_LOGIC  
+        led1 : out std_logic;
+   
+       -- SDRAM signals
+      SDRAM_CLK     : out   STD_LOGIC;
+      SDRAM_CKE     : out   STD_LOGIC;
+      SDRAM_CS      : out   STD_LOGIC;
+      SDRAM_RAS     : out   STD_LOGIC;
+      SDRAM_CAS     : out   STD_LOGIC;
+      SDRAM_WE      : out   STD_LOGIC;
+      SDRAM_DQM     : out   STD_LOGIC_VECTOR( 1 downto 0);
+      SDRAM_ADDR    : out   STD_LOGIC_VECTOR(12 downto 0);
+      SDRAM_BA      : out   STD_LOGIC_VECTOR( 1 downto 0);
+      SDRAM_DATA    : inout STD_LOGIC_VECTOR(15 downto 0)
     );
 end papilio_pro_dram_toplevel;
 
@@ -244,7 +245,7 @@ begin
 -- Will later be the DRAM
 -- for the moment we just use also block RAM here 
 
-sram: if FakeDRAM generate
+simulate_dram: if FakeDRAM generate
 
     DRAM:  entity work.wbs_memory_interface
     GENERIC MAP (
@@ -267,11 +268,46 @@ sram: if FakeDRAM generate
         wbs_adr_i =>  mem2_adr,
         wbs_dat_i =>  mem2_dat_wr,
         wbs_dat_o =>  mem2_dat_rd,
-       wbs_cti_i => ibus_cti_o 
+        wbs_cti_i => ibus_cti_o 
                
     );
 
 end generate;
+
+dram: if not FakeDRAM generate
+
+DRAM: entity work.wbs_sdram_interface 
+generic map (
+  wbs_adr_high => mem2_adr'high
+)
+PORT MAP(
+		 clk_i =>clk ,
+       rst_i => reset,
+       wbs_cyc_i =>  mem2_cyc,
+       wbs_stb_i =>  mem2_stb,
+       wbs_we_i =>    mem2_we,
+       wbs_sel_i =>  mem2_sel,
+       wbs_ack_o =>  mem2_ack,
+       wbs_adr_i =>  mem2_adr,
+       wbs_dat_i =>  mem2_dat_wr,
+       wbs_dat_o =>  mem2_dat_rd,
+       wbs_cti_i => ibus_cti_o, 
+		
+		SDRAM_CLK => SDRAM_CLK,
+		SDRAM_CKE => SDRAM_CKE,
+		SDRAM_CS => SDRAM_CS,
+		SDRAM_RAS => SDRAM_RAS,
+		SDRAM_CAS => SDRAM_CAS,
+		SDRAM_WE => SDRAM_WE,
+		SDRAM_DQM => SDRAM_DQM,
+		SDRAM_ADDR => SDRAM_ADDR,
+		SDRAM_BA => SDRAM_BA,
+		SDRAM_DATA => SDRAM_DATA
+	);
+
+
+end generate;
+
 
      Inst_gpio: entity work.gpio 
      
