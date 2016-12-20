@@ -16,3 +16,6 @@
 /platform/wildfire_papro/wf_memtest.vhd
 /platform/wildfire_papro/wf_mult.vhd
 /platform/wildfire_papro/ledslow.vhd
+/platform/wildfire_papro/bram_verify.vhd
+/platform/wildfire_papro/dram_verify.vhd
+/platform/wildfire_papro/dram_verify16.vhd
