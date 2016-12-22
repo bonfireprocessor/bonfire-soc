@@ -123,30 +123,22 @@ generic map (
    wbs_dat_o <= data_out;
    cmd_address <= wbs_adr_i(cmd_address'high+2 downto 2);
    
+   wbs_ack_o <= (wbs_stb_i and wbs_we_i and cmd_ready) -- Immediatly ack write
+                or (wbs_stb_i and read_pending and data_out_ready); -- Ack read when data ready     
+   
    process(clk_i) begin
      if rising_edge(clk_i) then
         if rst_i = '1' then
           read_pending <= '0';
-          wbs_ack_o <= '0';
         elsif wbs_cyc_i='1' and wbs_stb_i = '1'  then
-          if cmd_ready='1' then 
-             if wbs_we_i='1' then -- Write command ?
-               wbs_ack_o <= '1'; -- we can immediatly ack...
-             else -- read command
-               if data_out_ready='1' then
-                   wbs_ack_o <= '1'; 
-               else                
-                 read_pending <= '1';
-               end if;  
-             end if;
+          if cmd_ready='1' and wbs_we_i='0' then --read command 
+             read_pending <= '1';            
           end if;
-          -- Wait for read to complete to set wbs_ack
+          -- Wait for read to complete
           if read_pending='1' and data_out_ready='1' then
-             wbs_ack_o <= '1';
              read_pending <= '0';             
           end if;     
-        else -- at end of cycle deassert wbs_ack  
-          wbs_ack_o <= '0';    
+        else               
           read_pending <= '0'; -- just to be sure in case a read cycle was aborted before data arrived           
         end if;
           

@@ -10,6 +10,10 @@ TARGET_LD := $(TARGET_PREFIX)-gcc
 TARGET_SIZE := $(TARGET_PREFIX)-size
 TARGET_OBJCOPY := $(TARGET_PREFIX)-objcopy
 HEXDUMP ?= hexdump
+DATA2MEM = /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/data2mem
+
+PROJROOT = ../../..
+TOPLEVEL = ~/riscv/ise/bonfire/papilio_pro_dram_toplevel.bit
 
 
 TARGET_CFLAGS += -m32 -march=RV32IM -Wall -Os -g  -fomit-frame-pointer \
@@ -22,9 +26,10 @@ TARGET_LDFLAGS += -m32 -march=RV32I -nostartfiles  \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-T$(LINKDEF) \
 	-Wl,--gc-sections
 
-all: ledslow.hex counter.hex memtest.hex ledsim.hex mult.hex memsim.hex sim_hello.hex
+all: ledslow.hex counter.hex memtest.hex ledsim.hex mult.hex memsim.hex sim_hello.hex dram_codesim.hex
 
-
+%.bit: %.elf
+	$(DATA2MEM) -bm $(PROJROOT)/platform/wildfire_papro/soc_bd.bmm  -bd $< -bt $(TOPLEVEL)  -o hb $(basename $@)
 
 %.o : %.S
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $<
@@ -64,4 +69,8 @@ memsim.elf: start.o memsim.o  mempattern.o
 	
 sim_hello.elf: start.o uart.o sim_hello.o
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o uart.o sim_hello.o
+	
+dram_codesim.elf : start.o dram_codesim.o
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o dram_codesim.o
+	
 

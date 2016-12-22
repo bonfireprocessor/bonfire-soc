@@ -23,7 +23,7 @@ uint16_t magic = PATTERN;
 
    for(i=0;i<len;i++) {
       
-     pmem[i] = ((uint32_t)&pmem[i] /*<< 16  */ & 0x0ffff0000) | magic;
+     pmem[i] = ((uint32_t)&pmem[i] << 16   & 0x0ffff0000) | magic;
      magic = rotate4(magic);       
    } 
     
@@ -40,7 +40,7 @@ int errcount=0;
 
    for(i=0;i<len;i++) {
      
-     comp =  ((uint32_t)&pmem[i] /*<< 16  */ & 0x0ffff0000 ) | magic; 
+     comp =  ((uint32_t)&pmem[i] << 16   & 0x0ffff0000 ) | magic; 
      if (pmem[i] != comp) errcount++;
      magic = rotate4(magic);       
    }     

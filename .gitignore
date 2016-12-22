@@ -19,3 +19,6 @@
 /platform/wildfire_papro/bram_verify.vhd
 /platform/wildfire_papro/dram_verify.vhd
 /platform/wildfire_papro/dram_verify16.vhd
+/software/wildfire/test/memtest.vhd
+/software/wildfire/test/mult.vhd
+/spartan9/mult.vhd
