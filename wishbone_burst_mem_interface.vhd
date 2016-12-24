@@ -78,7 +78,7 @@ begin
   process (clk_i) is
   begin
 	if rising_edge(clk_i) then  
-      if ack_read='1' and wbs_cti_i="111" then -- clear ack at enf of burst
+      if ack_read='1' and wbs_cti_i="111" then -- clear ack at end of burst
         ack_read <= '0';
       else        
 		  ack_read<= is_read;
