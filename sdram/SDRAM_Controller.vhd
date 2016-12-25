@@ -37,7 +37,8 @@ entity SDRAM_Controller is
       sdram_column_bits   : natural;
       sdram_startup_cycles: natural;
       cycles_per_refresh  : natural;
-      delay_line_length : natural := 5 -- TH: configure data capture delay line length in clock cycles
+      delay_line_length : natural := 5; -- TH: configure data capture delay line length in clock cycles
+      hold_row_open : boolean := true -- TH: Hold active row open after read/write until a refresh is needed
     );
     Port ( clk           : in  STD_LOGIC;
            reset         : in  STD_LOGIC;
@@ -123,6 +124,7 @@ architecture Behavioral of SDRAM_Controller is
                       s_open_in_2, s_open_in_1,
                       s_write_1, s_write_2, s_write_3,
                       s_read_1,  s_read_2,  s_read_3,  s_read_4,  
+                      s_active_idle, -- TH: Idle Wait with row active until a new transaction or refresh comes in
                       s_precharge
                       );
 
@@ -423,8 +425,7 @@ main_proc: process(clk)
                   end if;
                end if;
 
-            when s_read_4 => 
-               state <= s_precharge;
+            when s_read_4 =>               
                -- can we do back-to-back read?
                if forcing_refresh = '0' and got_transaction = '1' and can_back_to_back = '1' then
                   if save_wr = '0' then
@@ -434,6 +435,12 @@ main_proc: process(clk)
                   else
                      state <= s_open_in_2; -- we have to wait for the read data to come back before we swutch the bus into HiZ
                   end if;
+               else 
+                 if hold_row_open then  --NEW TH: Go in into s_active_ilde state 
+                   state <= s_active_idle;
+                 else
+                   state <= s_precharge;
+                 end if;  
                end if;
 
             ------------------------------------------------------------------
@@ -492,6 +499,29 @@ main_proc: process(clk)
                state           <= s_idle_in_3;
                iob_command     <= CMD_PRECHARGE;
                iob_address(prefresh_cmd) <= '1'; -- A10 actually matters - it selects all banks or just one
+
+            -------------------------------------------------------------------
+            --  TH: Wait with open row
+            -------------------------------------------------------------------               
+            when s_active_idle =>   
+               if forcing_refresh='1' or pending_refresh='1' or
+                  (got_transaction='1' and can_back_to_back='0') then
+                  -- when either refresh is needed or next transaction is in a different row
+                  -- go to precharge
+                  state <= s_precharge;
+                elsif got_transaction='1' then -- Transaction in same row
+                  if save_wr='1' then
+                    state <= s_write_1;
+                    iob_dq_hiz  <= '0';
+                    iob_data    <= save_data_in(15 downto 0); -- get the DQ bus out of HiZ early
+                  else
+                    state <= s_read_1;
+                    iob_dq_hiz <= '1';
+                  end if;
+                  ready_for_new   <= '1'; -- we will be ready for a new transaction next cycle!
+                  got_transaction <= '0';                  
+                end if;                
+               
 
             -------------------------------------------------------------------
             -- We should never get here, but if we do then reset the memory
