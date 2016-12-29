@@ -117,6 +117,7 @@ BEGIN
     generic map (
         --RamFileName => "../../lxp32soc/software/wildfire/test/ledsim.hex",
         RamFileName => "../../lxp32soc/software/wildfire/test/dram_codesim.hex",
+        --RamFileName => "../../lxp32soc/software/wildfire/test/memsim.hex",
         --RamFileName => "../../lxp32soc/software/wildfire/test/sim_hello.hex",
         --RamFileName => "../../lxp32soc/riscv/software/cpptest/counter.hex",
          --RamFileName => "../../lxp32-cpu/riscv_test/branch.hex",

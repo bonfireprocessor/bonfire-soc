@@ -35,6 +35,7 @@ entity papro_bus is
         s0_adr_i: in std_logic_vector(31 downto 2);
         s0_dat_i: in std_logic_vector(31 downto 0);
         s0_dat_o: out std_logic_vector(31 downto 0);
+        s0_cti_i: in std_logic_vector(2 downto 0);
 
         s1_cyc_i: in std_logic;
         s1_stb_i: in std_logic;
@@ -44,6 +45,7 @@ entity papro_bus is
         s1_adr_i: in std_logic_vector(31 downto 2);
         s1_dat_i: in std_logic_vector(31 downto 0);
         s1_dat_o: out std_logic_vector(31 downto 0);
+        s1_cti_i: in std_logic_vector(2 downto 0);
 
         m0_cyc_o: out std_logic;
         m0_stb_o: out std_logic;
@@ -53,6 +55,7 @@ entity papro_bus is
         m0_adr_o: out std_logic_vector(25 downto 2);
         m0_dat_o: out std_logic_vector(31 downto 0);
         m0_dat_i: in std_logic_vector(31 downto 0);
+        m0_cti_o: out std_logic_vector(2 downto 0);
 
         m1_cyc_o: out std_logic;
         m1_stb_o: out std_logic;
@@ -62,6 +65,7 @@ entity papro_bus is
         m1_adr_o: out std_logic_vector(25 downto 2);
         m1_dat_o: out std_logic_vector(31 downto 0);
         m1_dat_i: in std_logic_vector(31 downto 0);
+        m1_cti_o: out std_logic_vector(2 downto 0);
 
         m2_cyc_o: out std_logic;
         m2_stb_o: out std_logic;
@@ -71,6 +75,7 @@ entity papro_bus is
         m2_adr_o: out std_logic_vector(25 downto 2);
         m2_dat_o: out std_logic_vector(31 downto 0);
         m2_dat_i: in std_logic_vector(31 downto 0);
+        m2_cti_o: out std_logic_vector(2 downto 0);
 
         m3_cyc_o: out std_logic;
         m3_stb_o: out std_logic;
@@ -79,7 +84,8 @@ entity papro_bus is
         m3_ack_i: in std_logic;
         m3_adr_o: out std_logic_vector(25 downto 2);
         m3_dat_o: out std_logic_vector(31 downto 0);
-        m3_dat_i: in std_logic_vector(31 downto 0)
+        m3_dat_i: in std_logic_vector(31 downto 0);
+        m3_cti_o: out std_logic_vector(2 downto 0)
     );
 end entity;
 
@@ -98,6 +104,7 @@ signal we_mux: std_logic;
 signal sel_mux: std_logic_vector(3 downto 0);
 signal adr_mux: std_logic_vector(31 downto 2);
 signal wdata_mux: std_logic_vector(31 downto 0);
+signal cti_mux : std_logic_vector(2 downto 0);
 
 signal ack_mux: std_logic;
 signal rdata_mux: std_logic_vector(31 downto 0);
@@ -153,6 +160,12 @@ wdata_mux_gen: for i in wdata_mux'range generate
         (s1_dat_i(i) and grant(1));
 end generate;
 
+cti_mux_gen: for i in cti_mux'range generate
+   cti_mux(i) <= (s0_cti_i(i) and grant(0)) or 
+                 (s1_cti_i(i) and grant(1));  
+
+end generate;
+
 -- MASTER->SLAVE DEMUX
 
 select_slave<="00001" when adr_mux(31 downto 26)="000000" else
@@ -167,6 +180,7 @@ m0_we_o<=we_mux;
 m0_sel_o<=sel_mux;
 m0_adr_o<=adr_mux(m0_adr_o'range);
 m0_dat_o<=wdata_mux;
+m0_cti_o <= cti_mux;
 
 m1_cyc_o<=cyc_mux and select_slave(1);
 m1_stb_o<=stb_mux and select_slave(1);
@@ -174,6 +188,7 @@ m1_we_o<=we_mux;
 m1_sel_o<=sel_mux;
 m1_adr_o<=adr_mux(m1_adr_o'range);
 m1_dat_o<=wdata_mux;
+m1_cti_o <= cti_mux;
 
 m2_cyc_o<=cyc_mux and select_slave(2);
 m2_stb_o<=stb_mux and select_slave(2);
@@ -181,6 +196,7 @@ m2_we_o<=we_mux;
 m2_sel_o<=sel_mux;
 m2_adr_o<=adr_mux(m2_adr_o'range);
 m2_dat_o<=wdata_mux;
+m2_cti_o <= cti_mux;
 
 m3_cyc_o<=cyc_mux and select_slave(3);
 m3_stb_o<=stb_mux and select_slave(3);
@@ -188,6 +204,7 @@ m3_we_o<=we_mux;
 m3_sel_o<=sel_mux;
 m3_adr_o<=adr_mux(m3_adr_o'range);
 m3_dat_o<=wdata_mux;
+m3_cti_o <= cti_mux;
 
 -- SLAVE->MASTER MUX
 

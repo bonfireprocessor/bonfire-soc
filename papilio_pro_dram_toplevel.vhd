@@ -34,9 +34,10 @@ generic (
      -- generics are set by the simulator only, when instaniating from a testbench
      -- when Design is physically build than the defaults are used
      RamFileName : string := ""; -- only used when UseBRAMPrimitives is false
-      mode : string := "H";       -- only used when UseBRAMPrimitives is false
+     mode : string := "H";       -- only used when UseBRAMPrimitives is false
      Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
-     FakeDRAM : boolean := false -- Use Block RAM instead of DRAM
+     FakeDRAM : boolean := false; -- Use Block RAM instead of DRAM
+     InstructionBurstSize : natural := 8
    );
    port(
         sysclk_32m  : in  std_logic;
@@ -117,6 +118,7 @@ signal mem_cyc,mem_stb,mem_we,mem_ack : std_logic;
 signal mem_sel :  std_logic_vector(3 downto 0);
 signal mem_dat_rd,mem_dat_wr : std_logic_vector(31 downto 0);
 signal mem_adr : std_logic_vector(slave_adr_high downto 2);
+signal mem_cti : std_logic_vector(2 downto 0);
 
 
 -- Memory 2 bus
@@ -124,6 +126,7 @@ signal mem2_cyc,mem2_stb,mem2_we,mem2_ack : std_logic;
 signal mem2_sel :  std_logic_vector(3 downto 0);
 signal mem2_dat_rd,mem2_dat_wr : std_logic_vector(31 downto 0);
 signal mem2_adr : std_logic_vector(slave_adr_high downto 2);
+signal mem2_cti : std_logic_vector(2 downto 0);
 
 -- gpio bus
 signal gpio_cyc,gpio_stb,gpio_we,gpio_ack : std_logic;
@@ -179,8 +182,8 @@ begin
        MUL_ARCH => "spartandsp",
        REG_RAM_STYLE => "block",
        START_ADDR => reset_adr(31 downto 2),
-       IBUS_BURST_SIZE => 4,
-       IBUS_PREFETCH_SIZE => 8
+       IBUS_BURST_SIZE =>InstructionBurstSize,
+       IBUS_PREFETCH_SIZE =>InstructionBurstSize
      )
 
      PORT MAP(
@@ -231,7 +234,7 @@ begin
         wbs_adr_i =>  mem_adr,
         wbs_dat_i =>  mem_dat_wr,
         wbs_dat_o =>  mem_dat_rd,
-        wbs_cti_i => ibus_cti_o
+        wbs_cti_i => mem_cti
         
 --        lli_re_i => '0',
 --		  lli_adr_i => (others => '0'),
@@ -268,7 +271,7 @@ simulate_dram: if FakeDRAM generate
         wbs_adr_i =>  mem2_adr,
         wbs_dat_i =>  mem2_dat_wr,
         wbs_dat_o =>  mem2_dat_rd,
-        wbs_cti_i => ibus_cti_o 
+        wbs_cti_i => mem2_cti
                
     );
 
@@ -278,20 +281,21 @@ dram: if not FakeDRAM generate
 
 DRAM: entity work.wbs_sdram_interface 
 generic map (
-  wbs_adr_high => mem2_adr'high
+  wbs_adr_high => mem2_adr'high,
+  wbs_burst_length => InstructionBurstSize
 )
 PORT MAP(
 		 clk_i =>clk ,
        rst_i => reset,
        wbs_cyc_i =>  mem2_cyc,
        wbs_stb_i =>  mem2_stb,
-       wbs_we_i =>    mem2_we,
+       wbs_we_i =>   mem2_we,
        wbs_sel_i =>  mem2_sel,
        wbs_ack_o =>  mem2_ack,
        wbs_adr_i =>  mem2_adr,
        wbs_dat_i =>  mem2_dat_wr,
        wbs_dat_o =>  mem2_dat_rd,
-       wbs_cti_i => ibus_cti_o, 
+       wbs_cti_i =>  mem2_cti, 
 		
 		SDRAM_CLK => SDRAM_CLK,
 		SDRAM_CKE => SDRAM_CKE,
@@ -400,6 +404,7 @@ end generate;
         s0_adr_i => dbus_adr_o,
         s0_dat_i => dbus_dat_o,
         s0_dat_o => dbus_dat_i,
+        s0_cti_i => "000",
 
         -- Instruction Bus
 
@@ -411,6 +416,7 @@ end generate;
         s1_adr_i => ibus_adr_o,
         s1_dat_i => (others=>'0'),
         s1_dat_o => ibus_dat_i,
+        s1_cti_i => ibus_cti_o,
 
 
           -- DRAM at address   0x00000000-0x03FFFFFF
@@ -422,6 +428,7 @@ end generate;
         m0_adr_o =>  mem2_adr,
         m0_dat_o =>  mem2_dat_wr,
         m0_dat_i =>  mem2_dat_rd,
+        m0_cti_o =>  mem2_cti,
         --IO Space 1: 0x04000000-0x07FFFFF (Decode 0000 01)
         m1_cyc_o => gpio_cyc,
         m1_stb_o => gpio_stb,
@@ -450,7 +457,8 @@ end generate;
         m3_ack_i =>  mem_ack,
         m3_adr_o =>  mem_adr,
         m3_dat_o =>  mem_dat_wr,
-        m3_dat_i =>  mem_dat_rd           
+        m3_dat_i =>  mem_dat_rd,
+        m3_cti_o =>  mem_cti        
     );
 
 

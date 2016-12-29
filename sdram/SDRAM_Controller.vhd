@@ -489,7 +489,11 @@ main_proc: process(clk)
                   end if;
                else
                   iob_dq_hiz         <= '1';
-                  state              <= s_precharge;
+                  if hold_row_open then  --NEW TH: Go in into s_active_ilde state 
+                     state <= s_active_idle;
+                   else
+                     state <= s_precharge;
+                 end if;  
                end if;
 
             -------------------------------------------------------------------

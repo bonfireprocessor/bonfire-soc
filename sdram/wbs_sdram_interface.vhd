@@ -93,7 +93,9 @@ architecture Behavioral of wbs_sdram_interface is
    signal burst : std_logic := '0'; -- Wishbone burst active
    signal burstfetch_enable : std_logic;  -- prefetching enable in burst
    signal adr_reg : std_logic_vector(sdram_address_width-2 downto 0); -- for Burst mode support
-   signal burst_counter : unsigned(log2(wbs_burst_length)-1 downto 0);
+   signal burst_counter : unsigned(log2(wbs_burst_length)-1 downto 0) := (others=>'0');
+   signal pending_read_counter : unsigned(log2(wbs_burst_length)-1 downto 0) := (others=>'0');
+
 
 begin
 
@@ -190,33 +192,35 @@ generic map (
         elsif  wbs_stb_i='0' or  wbs_cti_i="111" then
           burst <= '0';        
         end if;
-	end if;
-   
+	  end if;
    end process;
+   
+   
+   -- Pending read counter 
+  process(clk_i) is
+  variable next_counter : unsigned(pending_read_counter'high downto 0);
+  begin
+    if rising_edge(clk_i) then
+      if rst_i = '1' then
+        next_counter := to_unsigned(0,pending_read_counter'length);
+        read_pending <= '0';
+      else
+        if is_read='1' and cmd_ready='1' and cmd_enable='1' then
+          next_counter := pending_read_counter + 1;
+          read_pending <= '1';
+        end if;  
+        if read_pending = '1' and data_out_ready = '1' then 
+          next_counter := next_counter - 1;
+          if next_counter = 0 then
+            read_pending <= '0';
+          end if;  
+        end if;  
+      end if;  
+      pending_read_counter <= next_counter;
+    end if;
+  end process;
    
       
-   process(clk_i) begin
-     if rising_edge(clk_i) then
-        if rst_i = '1' then
-          read_pending <= '0';
-        elsif wbs_cyc_i='1' and wbs_stb_i = '1'  then
-          if cmd_ready='1' and wbs_we_i='0' then --read command 
-             read_pending <= '1';            
-          end if;
-          -- Wait for read to complete
-          if read_pending='1' and data_out_ready='1' then
-             if burst = '0' or (burst = '1' and wbs_cti_i="111") then
-               read_pending <= '0';
-             end if;  
-          end if;     
-        else               
-          read_pending <= '0'; -- just to be sure in case a read cycle was aborted before data arrived           
-        end if;
-          
-     end if;
-   
-   end process;
-   
    
 end Behavioral;
 
