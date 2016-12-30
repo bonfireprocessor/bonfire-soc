@@ -93,8 +93,9 @@ architecture Behavioral of wbs_sdram_interface is
    signal burst : std_logic := '0'; -- Wishbone burst active
    signal burstfetch_enable : std_logic;  -- prefetching enable in burst
    signal adr_reg : std_logic_vector(sdram_address_width-2 downto 0); -- for Burst mode support
-   signal burst_counter : unsigned(log2(wbs_burst_length)-1 downto 0) := (others=>'0');
-   signal pending_read_counter : unsigned(log2(wbs_burst_length)-1 downto 0) := (others=>'0');
+   signal burst_counter : unsigned(log2(wbs_burst_length)-1 downto 0) := (others=>'0'); -- Countdown for WBS burst cycles
+   signal pending_read_counter : unsigned(log2(wbs_burst_length)-1 downto 0) := (others=>'0'); -- Outstanding reads
+   signal orphan_read : std_logic := '0'; -- Flag: outstanding reads after burst cycle has ended
 
 
 begin
@@ -143,7 +144,7 @@ generic map (
   
    
    wbs_ack_o <= (wbs_stb_i and wbs_we_i and cmd_ready) -- Immediatly ack write
-                or (wbs_stb_i and read_pending and data_out_ready); -- Ack read when data ready     
+                or (wbs_stb_i and read_pending and data_out_ready and not orphan_read); -- Ack read when data ready and no orphan outstanding reads   
    
    
    is_read <= wbs_cyc_i and wbs_stb_i and not wbs_we_i;
@@ -204,6 +205,7 @@ generic map (
       if rst_i = '1' then
         next_counter := to_unsigned(0,pending_read_counter'length);
         read_pending <= '0';
+        orphan_read <= '0';
       else
         if is_read='1' and cmd_ready='1' and cmd_enable='1' then
           next_counter := pending_read_counter + 1;
@@ -213,6 +215,9 @@ generic map (
           next_counter := next_counter - 1;
           if next_counter = 0 then
             read_pending <= '0';
+            orphan_read <= '0';
+          elsif wbs_stb_i='0' or  wbs_cti_i="111" then -- WBS cycle ended while still pending reads
+            orphan_read <= '1'; -- set orphan read flag          
           end if;  
         end if;  
       end if;  
