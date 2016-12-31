@@ -9,6 +9,7 @@ void writechar(char c);
 char readchar();
 
 void writestr(char *p);
+void write_console(char *p);
 
 void writeHex(uint32_t v);
 

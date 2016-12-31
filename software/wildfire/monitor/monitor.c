@@ -19,13 +19,7 @@ char buff[128];
              ptf->cause,ptf->epc,*((uint32_t*)ptf->epc));
 
     writestr(buff);
-    
-    //writestr("Trap cause: ");
-    //writeHex(ptf->cause);
-    //writestr(" Trap pc: ");
-    //writeHex(ptf->epc);
-    //writestr(" Trap opcode: ");
-    //writeHex(*((uint32_t*)ptf->epc) );
+    dump_tf(ptf);
     ptf->epc+=4; 
     return ptf;
 }
@@ -48,9 +42,9 @@ char buff[128];
    writestr("\r\n");
    
    // Test trap Handler
-   do_break();
+   do_break((uint32_t)buff,1,2,3);
    writestr("\r\nReturn from break");
-   do_break();
+   do_break(sizeof(trapframe_t),5,6);
    
    while(1); 
     

@@ -48,8 +48,18 @@ void writestr(char *p)
     writechar(*p);
     p++;
   }
+}
 
 
+// Like Writestr but expands \n to \n\r
+void write_console(char *p)
+{
+   while (*p) {
+    if (*p=='\n') writechar('\r');   
+    writechar(*p);
+    p++;
+  } 
+    
 }
 
 void writeHex(uint32_t v)

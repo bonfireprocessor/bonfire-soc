@@ -54,7 +54,7 @@ all: monitor.hex
 
 
 	
-monitor.elf : start.o monitor.o uart.o snprintf.o string.o
-	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o monitor.o uart.o snprintf.o string.o
+monitor.elf : start.o monitor.o uart.o snprintf.o string.o console.o
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o monitor.o uart.o snprintf.o string.o console.o
 	
 

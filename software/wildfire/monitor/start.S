@@ -101,7 +101,7 @@ _start:
 
 la sp,_stacktop // set SP to end of RAM
 csrw mscratch,sp // save stacktop as trap handler stack
-addi sp,sp,-512 // save 512 Bytes for Trap handler stack
+addi sp,sp,-1024 // save 1024 Bytes for Trap handler stack
 
 la a1, __trap
 csrw mtvec,a1
