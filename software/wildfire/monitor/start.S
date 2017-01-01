@@ -56,9 +56,9 @@
   STORE  t2,34*REGBYTES(x2)
   STORE  t3,35*REGBYTES(x2)
 
-  # get faulting insn, if it wasn't a fetch-related trap
-  li x5,-1
-  STORE x5,36*REGBYTES(x2)
+  # get faulting insn
+  lw t4,(t1)
+  STORE t4,36*REGBYTES(x2)
 1:
   .endm
 

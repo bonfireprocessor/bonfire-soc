@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <ctype.h>
 #include "uart.h"
 #include "monitor.h"
 
@@ -44,7 +45,7 @@ void dump_tf(trapframe_t* tf)
     for(int j = 0; j < 4; j++)
       printk("%s %lx%c",regnames[i+j],tf->gpr[i+j],j < 3 ? ' ' : '\n');
   }
-  printk("pc %lx va %lx insn       %x sr %lx\n", tf->epc, tf->badvaddr,
+  printk("pc %lx va %lx op %x sr %lx\n", tf->epc, tf->badvaddr,
          (uint32_t)tf->insn, tf->status);
 }
 
@@ -63,3 +64,45 @@ void kassert_fail(const char* s)
   register uintptr_t ra asm ("ra");
   do_panic("assertion failed @ %p: %s\n", ra, s);
 }
+
+
+
+void read_hex_str(char *b,int sz) {
+char c;
+char *p;
+
+   p=b;
+   c=toupper(readchar());
+   while (c!='\r') {
+
+      if (c==8 && p>b) {// backspace
+        p--;
+        writestr("\b \b");
+      } else if ( ((c>='0' && c<='9') || (c>='A' && c<='F')) && p<(b+sz-1) ) {
+          *p++=c;
+          writechar(c); // echo
+      }
+      else
+        writechar('\a'); // beep
+
+      c=toupper(readchar());
+   }
+   *p='\0';
+
+}
+
+
+void hex_dump(void *mem,int numWords)
+{
+uint32_t *pmem = mem;
+int i;
+
+    for(i=0;i<numWords;i++) {
+      if ((i % 4)==0) { // Write Memory address for every four words
+        printk("\n%lx    ",(uint32_t)&pmem[i]);  
+        
+      }
+      printk("%lx ",pmem[i]);
+    }
+}
+

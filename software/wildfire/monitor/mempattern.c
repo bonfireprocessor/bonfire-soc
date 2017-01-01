@@ -1,4 +1,4 @@
-#include "wildfire.h"
+#include "bonfire.h"
 
 #define PATTERN 0x0ABCD
 
