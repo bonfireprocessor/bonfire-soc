@@ -28,20 +28,27 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=1
-FILE_NAME_0=1054;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmemtest.c;0;4
-FILE_NAME_1=61;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.c;0;4
-FILE_NAME_2=86;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fplatform%2Fbonfire.h;0;4
-FILE_NAME_3=475;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2FMakefile;0;4
-FILE_NAME_4=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fplatform%2FPAPRO%2Fplatform.h;0;4
-FILE_NAME_5=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.lst;0;4
+current_page=6
+FILE_NAME_0=1645;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.c;0;4
+FILE_NAME_1=16318;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.lst;0;4
+FILE_NAME_2=116;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fuart.h;0;4
+FILE_NAME_3=74;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fbits.h;0;4
+FILE_NAME_4=1740;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fconsole.c;0;4
+FILE_NAME_5=20981;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.dmp;0;4
+FILE_NAME_6=2967;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fxmodem.c;0;4
+FILE_NAME_7=287;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fsnprintf.c;0;4
+FILE_NAME_8=332;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fxmodem.h;0;4
+FILE_NAME_9=39;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Ftype.h;0;4
+FILE_NAME_10=1014;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2FMakefile;0;4
+FILE_NAME_11=1288;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fuart.c;0;4
+FILE_NAME_12=55;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmempattern.c;0;4
 
 [VTE]
 last_dir=/home/thomas/riscv/lxp32soc/software/wildfire/monitor
 
 [build-menu]
 CFT_00_LB=_Compile
-CFT_00_CM=make %e.o
+CFT_00_CM=make -B  %e.o
 CFT_00_WD=
 CFT_01_LB=_Build
 CFT_01_CM=make %e.elf

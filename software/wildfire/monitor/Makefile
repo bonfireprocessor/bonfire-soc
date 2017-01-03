@@ -22,7 +22,7 @@ LINKDEF=$(PLATFORMDIR)/$(PLATFORM)/firmware.ld
 
 
 
-TARGET_CFLAGS += -m32 -march=$(ARCH) -Wall -Os -g  -fomit-frame-pointer \
+TARGET_CFLAGS += -m32 -march=$(ARCH) -Wall -Og -g  -fomit-frame-pointer \
           -msoft-float\
 	-ffreestanding -fno-builtin  \
 	-Wall -Werror=implicit-function-declaration \
@@ -54,7 +54,7 @@ all: monitor.hex
 
 
 	
-monitor.elf : start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o
-	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o
+monitor.elf : start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xmodem.o
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xmodem.o
 	
 

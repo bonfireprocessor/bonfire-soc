@@ -10,13 +10,17 @@
 #include "monitor.h"
 #include "mempattern.h"
 #include "console.h"
+#include "xmodem.h"
 
 
+extern uint8_t *gpioadr;
 
 
 trapframe_t* trap_handler(trapframe_t *ptf)
 {
-
+    
+    *gpioadr = (ptf->cause & 0x0f); // Show trap cause on LEDs
+    
     printk("\nTrap cause: %lx\n",ptf->cause);
     dump_tf(ptf);
     ptf->epc+=4; 
@@ -24,8 +28,19 @@ trapframe_t* trap_handler(trapframe_t *ptf)
 }
 
 
+void xm_send(u8 c)
+{
+  writechar((char)c);  
+}
 
 
+void test_dram()
+{
+   printk("\nTesting %d Kilobytes of DRAM...\n",DRAM_SIZE/1024);
+   writepattern((void*)DRAM_BASE,DRAM_SIZE/4);
+   printk("Verifying...\n");
+   printk("Found %d errors\n",verifypattern((void*)DRAM_BASE,DRAM_SIZE/4));    
+}
 
 
 int main()
@@ -34,18 +49,17 @@ char cmd;
 char buff[8];
 uint32_t dumpaddress=DRAM_BASE;
 uint32_t arg1;
+long recv_bytes=0;
+//int c;
+//long lasterror=0;
     
    setBaudRate(115200);
   
-   printk("\nBonfire Boot Monitor 0.1b\n");
+   printk("\nBonfire Boot Monitor 0.1d\n");
  
    printk("Processor ID: %lx \nUART Divisor: %d\n",get_impid(),getDivisor());
-   printk("Testing %d Kilobytes of DRAM...\n",DRAM_SIZE/1024);
-   writepattern((void*)DRAM_BASE,DRAM_SIZE/4);
-   printk("Verifying...\n");
-   printk("Found %d errors\n",verifypattern((void*)DRAM_BASE,DRAM_SIZE/4));
    
-   
+   xmodem_init(xm_send,wait_receive);
    
    
    // Test trap Handler
@@ -68,6 +82,27 @@ uint32_t arg1;
          hex_dump((void*)dumpaddress,64);
          dumpaddress+=64;  
          break;
+       case 'X': // XModem receive command
+         write_console("Wait for receive...\n");
+     
+         recv_bytes=xmodem_receive((char*)DRAM_BASE,DRAM_SIZE);
+         *gpioadr= (recv_bytes<0?(recv_bytes*-1)|0x08:0x0f) & 0x0f;  
+         
+         //do {
+           //c=wait_receive(1);  
+         //}while(c == -1 );
+             
+         break;  
+       case 'E':
+         if (recv_bytes>=0) 
+           printk("\n%ld Bytes received\n",recv_bytes);
+         else {
+           printk("\nXmodem Error %ld occured\n",recv_bytes);    
+         }    
+         break;  
+       case 'T':
+         test_dram();
+         break;           
        default:
          writechar('\a'); // beep...  
       }     

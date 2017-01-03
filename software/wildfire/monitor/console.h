@@ -1,6 +1,8 @@
 #ifndef __CONSOLE_H
 #define __CONSOLE_H
 
+#include <stdint.h>
+#include "monitor.h"
 
 void printk(const char* s, ...);
 void dump_tf(trapframe_t* tf);

@@ -3,7 +3,7 @@
 #define PATTERN 0x0ABCD
 
 
-inline uint16_t rotate4(uint16_t p)
+inline  uint16_t rotate4(uint16_t p)
 {
 uint32_t t = p  >> 12; // shift uppper nibble to lowest nibble  
   

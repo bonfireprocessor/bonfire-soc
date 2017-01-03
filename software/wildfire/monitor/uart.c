@@ -13,6 +13,8 @@
 //--! |--------------------|--------------------------------------------|
 
 #include <stdint.h>
+#include <stdbool.h>
+
 
 #include "platform.h"
 
@@ -25,7 +27,7 @@
 
 volatile uint8_t *uartadr=(uint8_t *)UART_BASE;
 
-
+volatile uint8_t *gpioadr=(uint8_t *)GPIO_BASE;
 
 
 void writechar(char c)
@@ -40,6 +42,28 @@ char readchar()
   while (uartadr[UART_STATUS] & 0x01); // Wait while receive buffer empty
   return uartadr[UART_RECV];
 }
+
+
+int wait_receive(long timeout)
+{
+uint8_t status;
+bool forever = timeout < 0;
+    
+  do {
+    status=uartadr[UART_STATUS];
+    *gpioadr = status & 0x0f; // show status on LEDs
+    if ((status & 0x01)==0) { // receive buffer not empty?
+       *gpioadr=0; // clear LEDs  
+      return uartadr[UART_RECV];
+    } else
+      timeout--;  
+      
+  }while(forever ||  timeout>=0 );
+  *gpioadr=0; // clear LEDs
+  return -1;    
+
+}
+
 
 
 void writestr(char *p)

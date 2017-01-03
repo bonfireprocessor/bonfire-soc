@@ -8,6 +8,8 @@ void writechar(char c);
 
 char readchar();
 
+int wait_receive(long timeout);
+
 void writestr(char *p);
 void write_console(char *p);
 
