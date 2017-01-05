@@ -19,7 +19,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 library STD;
 use STD.textio.all;
---use STD.textutil.all;
+
 
 
 entity MainMemory is
