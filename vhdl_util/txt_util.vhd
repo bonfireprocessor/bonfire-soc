@@ -9,10 +9,15 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+USE ieee.numeric_std.ALL;
+
+library std;
 use std.textio.all;
 
 
 package txt_util is
+
+subtype t_byte is std_logic_vector(7 downto 0);
 
     -- prints a message to the screen
     procedure print(text: string);
@@ -73,6 +78,8 @@ package txt_util is
     -- converts a string into std_logic_vector
     function to_std_logic_vector(s: string) return std_logic_vector; 
 
+    -- converts a characters ASCII code to a byte (std_logic_vector 7 downto 0)
+    function char_to_ascii_byte(c: character) return t_byte;
 
   
     -- file I/O
@@ -584,6 +591,11 @@ procedure str_write(file out_file: TEXT;
    end loop;               
                      
 end str_write;
+
+function char_to_ascii_byte(c: character) return t_byte is
+begin
+  return std_logic_vector(to_unsigned(character'pos(c),8)); 
+end;
 
 
 

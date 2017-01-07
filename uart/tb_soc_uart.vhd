@@ -2,6 +2,9 @@
 -- (c) Kristian Klomsten Skordal 2014 - 2016 <kristian.skordal@wafflemail.net>
 -- Report bugs and issues on <https://github.com/skordal/potato/issues>
 
+
+-- TH: Enhanced UART Testbench to test UART receiver more deeply
+
 library ieee;
 use ieee.std_logic_1164.all;
 USE ieee.numeric_std.ALL;
@@ -116,18 +119,18 @@ begin
    begin
        wait for bit_time*10;
       -- Send range of bytes
-      for i in 0 to 255 loop
-        send_byte(std_logic_vector(to_unsigned(i,8)));
-      end loop;
-      
-      -- send difficult values
-      for i in 0 to 16 loop
-        send_byte("10000000");
-      end loop;
-      
-      for i in 0 to 16 loop
-        send_byte("00000001");
-      end loop;
+--      for i in 0 to 255 loop
+--        send_byte(std_logic_vector(to_unsigned(i,8)));
+--      end loop;
+--      
+--      -- send difficult values
+--      for i in 0 to 16 loop
+--        send_byte("10000000");
+--      end loop;
+--      
+--      for i in 0 to 16 loop
+--        send_byte("00000001");
+--      end loop;
       
       -- Send a string to the UART receiver pin
       for i in 0 to 512 / Teststr'length loop
@@ -204,20 +207,6 @@ begin
        print("Simulation finished");
        wait;
        
-		-- Disable the IRQ:
-		--uart_write(x"10", x"00");
-     
---		wait until irq = '0';
-
---		-- Output a "Potato" on the UART:
---		uart_write(x"00", x"50");
---		uart_write(x"00", x"6f");
---		uart_write(x"00", x"74");
---		uart_write(x"00", x"61");
---		uart_write(x"00", x"74");
---		uart_write(x"00", x"6f");
-
-		wait;
 	end process stimulus;
 
 end architecture testbench;

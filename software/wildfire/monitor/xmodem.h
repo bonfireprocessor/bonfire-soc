@@ -19,10 +19,14 @@
 #define XMODEM_ERROR_OUTOFSYNC        (-2)
 #define XMODEM_ERROR_RETRYEXCEED      (-3)
 #define XMODEM_ERROR_OUTOFMEM         (-4)
+#define XMODEM_ERROR_CRC              (-5)
+#define XMODEM_ERROR_HEADER           (-6)
 
 typedef void ( *p_xm_send_func )( u8 );
 typedef int ( *p_xm_recv_func )(long);
 long xmodem_receive( char *dest,long maxsize );
 void xmodem_init( p_xm_send_func send_func, p_xm_recv_func recv_func );
+
+void xmmodem_errrorDump();
 
 #endif // #ifndef __XMODEM_H__
