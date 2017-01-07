@@ -55,9 +55,9 @@ architecture testbench of tb_soc_uart is
 
 begin
 
-	uut: entity work.pp_soc_uart
+	uut: entity work.wb_uart_interface
       generic map(
-        FIFO_DEPTH => 256 )
+        FIFO_DEPTH => 32 )
 		port map(
 			clk => clk,
 			reset => reset,
