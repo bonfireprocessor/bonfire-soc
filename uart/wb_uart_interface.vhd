@@ -19,13 +19,15 @@
 --! | 0x08               | Status register (read-only)                |
 --! | 0x0c               | Sample clock divisor register (read/write) |
 --! | 0x10               | Interrupt enable register (read/write)     |
+--! | 0x14               | Revision Code                              |
 --! |--------------------|--------------------------------------------|
 --!
 --! The status register contains the following bits:
 --! - Bit 0: receive buffer empty
---! - Bit 1: transmit buffer empty
+--! - Bit 1: transmiter idle
 --! - Bit 2: receive buffer full
 --! - Bit 3: transmit buffer full
+
 --
 -- Dependencies: 
 --
@@ -78,8 +80,9 @@ end wb_uart_interface;
 
 architecture Behavioral of wb_uart_interface is
 
+   constant uart_revsion : std_logic_vector(7 downto 0) :=X"12";
 
-    signal uart_data_in         : std_logic_vector(7 downto 0);
+  --  signal uart_data_in         : std_logic_vector(7 downto 0);
     signal uart_data_out        : std_logic_vector(7 downto 0);
     signal fifo_data_out        : std_logic_vector(7 downto 0);
     signal fifo_data_ready      : std_logic;
@@ -92,13 +95,15 @@ architecture Behavioral of wb_uart_interface is
     signal can_transmit         : std_logic :='1'; -- constant value at the moment
     signal status_register, 
            sample_clk_divisor_register,
-           transmit_register,
-           interrupt_register    : std_logic_vector(7 downto 0);
+           transmit_register    : std_logic_vector(7 downto 0);
+    signal interrupt_register   : std_logic_vector(1 downto 0); 
            
     signal wb_read_buffer :  std_logic_vector(7 downto 0); -- register for wishbone reads      
     signal ack_read : std_logic :='0';
     
     signal tx_reg_pending : std_logic :='0';  -- Indicates that data is loaded into tx register 
+    
+    signal divisor_wen : std_logic :='0';
     
     
 
@@ -107,8 +112,7 @@ begin
     wb_dat_out <= wb_read_buffer;
     wb_ack_out <= ack_read or (wb_we_in and wb_stb_in);
     
-    -- assert only when uart is not busy anymore, so we know that data will be taken by the UART on the next clock
-    
+    -- assert uart_data_load only when uart is not busy anymore, so we know that data will be taken by the UART on the next clock
     uart_data_load <= tx_reg_pending and not uart_tx_busy;
    
    
@@ -124,7 +128,7 @@ begin
     -- Read register assignments
    
    -- - Bit 0: receive buffer empty
-   -- - Bit 1: transmit buffer empty
+   -- - Bit 1: transmitter idle
    -- - Bit 2: receive buffer full 
    -- - Bit 3: transmit buffer full
   
@@ -147,6 +151,10 @@ begin
            if uart_data_load='1' then
              tx_reg_pending <= '0';
            end if;  
+           
+           if divisor_wen='1' then
+             divisor_wen <= '0';
+           end if;  
         
            if wb_cyc_in ='1' and wb_stb_in='1' then
              if wb_we_in='0' and ack_read='0' then -- read access
@@ -160,7 +168,9 @@ begin
                   when  "011"   =>  -- Addr 0xC
                     wb_read_buffer <= sample_clk_divisor_register;
                   when  "100"   => -- Addr 0x10
-                    wb_read_buffer <= interrupt_register;
+                    wb_read_buffer <= "000000"&interrupt_register;
+                  when  "101"   => -- Addr 0x14
+                     wb_read_buffer <= uart_revsion;
                   when others  => -- others don't care...
                     wb_read_buffer <=  (others => 'X'); 
                end case;
@@ -172,8 +182,9 @@ begin
                    tx_reg_pending<='1';
                  when  "011"   =>-- Addr 0xC 
                    sample_clk_divisor_register <= wb_dat_in;
+                   divisor_wen <= '1';
                  when  "100"   => -- Addr 0x10
-                   interrupt_register <=  wb_dat_in;
+                   interrupt_register <=  wb_dat_in(1 downto 0);
                  when others => -- do nothing  
                end case; 
              end if;              
@@ -182,23 +193,6 @@ begin
     
     end process;
     
-
-  
-  
-   --with wb_adr_in(4 downto 2) select
-     --wb_dat_out <=  fifo_data_out   when  "001" -- Addr 0x4  UART receive register 
-                    --status_register when  "010" -- Addr 0x8
-                    --sample_clk_divisor_register when "011" -- Addr 0xC
-                    --interrupt_register when "100" -- Addr 0x10
-                    --(others => 'X') when others; -- others don't care...
-                    
-                    
-     --wb_ack_out <= wb_cyc_in and wb_stb_in;  -- we don't  have any waitstates               
-                
-                
-                    
-              
-
 
 fifo_instance: entity work.fifo
     generic map (
@@ -224,13 +218,15 @@ fifo_instance: entity work.fifo
         clk => clk,
         serial_out => txd,
         serial_in => rxd,
-        data_in => uart_data_in,
+        data_in => transmit_register,
         data_in_load => uart_data_load,
         data_out => uart_data_out,
         data_out_ready => uart_rx_ready,
         bad_bit => uart_badbit,
         transmitter_busy => uart_tx_busy,
-        can_transmit => can_transmit
+        can_transmit => can_transmit,
+        sample_clock_divisor => sample_clk_divisor_register,
+        divisor_wen => divisor_wen
     );
 
 

@@ -7,6 +7,7 @@
 --|                                   |              http://sowerbutts.com/ |--
 --+-----------------------------------+-------------------------------------+--
 --| UART implementation                                                     |--
+--| TH: Added runtime configuration of the baud rate                        |--
 --+-------------------------------------------------------------------------+--
 
 library IEEE;
@@ -26,22 +27,29 @@ entity uart is
            data_out_ready   : out std_logic;
            bad_bit          : out std_logic;
            transmitter_busy : out std_logic;
-           can_transmit     : in  std_logic
+           can_transmit     : in  std_logic;
+           sample_clock_divisor : in  std_logic_vector(7 downto 0); --TH
+           divisor_wen      : in  std_logic --TH
     );
 end uart;
 
 architecture Behavioral of uart is
 
-    -- tested at 1,000,000bps with 48MHz clock. Works (apparently).
-    constant rx_sample_interval : unsigned(13 downto 0) := to_unsigned(clk_frequency / (115200 * 16) - 1, 14);  -- clock speed / (baud x 16) - 1 ; eg 32MHz / (9600 * 16) - 1 = 207
-    constant bit_duration       : unsigned(13 downto 0) := to_unsigned(clk_frequency / (115200 *  1) - 1, 14);  -- clock speed / baud - 1 ; eg 32MHz / 9600 - 1 = 3332
+    constant counter_len : natural := 13;
 
-    signal tx_counter   : unsigned(13 downto 0) := to_unsigned(0, 14);
+    -- tested at 1,000,000bps with 48MHz clock. Works (apparently).
+    constant c_rx_sample_interval : unsigned(7 downto 0) := to_unsigned(clk_frequency / (115200 * 16) - 1,8);  -- clock speed / (baud x 16) - 1 ; eg 32MHz / (9600 * 16) - 1 = 207
+    constant c_bit_duration       : unsigned(counter_len-1 downto 0) := to_unsigned(clk_frequency / (115200 *  1) - 1, counter_len);  -- clock speed / baud - 1 ; eg 32MHz / 9600 - 1 = 3332
+
+    signal rx_sample_interval : unsigned(7 downto 0)  :=  c_rx_sample_interval;
+    signal bit_duration       : unsigned(counter_len-1 downto 0) := c_bit_duration;
+
+    signal tx_counter   : unsigned(counter_len-1 downto 0) := to_unsigned(0, counter_len);
     signal tx_shift_reg : std_logic_vector(8 downto 0) := "111111111";
     signal tx_bits_left : unsigned(3 downto 0) := to_unsigned(0, 4);
     signal tx_busy      : std_logic;
 
-    signal rx_counter   : unsigned(13 downto 0) := to_unsigned(0, 14);
+    signal rx_counter   : unsigned(counter_len-1  downto 0) := to_unsigned(0, counter_len);
     signal rx_shift_reg : std_logic_vector(8 downto 0) := "000000000";
     signal rx_bits_got  : unsigned(3 downto 0) := to_unsigned(0, 4);
     signal rx_state     : unsigned(7 downto 0) := (others => '0'); -- 10 bits x 16 samples each = at least 160 states.
@@ -56,8 +64,28 @@ architecture Behavioral of uart is
     signal rx_sample_majority : std_logic;
 
     signal rx_badbit    : std_logic := '0';
+    
+    -- Place TX in IOB Register
+    signal tx : std_logic; -- UART Out
+    attribute IOB: string;
+    attribute IOB of tx: signal is "true";
 
 begin
+
+   serial_out <= tx; -- Connect TX line...
+   
+    -- Sample Clock Divisior setting
+    process(clk) 
+    variable d : unsigned(7 downto 0);
+    begin  
+      if rising_edge(clk) then
+        if divisor_wen='1' then
+          d:=unsigned(sample_clock_divisor);
+          rx_sample_interval <= d;
+          bit_duration <= ((resize(d,9)+1)&"0000"); -- (divisor+1) * 16
+        end if;  
+      end if;
+    end process;
 
     -- -- receiver -- --
     --
@@ -149,7 +177,7 @@ begin
     -- just clock out the bits, damn it.
     --
 
-    serial_out <= tx_shift_reg(0); -- we always output the bottom bit of the shift register.
+    --serial_out <= tx_shift_reg(0); -- we always output the bottom bit of the shift register.
     transmitter_busy <= tx_busy; -- or data_in_load;
 
     transmitter: process(clk)
@@ -157,7 +185,9 @@ begin
 
         if rising_edge(clk) then
             tx_busy <= '1';
-
+            
+            tx <= tx_shift_reg(0); -- we always output the bottom bit of the shift register.
+            
             if tx_bits_left = 0 then
                 -- idle
                 if data_in_load = '1' then

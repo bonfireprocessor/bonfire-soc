@@ -10,7 +10,14 @@
 //--! | 0x08               | Status register (read-only)                |
 //--! | 0x0c               | Sample clock divisor register (read/write) |
 //--! | 0x10               | Interrupt enable register (read/write)     |
+// !  | 0x14               | Revision Code                              |
 //--! |--------------------|--------------------------------------------|
+
+//--! The status register contains the following bits:
+//--! - Bit 0: receive buffer empty
+//--! - Bit 1: transmit buffer empty
+//--! - Bit 2: receive buffer full
+//--! - Bit 3: transmit buffer full
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -23,6 +30,7 @@
 #define UART_STATUS 0x08
 #define UART_DIVISOR 0x0c
 #define UART_INTE 0x10
+#define UART_REVISION 0x14
 
 
 volatile uint8_t *uartadr=(uint8_t *)UART_BASE;
@@ -30,8 +38,19 @@ volatile uint8_t *uartadr=(uint8_t *)UART_BASE;
 volatile uint8_t *gpioadr=(uint8_t *)GPIO_BASE;
 
 
+void wait(long nWait)
+{
+static volatile int c;
+
+  c=0;
+  while (c++ < nWait);
+}
+
+
+
 void writechar(char c)
 {
+  //wait(200);  
   while (uartadr[UART_STATUS] & 0x08); // Wait while transmit buffer full
   uartadr[UART_TX]=(uint8_t)c;
 
@@ -51,9 +70,9 @@ bool forever = timeout < 0;
     
   do {
     status=uartadr[UART_STATUS];
-    *gpioadr = status & 0x0f; // show status on LEDs
+  //  *gpioadr = status & 0x0f; // show status on LEDs
     if ((status & 0x01)==0) { // receive buffer not empty?
-       *gpioadr=0; // clear LEDs  
+   //    *gpioadr=0; // clear LEDs  
       return uartadr[UART_RECV];
     } else
       timeout--;  
@@ -105,13 +124,6 @@ char c;
 }
 
 
-void wait()
-{
-static volatile int c;
-
-  c=0;
-  while (c++ < 1000000);
-}
 
 
 void _setDivisor(uint32_t divisor){
@@ -122,7 +134,7 @@ void _setDivisor(uint32_t divisor){
 void setDivisor(uint32_t divisor)
 {
     _setDivisor(divisor);   
-    wait();
+    wait(1000000);
 }
 
 uint32_t getDivisor()
@@ -137,3 +149,8 @@ void setBaudRate(int baudrate) {
    setDivisor(SYSCLK / (baudrate*16) -1); 
 }
 
+uint8_t getUartRevision()
+{
+   return uartadr[UART_REVISION];   
+     
+}

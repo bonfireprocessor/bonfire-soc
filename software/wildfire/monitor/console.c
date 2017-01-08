@@ -91,6 +91,30 @@ char *p;
 
 }
 
+void read_num_str(char *b,int sz) {
+char c;
+char *p;
+
+   p=b;
+   c=readchar();
+   while (c!='\r') {
+
+      if (c==8 && p>b) {// backspace
+        p--;
+        writestr("\b \b");
+      } else if (((c>='0' && c<='9') || c=='-') && p<(b+sz-1) ) {
+          *p++=c;
+          writechar(c); // echo
+      }
+      else
+        writechar('\a'); // beep
+
+      c=readchar();
+   }
+   *p='\0';
+
+}
+
 
 void hex_dump(void *mem,int numWords)
 {
@@ -100,7 +124,6 @@ int i;
     for(i=0;i<numWords;i++) {
       if ((i % 4)==0) { // Write Memory address for every four words
         printk("\n%lx    ",(uint32_t)&pmem[i]);  
-        
       }
       printk("%lx ",pmem[i]);
       //writeHex(pmem[i]);

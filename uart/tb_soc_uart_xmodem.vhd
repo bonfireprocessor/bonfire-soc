@@ -65,9 +65,9 @@ architecture testbench of tb_soc_uart_xmodem is
 
 begin
 
-	uut: entity work.pp_soc_uart
---      generic map(
---        FIFO_DEPTH => 256 )
+	uut: entity work.wb_uart_interface
+      generic map(
+        FIFO_DEPTH => 32 )
 		port map(
 			clk => clk,
 			reset => reset,
@@ -158,35 +158,37 @@ begin
    
 
 	stimulus: process
-      procedure uart_write(address : in std_logic_vector(7 downto 0); data : in std_logic_vector(7 downto 0)) is
+       procedure uart_write(address : in std_logic_vector(7 downto 0); data : in std_logic_vector(7 downto 0)) is
 		begin
 			wb_adr_in <= address;
+         wait until rising_edge(clk);
 			wb_dat_in <= data;
 			wb_we_in <= '1';
 			wb_cyc_in <= '1';
 			wb_stb_in <= '1';
 
 			wait until wb_ack_out = '1';
-			wait for clk_period;
+			wait  until rising_edge(clk);
 			wb_stb_in <= '0';
 			wb_cyc_in <= '0';
-			wait for clk_period;
+			
 		end procedure;
       
       procedure uart_read(address : in std_logic_vector(7 downto 0);
                           data: out std_logic_vector(7 downto 0) )  is
 		begin
 			wb_adr_in <= address;
+         wait until rising_edge(clk);
 			wb_we_in <= '1';
 			wb_cyc_in <= '1';
 			wb_stb_in <= '1';
          wb_we_in <= '0';
 			wait until wb_ack_out = '1';
 			data:= wb_dat_out;
-         wait for clk_period;
+         wait until rising_edge(clk);
 			wb_stb_in <= '0';
 			wb_cyc_in <= '0';
-		   wait for clk_period;
+		   --wait for clk_period;
 		end procedure;
       
       variable status,rx_byte,h1 : std_logic_vector(7 downto 0);
@@ -232,7 +234,7 @@ begin
                   chksum:=X"00";
               when s_pack=>
                 s(1):=character'val(to_integer(unsigned(rx_byte)));
-                --s(1):=c;
+               
                 write(l_file,s);
                 --print(l_file,hstr(rx_byte));
                 chksum:=chksum+unsigned(rx_byte);

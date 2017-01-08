@@ -20,6 +20,8 @@ void _setDivisor(uint32_t divisor);
 uint32_t getDivisor();
 
 void setBaudRate(int baudrate);
+void wait(long nWait);
+uint8_t getUartRevision();
 
 
 #endif

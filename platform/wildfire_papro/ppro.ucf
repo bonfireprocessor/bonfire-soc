@@ -34,8 +34,8 @@ CONFIG PROHIBIT=P60;
 ##TIMESPEC "TS_XDOMAINS_TIMESYS" = from "timerclk" to "sysclk" TIG;
 
 NET sysclk_32m     LOC="P94"  | IOSTANDARD=LVTTL | PERIOD=31.25ns;               # CLK
-NET uart0_rxd      LOC="P101" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST;          # RX
-NET uart0_txd      LOC="P105" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST; 			# TX
+NET uart0_rxd      LOC="P101" | IOSTANDARD=LVTTL;                                # RX
+NET uart0_txd      LOC="P105" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW; 			# TX
 
 NET I_RESET        LOC="P85"  | IOSTANDARD=LVTTL | PULLDOWN;                     # A11
 NET LED1           LOC="P112" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW;          # LED1

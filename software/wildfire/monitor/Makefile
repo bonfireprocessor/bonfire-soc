@@ -26,11 +26,15 @@ TARGET_CFLAGS += -m32 -march=$(ARCH) -Wall -Og -g  -fomit-frame-pointer \
           -msoft-float\
 	-ffreestanding -fno-builtin  \
 	-Wall -Werror=implicit-function-declaration \
-	-D$(PLATFORM) -I$(PLATFORMDIR) -I$(PLATFORMDIR)/$(PLATFORM)
+	-D$(PLATFORM) -I$(PLATFORMDIR) -I$(PLATFORMDIR)/$(PLATFORM) -I./spiflash_driver/src -I.
 
 TARGET_LDFLAGS += -m32 -march=$(ARCH) -nostartfiles  \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-T$(LINKDEF) \
 	-Wl,--gc-sections
+
+
+OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o
+
 
 all: monitor.hex
 
@@ -53,8 +57,12 @@ all: monitor.hex
 	$(TARGET_PREFIX)-size  $<
 
 
+spiflash.o : spiflash_driver/src/spiflash.c 
+	$(TARGET_CC) $(TARGET_CFLAGS) -c $<
+
+
 	
-monitor.elf : start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xmodem.o
-	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xmodem.o
-	
+monitor.elf : $(OBJECTS)
+	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS)  $(OBJECTS)
+#	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xmodem.o	
 

@@ -133,7 +133,7 @@ begin
 --      end loop;
       
       -- Send a string to the UART receiver pin
-      for i in 0 to 512 / Teststr'length loop
+      for i in 0 to 128 / Teststr'length loop
         sendstring(Teststr);
       end loop; 
       
@@ -149,36 +149,38 @@ begin
       procedure uart_write(address : in std_logic_vector(7 downto 0); data : in std_logic_vector(7 downto 0)) is
 		begin
 			wb_adr_in <= address;
+         wait until rising_edge(clk);
 			wb_dat_in <= data;
 			wb_we_in <= '1';
 			wb_cyc_in <= '1';
 			wb_stb_in <= '1';
 
 			wait until wb_ack_out = '1';
-			wait for clk_period;
+			wait  until rising_edge(clk);
 			wb_stb_in <= '0';
 			wb_cyc_in <= '0';
-			wait for clk_period;
+			
 		end procedure;
       
       procedure uart_read(address : in std_logic_vector(7 downto 0);
                           data: out std_logic_vector(7 downto 0) )  is
 		begin
 			wb_adr_in <= address;
+         wait until rising_edge(clk);
 			wb_we_in <= '1';
 			wb_cyc_in <= '1';
 			wb_stb_in <= '1';
          wb_we_in <= '0';
 			wait until wb_ack_out = '1';
 			data:= wb_dat_out;
-         wait for clk_period;
+         wait until rising_edge(clk);
 			wb_stb_in <= '0';
 			wb_cyc_in <= '0';
-		   wait for clk_period;
+		   --wait for clk_period;
 		end procedure;
       
       variable status,rx_byte : std_logic_vector(7 downto 0);
-      
+      variable s: string(1 to 1);
       file l_file: TEXT open write_mode is log_file;
 
 	begin
@@ -187,10 +189,9 @@ begin
 
 	
        uart_write(x"0C",std_logic_vector(to_unsigned(51,8))); -- Divisor 51 for 115200 Baud
-
 		-- Enable the data received interrupt:
 		--uart_write(x"10", x"01");
-    
+       --receive loop
        while not finish loop
           -- Check Status Register
            status := X"01";
@@ -200,11 +201,26 @@ begin
            -- Get byte
            if (status and X"01") = X"00" then
              uart_read(X"04",rx_byte);
-             print(l_file,hstr(rx_byte));
+             s(1):=character'val(to_integer(unsigned(rx_byte)));  
+             write(l_file,s);
+             --print(l_file,hstr(rx_byte));
            end if;
             
        end loop;
-       print("Simulation finished");
+       print("Receive Simulation finished");
+       
+       -- UART Send Simulation
+       for i in 1 to TestStr'length loop
+          -- Check Status Register
+           status := X"08";
+           while (status and X"82") /= X"02"  loop
+             uart_read(X"08",status); 
+           end loop;
+           uart_write(X"00",char_to_ascii_byte(TestStr(i)));
+       end loop;
+       
+       
+       print("Send Simulation finished");
        wait;
        
 	end process stimulus;

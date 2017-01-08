@@ -10,6 +10,7 @@ void do_panic(const char* s, ...);
 void kassert_fail(const char* s);
 void read_hex_str(char *b,int sz);
 void hex_dump(void *mem,int numWords);
+void read_num_str(char *b,int sz);
 
 
 #endif

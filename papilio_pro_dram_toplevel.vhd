@@ -375,7 +375,13 @@ end generate;
     );
 
 
-   inst_uart:  entity work.pp_soc_uart PORT MAP(
+   inst_uart:  entity work.wb_uart_interface
+   generic map(
+   
+         FIFO_DEPTH => 64 )
+   
+   
+   PORT MAP(
         clk =>clk ,
         reset => reset,
         txd => uart0_txd,
