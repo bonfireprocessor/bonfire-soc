@@ -38,8 +38,10 @@ OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm
 
 all: monitor.hex
 
-%.bit: %.elf
+%.bit: %.elf $(TOPLEVEL)
 	$(DATA2MEM) -bm $(PROJROOT)/platform/wildfire_papro/soc_bd.bmm  -bd $< -bt $(TOPLEVEL)  -o hb $(basename $@)
+	$(TARGET_PREFIX)-objdump -S -d $< >$(basename $@).lst
+	$(TARGET_PREFIX)-size  $<
 
 %.o : %.S
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $<

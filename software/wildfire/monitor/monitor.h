@@ -1,6 +1,9 @@
 #ifndef __MONITOR_H
 #define __MONITOR_H
 
+#define LOAD_BASE (void*)0x010000
+
+
 typedef struct
 {
   long gpr[32];

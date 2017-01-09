@@ -28,9 +28,15 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=0
-FILE_NAME_0=1325;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2FMakefile;0;4
-FILE_NAME_1=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fplatform%2Fpapro%2Fwildfboot.ld;0;4
+current_page=2
+FILE_NAME_0=57;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
+FILE_NAME_1=13255;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.dmp;0;4
+FILE_NAME_2=673;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.c;0;4
+FILE_NAME_3=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fsnprintf.c;0;4
+FILE_NAME_4=5872;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.lst;0;4
+FILE_NAME_5=169;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fwildfdram.ld;0;4
+FILE_NAME_6=127;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fstart.S;0;4
+FILE_NAME_7=440;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fconsole.c;0;4
 
 [VTE]
 last_dir=/home/thomas/riscv/lxp32soc/software/wildfire/test

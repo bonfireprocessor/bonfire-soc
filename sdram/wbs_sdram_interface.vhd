@@ -161,10 +161,14 @@ generic map (
      end if;        
    end process;
    
+ 
+ 
+ -- Burst Mode support 
+ -- needs wbs_burst_length of 4 or gerater to be enabled 
+ 
+burstread: if wbs_burst_length>= 4 generate 
    
-   
-   -- Burst Mode support
-   
+  
    process(burst,burst_counter) 
    begin
      if burst='1' and (burst_counter /= 0) then
@@ -174,6 +178,7 @@ generic map (
      end if;       
    end process;
    
+
 
    process(clk_i) is
    begin
@@ -195,7 +200,8 @@ generic map (
         end if;
 	  end if;
    end process;
-   
+
+end generate;   
    
    -- Pending read counter 
   process(clk_i) is

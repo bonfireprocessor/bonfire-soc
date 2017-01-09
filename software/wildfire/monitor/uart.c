@@ -32,6 +32,8 @@
 #define UART_INTE 0x10
 #define UART_REVISION 0x14
 
+#define ENABLE_SEND_DELAY 0
+
 
 volatile uint8_t *uartadr=(uint8_t *)UART_BASE;
 
@@ -50,7 +52,10 @@ static volatile int c;
 
 void writechar(char c)
 {
-  //wait(200);  
+
+#ifdef  ENABLE_SEND_DELAY
+   wait(1000);     
+#endif
   while (uartadr[UART_STATUS] & 0x08); // Wait while transmit buffer full
   uartadr[UART_TX]=(uint8_t)c;
 

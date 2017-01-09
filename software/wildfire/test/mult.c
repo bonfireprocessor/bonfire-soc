@@ -2,6 +2,8 @@
 #include "uart.h"
 
 #include <stdlib.h>
+#include <stdio.h>
+#include "console.h"
 
 void readnumstr(char *b,int sz) {
 char c;
@@ -24,27 +26,25 @@ char *p;
       c=readchar();
    }
    *p='\0';
-
-}
-
-void newline()
-{
-  writestr("\r\n");
 }
 
 
+inline void newline() {
+  write_console("\n");    
+}
 
 int main() {
 char buff[80];
-int x,y;
+int x,y,result;
+uint32_t impid;
 
-  //setDivisor(16);
-  setBaudRate(115200);
-  newline();
-  writestr("Processor ID: ");
-  writeHex(get_impid());
-  newline();
-
+  //setBaudRate(115200);
+  setBaudRate(38400);
+  
+  impid=get_impid();
+  
+  printk("\nProcessor ID: %x\n",impid);
+  
   while(1) {
     writestr("Enter x (max 10 digits):");
     readnumstr(buff,11);
@@ -56,9 +56,9 @@ int x,y;
     y=atoi(buff);
     newline();
 
-    itoa(x*y,buff,10);
-    writestr(buff);
-    newline();
+    result=x*y;
+     
+    printk(" %d * %d = %d\n",x,y,result);
 
   }
   return 0;
