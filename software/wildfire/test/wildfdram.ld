@@ -28,5 +28,6 @@ SECTIONS
    
  } > RAM
    _stacktop = 0x07ffff0; 
+/*     _stacktop = end + 1024; */ 
  
 }

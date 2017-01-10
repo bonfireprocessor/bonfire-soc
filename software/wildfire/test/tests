@@ -29,14 +29,16 @@ long_line_column=72
 
 [files]
 current_page=2
-FILE_NAME_0=57;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
-FILE_NAME_1=13255;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.dmp;0;4
-FILE_NAME_2=673;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.c;0;4
-FILE_NAME_3=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fsnprintf.c;0;4
-FILE_NAME_4=5872;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.lst;0;4
-FILE_NAME_5=169;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fwildfdram.ld;0;4
-FILE_NAME_6=127;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fstart.S;0;4
-FILE_NAME_7=440;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fconsole.c;0;4
+FILE_NAME_0=2409;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
+FILE_NAME_1=673;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.c;0;4
+FILE_NAME_2=514;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.lst;0;4
+FILE_NAME_3=300;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fwildfdram.ld;0;4
+FILE_NAME_4=137;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fstart.S;0;4
+FILE_NAME_5=440;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fconsole.c;0;4
+FILE_NAME_6=103;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fjump0.S;0;4
+FILE_NAME_7=2236;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fstart.S;0;4
+FILE_NAME_8=63;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fjump0.hex;0;4
+FILE_NAME_9=2893;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fuart.c;0;4
 
 [VTE]
 last_dir=/home/thomas/riscv/lxp32soc/software/wildfire/test

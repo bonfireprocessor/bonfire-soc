@@ -279,17 +279,12 @@ end generate;
 
 dram: if not FakeDRAM generate
 
--- For the moment DRAM burst read is disabled , because it is not working correctly together with the cpu
--- most likely because the instruction cache aborting fetches or bus because of interferences with data r/w cycles
--- need to debug
-
-
 
 DRAM: entity work.wbs_sdram_interface 
 generic map (
   wbs_adr_high => mem2_adr'high,
---  wbs_burst_length => InstructionBurstSize
-  wbs_burst_length  => 1
+  wbs_burst_length => InstructionBurstSize
+  --wbs_burst_length  => 1
 )
 PORT MAP(
 		 clk_i =>clk ,

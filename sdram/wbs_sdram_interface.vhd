@@ -96,6 +96,8 @@ architecture Behavioral of wbs_sdram_interface is
    signal burst_counter : unsigned(log2(wbs_burst_length)-1 downto 0) := (others=>'0'); -- Countdown for WBS burst cycles
    signal pending_read_counter : unsigned(log2(wbs_burst_length)-1 downto 0) := (others=>'0'); -- Outstanding reads
    signal orphan_read : std_logic := '0'; -- Flag: outstanding reads after burst cycle has ended
+   
+   signal burst_disable : boolean := true;
 
 
 begin
@@ -166,7 +168,7 @@ generic map (
  -- Burst Mode support 
  -- needs wbs_burst_length of 4 or gerater to be enabled 
  
-burstread: if wbs_burst_length>= 4 generate 
+
    
   
    process(burst,burst_counter) 
@@ -178,20 +180,22 @@ burstread: if wbs_burst_length>= 4 generate
      end if;       
    end process;
    
-
+burstread: if wbs_burst_length>= 4 generate 
+   
+   burst_disable <= false;
 
    process(clk_i) is
    begin
      if rising_edge(clk_i) then  
         if rst_i = '1' then
           burst <= '0';
-        elsif is_read='1' and wbs_cti_i="010" then  -- burst cycle ??
+        elsif is_read='1' and wbs_cti_i="010" and cmd_ready='1' then  -- burst cycle ??
           if read_pending='0' then -- begin of new cycle
             burst <= '1';
             adr_reg <= std_logic_vector(unsigned(ram_adr)+1);  
             burst_counter <= to_unsigned(wbs_burst_length-1,burst_counter'length);
           end if;
-          if burstfetch_enable='1' and cmd_ready='1'  then
+          if burstfetch_enable='1' then
              adr_reg <= std_logic_vector(unsigned(adr_reg)+1); 
              burst_counter <= burst_counter - 1; 
           end if;             
@@ -219,7 +223,7 @@ end generate;
         end if;  
         if read_pending = '1' and data_out_ready = '1' then 
           next_counter := next_counter - 1;
-          if next_counter = 0 then
+          if next_counter = 0 or burst_disable then
             read_pending <= '0';
             orphan_read <= '0';
           elsif wbs_stb_i='0' or  wbs_cti_i="111" then -- WBS cycle ended while still pending reads

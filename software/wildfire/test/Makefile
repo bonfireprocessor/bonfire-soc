@@ -2,6 +2,9 @@
 .PHONY: all clean
 
 PLATFORM=PAPRO
+
+BOOTLINK=wildfboot.ld
+
 #LINKDEF=wildfboot.ld
 LINKDEF=wildfdram.ld
 
@@ -74,5 +77,9 @@ sim_hello.elf: start.o uart.o sim_hello.o
 	
 dram_codesim.elf : start.o dram_codesim.o
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o dram_codesim.o
+
+jump0.elf : jump0.S
+	$(TARGET_LD) -o $@ -march=RV32IM -nostartfiles   -Wl,-T$(BOOTLINK)	$<
+	
 	
 

@@ -69,6 +69,10 @@ ARCHITECTURE behavior OF tb_dramtest IS
     END COMPONENT;
     
    COMPONENT sdram_model
+   GENERIC (
+     RamFileName : string := "meminit.ram";
+     mode : string := "H"
+   );
 	PORT(
 		CLK : IN std_logic;
 		CKE : IN std_logic;
@@ -115,9 +119,9 @@ BEGIN
    uut: papilio_pro_dram_toplevel 
    
     generic map (
-        --RamFileName => "../../lxp32soc/software/wildfire/test/ledsim.hex",
+        RamFileName => "../../lxp32soc/software/wildfire/test/jump0.hex",
         --RamFileName => "../../lxp32soc/software/wildfire/test/dram_codesim.hex",
-         RamFileName => "../../lxp32soc/software/wildfire/monitor/monitor.hex",
+        --RamFileName => "../../lxp32soc/software/wildfire/monitor/monitor.hex",
         --RamFileName => "../../lxp32soc/software/wildfire/test/memsim.hex",
         --RamFileName => "../../lxp32soc/software/wildfire/test/sim_hello.hex",
         --RamFileName => "../../lxp32soc/riscv/software/cpptest/counter.hex",
@@ -150,7 +154,10 @@ BEGIN
         );
         
         
-  Inst_sdram_model: sdram_model 
+  Inst_sdram_model: sdram_model
+    GENERIC MAP (
+       RamFileName => "../../lxp32soc/software/wildfire/test/multsim.hex"
+    )    
     PORT MAP(
 		CLK => SDRAM_CLK,
 		CKE => SDRAM_CKE,

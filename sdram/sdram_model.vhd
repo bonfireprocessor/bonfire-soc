@@ -20,8 +20,21 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.std_logic_textio.all;
+
+
+library STD;
+use STD.textio.all;
+
+use work.util.all;
+
 
 entity sdram_model is
+generic (
+     RamFileName : string := "meminit.ram";
+     mode : string := "H";
+     DRAM_pagesize : natural :=256
+    );
     Port ( CLK     : in  STD_LOGIC;
            CKE     : in  STD_LOGIC;
            CS_N    : in  STD_LOGIC;
@@ -41,25 +54,58 @@ architecture Behavioral of sdram_model is
    signal dqm_sr : std_logic_vector(3 downto 0) := (others => '0');
    
    signal selected_bank : std_logic_vector( 1 downto 0);
-   signal column        : std_logic_vector( 8 downto 0) := (others => '0');
+   signal column        : std_logic_vector( log2(DRAM_pagesize)-1 downto 0) := (others => '0');
 
    -- Only eight rows of four banks are modeled
-   type   memory_array is array (0 to 8 * 512 * 4 -1 ) of std_logic_vector( 15 downto 0);
+   type   memory_array is array (0 to 8 * DRAM_pagesize * 4 -1 ) of std_logic_vector( 15 downto 0);
    type   row_array    is array (0 to       3) of std_logic_vector(2 downto 0);
    
-   signal memory        : memory_array;
+  
    signal active_row    : row_array;
    signal is_row_active : std_logic_vector(3 downto 0);
    signal mode_reg      : std_logic_vector(12 downto 0);
    signal data_delay1   : std_logic_vector(15 downto 0);
    signal data_delay2   : std_logic_vector(15 downto 0);
    signal data_delay3   : std_logic_vector(15 downto 0);
-   signal addr_index    : STD_LOGIC_VECTOR(13 downto 0);         
+   signal addr_index    : STD_LOGIC_VECTOR(log2(memory_array'length)-1 downto 0);         
    
    signal wr_mask       : std_logic_vector( 1 downto 0);
    signal wr_data       : std_logic_vector(15 downto 0);
    signal wr_burst      : std_logic_vector( 8 downto 0);
    signal rd_burst      : std_logic_vector( 9 downto 0);
+   
+   
+   impure function InitFromFile  return memory_array is
+   FILE RamFile : text is in RamFileName;
+   variable RamFileLine : line;
+   variable word : std_logic_vector(31 downto 0);
+   variable r : memory_array;
+   variable I : natural;
+
+
+   begin
+
+       I:=0;
+       while not endfile(RamFile) loop
+         readline (RamFile, RamFileLine);
+         if mode="H" then 
+            hread (RamFileLine, word); -- alternative: HEX read 
+         else  	
+            read(RamFileLine,word);  -- Binary read
+         end if;
+         
+         r(I) := word(15 downto 0);
+         r(I+1) := word(31 downto 16);
+         I:=I+2;         
+         
+       end loop;     
+    
+     return r; 
+   end function;
+   
+   signal memory  : memory_array:=InitFromFile;
+   
+   
    
 begin
    addr_index <= active_row(to_integer(unsigned(selected_bank))) & selected_bank & column;
@@ -107,7 +153,7 @@ data_process : process(clk)
          wr_mask <= "00";
          if command = wr_c then
             rd_burst <= (others => '0');
-            column        <= addr(8 downto 0);
+            column        <= addr(column'high downto 0);
             selected_bank <= ba;
             if mode_reg(9) = '1' then 
                wr_burst <= "000000001";
@@ -133,7 +179,7 @@ data_process : process(clk)
             is_row_active(to_integer(unsigned(ba))) <= '0';
          elsif command = RD_c then
             wr_burst      <= (others => '0');
-            column        <= addr(8 downto 0);
+            column        <= addr(column'high downto 0);
             selected_bank <= ba;
             -- This sets the bust length
             case mode_reg(2 downto 0) is

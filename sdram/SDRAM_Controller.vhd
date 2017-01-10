@@ -191,9 +191,9 @@ begin
    ----------------------------------------------------------------------------
    -- Seperate the address into row / bank / address
    ----------------------------------------------------------------------------
-   addr_row(end_of_row-start_of_row downto 0) <= cmd_address(end_of_row  downto start_of_row);       -- 12:0 <=  22:10
-   addr_bank                                  <= cmd_address(end_of_bank downto start_of_bank);      -- 1:0  <=  9:8
-   addr_col(sdram_column_bits-1 downto 0)     <= cmd_address(end_of_col  downto start_of_col) & '0'; -- 8:0  <=  7:0 & '0'
+   addr_row(end_of_row-start_of_row downto 0) <= cmd_address(end_of_row  downto start_of_row);       -- 12:0 <=  20:9
+   addr_bank                                  <= cmd_address(end_of_bank downto start_of_bank);      -- 1:0  <=  8:7
+   addr_col(sdram_column_bits-1 downto 0)     <= cmd_address(end_of_col  downto start_of_col) & '0'; -- 7:0  <=  6:0 & '0'
 
    -----------------------------------------------------------
    -- Forward the SDRAM clock to the SDRAM chip - 180 degress 
@@ -262,6 +262,7 @@ main_proc: process(clk)
                can_back_to_back <= '1';
             else
                can_back_to_back <= '0';
+
             end if;
             save_row         <= addr_row;
             save_bank        <= addr_bank;
