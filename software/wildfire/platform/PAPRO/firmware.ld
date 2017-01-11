@@ -21,6 +21,8 @@ SECTIONS
 
   .data  ALIGN(4) : {
      *(.rodata.*)
+     *(.rodata)
+     *(.eh_frame)
      *(.sdata)
      *(.data)
      *(.bss)

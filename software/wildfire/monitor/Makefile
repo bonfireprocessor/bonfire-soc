@@ -24,7 +24,7 @@ LINKDEF=$(PLATFORMDIR)/$(PLATFORM)/firmware.ld
 
 TARGET_CFLAGS += -m32 -march=$(ARCH) -Wall -Og -g  -fomit-frame-pointer \
           -msoft-float\
-	-ffreestanding -fno-builtin  \
+	-ffreestanding -fno-builtin   \
 	-Wall -Werror=implicit-function-declaration \
 	-D$(PLATFORM) -I$(PLATFORMDIR) -I$(PLATFORMDIR)/$(PLATFORM) -I./spiflash_driver/src -I.
 
@@ -64,7 +64,7 @@ spiflash.o : spiflash_driver/src/spiflash.c
 
 
 	
-monitor.elf : $(OBJECTS)
+monitor.elf : $(OBJECTS) $(LINKDEF)
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS)  $(OBJECTS)
-#	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS) start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xmodem.o	
+
 

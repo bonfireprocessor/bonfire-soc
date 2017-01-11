@@ -11,8 +11,8 @@
 
 // This global function receives a x-modem transmission consisting of
 // (potentially) several blocks.  Returns the number of bytes received or
-// an error code 
-// dest: Pointer to memory buffer 
+// an error code
+// dest: Pointer to memory buffer
 // maxsize: Length of memory buffer
 
 #define XM_PACKSIZE 128
@@ -27,16 +27,18 @@
 
 extern uint8_t *gpioadr;
 
+//#define XM_DEBUGMODE 1
+
+#ifdef XM_DEBUGMODE
+
 uint8_t h1,h2,chksum,recv_chksum;
 enum txm_state {s_idle,s_h1,s_h2,s_pack,s_chk,s_recover } xm_state;
 
-
-
 inline char hex_nibble(u8 nibble)
 {
-   nibble=nibble & 0x0f; 
-   return (nibble<=9)?(char)(nibble + '0'):(char)(nibble-10+'A');   
-}    
+   nibble=nibble & 0x0f;
+   return (nibble<=9)?(char)(nibble + '0'):(char)(nibble-10+'A');
+}
 
 void dumpByte(u8 v)
 {
@@ -45,33 +47,36 @@ void dumpByte(u8 v)
 }
 
 
-char* nack_block; 
+char* nack_block;
 
 
 void xmmodem_errrorDump()
-{ 
+{
 int i;
 char c;
-       
-  printk("H1: %x H2: %x ~H2: %x chksum: %x recv chksum: %x state: %d\n",h1,h2,~h2 & 0x0ff,chksum,recv_chksum,xm_state);    
-  
+
+  printk("H1: %x H2: %x ~H2: %x chksum: %x recv chksum: %x state: %d\n",h1,h2,~h2 & 0x0ff,chksum,recv_chksum,xm_state);
+
   for(i=0;i<128;i++) {
      printk(!(i % 8)?"\n %d =>  ":" ",i);
-     dumpByte(nack_block[i+2]);      
-  } 
+     dumpByte(nack_block[i+2]);
+  }
    for(i=0;i<128;i++) {
      if (!(i % 8) ) printk("\n %d =>  ",i);
      c=nack_block[i+2];
-     writechar(c>=32?c:'.');      
-  }  
-        
+     writechar(c>=32?c:'.');
+  }
+
 }
 
+#endif
 
 long xmodem_receive( char *dest,long maxsize)
 {
-    
-//enum txm_state {s_idle,s_h1,s_h2,s_pack,s_chk,s_recover } xm_state;
+#ifndef  XM_DEBUGMODE
+uint8_t h1,h2,chksum,recv_chksum;
+enum txm_state {s_idle,s_h1,s_h2,s_pack,s_chk,s_recover } xm_state;
+#endif
 
 long recv;
 int retry=XMODEM_RETRY_LIMIT;
@@ -79,23 +84,28 @@ long nBytes=0;
 //uint8_t h1,chksum;
 int indx=0;
 
+#ifdef XM_DEBUGMODE
+    nack_block=dest;
+#endif
+    do {
+      writechar(XM_NAK);
+      recv=wait_receive(XMODEM_TIMEOUT);
+      *gpioadr=(uint8_t)retry;
 
-   nack_block=dest;
-   do {
-     writechar(XM_NAK);
-     recv=wait_receive(XMODEM_TIMEOUT);
-     *gpioadr=(uint8_t)retry;
-        
-   }while(recv<0 && retry--);
+    }while(recv<0 && retry--);
+    if (recv<0) return XMODEM_ERROR_RETRYEXCEED;
     *gpioadr=0;
     xm_state=s_idle;
     h1=h2=chksum=0;
-  
+
+
     do {
       *gpioadr=(uint8_t)xm_state;
       switch(xm_state) {
-          
+
          case s_idle:
+           retry=XMODEM_RETRY_LIMIT; // reset counter on every success...
+           // fall through
          case s_recover:
            switch(recv) {
              case XM_EOT:
@@ -103,17 +113,17 @@ int indx=0;
                return nBytes;
                break;
              case XM_CAN:
-               writechar(XM_ACK);  
+               writechar(XM_ACK);
                return XMODEM_ERROR_REMOTECANCEL;
-               break;   
+               break;
              case XM_SOH:
                xm_state=s_h1;
-               break;  
+               break;
              //default:
-           }    
+           }
            break;
          case s_h1:
-           h1=(uint8_t)recv;  
+           h1=(uint8_t)recv;
            xm_state=s_h2;
            break;
          case s_h2:
@@ -121,49 +131,62 @@ int indx=0;
            chksum=0;
            h2=(uint8_t)recv;
            if (h1 == (~h2 & 0x0ff) ) {
-             xm_state=s_pack;        
+             xm_state=s_pack;
            } else {
+#ifdef XM_DEBUGMODE
             // Abort immedatly on error for debugging purposes
-            writechar(XM_CAN);   
-            //xm_state=s_recover;
+            writechar(XM_CAN);
+
             return XMODEM_ERROR_HEADER;
-               
+#else
+            writechar(XM_NAK);
+            retry--;
+            xm_state=s_recover;
+#endif
            }
            break;
          case s_pack:
            dest[indx++]=(char)recv;
            chksum+=(uint8_t)recv;
-           
+
            if (indx==XM_PACKSIZE) {
-             xm_state=s_chk;   
+             xm_state=s_chk;
            }
            break;
          case s_chk:
            recv_chksum=(uint8_t)recv;
            if (recv_chksum==chksum) {
               dest+=XM_PACKSIZE;
+ #ifdef XM_DEBUGMODE             
               nack_block=dest;
+#endif              
               nBytes+=XM_PACKSIZE;
               if (nBytes > maxsize) {
-                writechar(XM_CAN);     
+                writechar(XM_CAN);
                 return XMODEM_ERROR_OUTOFMEM;
-              } else          
-                writechar(XM_ACK);                 
-           } else {      
-             // Abort immedatly on error for debugging purposes   
-             writechar(XM_CAN);   
-             //xm_state=s_recover;      
-             return XMODEM_ERROR_CRC;         
-           }  
-           xm_state=s_idle;                            
-          
-      }
-      
-      //recv=wait_receive(XMODEM_TIMEOUT);
-      recv=readchar();
-      if (recv<0) return XMODEM_ERROR_RETRYEXCEED;      
-        
-    }while(1);           
+              } else {
+                writechar(XM_ACK);
+                xm_state=s_idle;
+              }   
+           } else {
+#ifdef XM_DEBUGMODE
+             // Abort immedatly on error for debugging purposes
+             writechar(XM_CAN);
+             return XMODEM_ERROR_CRC;
+#else
+             writechar(XM_NAK);
+             retry--;
+             xm_state=s_recover;
 
-    
+#endif
+           }
+
+      }
+
+      recv=wait_receive(XMODEM_TIMEOUT);
+      if (recv<0) return XMODEM_ERROR_RETRYEXCEED;
+
+    }while(1);
+
+
 }

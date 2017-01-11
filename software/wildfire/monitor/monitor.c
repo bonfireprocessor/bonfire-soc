@@ -65,7 +65,7 @@ long newBaud;
         printk("\nChangine baudratew now....\n");
         setBaudRate(newBaud);
      } else {
-       printk("Valid values are between 300 aund 500.000\n");
+       printk("\nInvalid, enter 300-500000\n",newBaud);
      }
    }
 }
@@ -73,23 +73,30 @@ long newBaud;
 void printInfo()
 {
 
-  printk("\nBonfire Boot Monitor 0.1f\n");
+  printk("\nBonfire Boot Monitor 0.1g\n");
   printk("Processor ID: %lx \nUART Divisor: %d\nUART Revision %x\n",get_impid(),getDivisor(),getUartRevision());
 
 }
 
+void error(int n)
+{
+  printk("Error %d\n",n);    
+}
 
 int main()
 {
-char cmd;
-char buff[8];
+
+char cmd[64];
+char *p;
+char xcmd;
 uint32_t *dumpaddress=LOAD_BASE;
-uint32_t arg1;
+
 long recv_bytes=0;
-//int c;
-//long lasterror=0;
-char *mem_ptr,*test_ptr;
-void (*pfunc)() = LOAD_BASE;
+
+void (*pfunc)();
+
+uint32_t args[3];
+int nArgs;
 
 
    setBaudRate(38400);
@@ -101,51 +108,71 @@ void (*pfunc)() = LOAD_BASE;
    //do_break(sizeof(trapframe_t),5,6);
 
    while(1) {
+     restart:  
      write_console("\n>");
-     cmd=toupper(readchar());
-     writechar(cmd);
-     switch(cmd) {
+     if (readBuffer(cmd,sizeof(cmd))) {
+        p=cmd;
+        skipWhiteSpace(&p);
+        if (*p!='\0' && isalpha(*p)) {
+          xcmd=toupper(*p++);
+          skipWhiteSpace(&p);    
+        }  else {
+          error(1);  
+          continue;
+        }
+        nArgs=0;
+        while(nArgs<3 && *p!='\0' ) {
+          if (parseNext(p,&p,&args[nArgs])) {
+            nArgs++;
+            skipWhiteSpace(&p);
+          } else {
+            error(2);
+            goto restart;
+          }    
+        };
+     } else continue;           
+         
+     switch(xcmd) {
        case 'D': // Dump command
 
-         buff[0]='\0';
-         printk("\nEnter address(%lx):  ",dumpaddress);read_hex_str(buff,sizeof(buff));
-         if (strlen(buff)) {
-           arg1=strtol(buff,&test_ptr,16);
-           if (test_ptr!=buff)
-             dumpaddress=(uint32_t*) (arg1 & 0x0fffffffc); // mask lower two bits to avoid misalignment
-         }
+         if (nArgs>=1)
+             dumpaddress=(uint32_t*) (args[0] & 0x0fffffffc); // mask lower two bits to avoid misalignment
          hex_dump((void*)dumpaddress,64);
          dumpaddress+=64;
          break;
        case 'X': // XModem receive command
+         switch(nArgs) {
+            case 0:
+              args[0]=(uint32_t)LOAD_BASE;
+              args[1]=LOAD_SIZE;
+              break;
+            case 1:
+              if (args[0]>=DRAM_TOP) {
+                 error(3);
+                 continue;   
+              }    
+              args[1]=DRAM_SIZE-args[0];
+              break;
+            default:
+              error(4);
+              continue;       
+         };    
+       
          write_console("Wait for receive...\n");
-
-         recv_bytes=xmodem_receive((char*)LOAD_BASE,LOAD_SIZE);
-   
+         recv_bytes=xmodem_receive((char*)args[0],args[1]);
          break;
        case 'E':
          if (recv_bytes>=0)
            printk("\n%ld Bytes received\n",recv_bytes);
          else {
            printk("\nXmodem Error %ld occured\n",recv_bytes);
-           xmmodem_errrorDump();
+           //xmmodem_errrorDump();
          }
          break;
        case 'T':
          test_dram();
          break;
        case 'C':
-         // Echo Program
-         printk("Echo:\n");
-         recv_bytes=0;
-         mem_ptr=LOAD_BASE;
-
-         while((cmd=readchar())!=0x1b ) {
-           //writechar(cmd);
-           mem_ptr[recv_bytes++]=cmd;
-         }
-         mem_ptr[recv_bytes]='\0';
-         write_console(mem_ptr);
       case 'B':
         changeBaudRate();
         break;
@@ -153,6 +180,11 @@ void (*pfunc)() = LOAD_BASE;
         printInfo();
         break;
        case 'G':
+         if (nArgs>=1) 
+           pfunc=(void*)args[0];
+         else
+           pfunc=LOAD_BASE;
+             
          pfunc();
          break;
         
@@ -160,7 +192,5 @@ void (*pfunc)() = LOAD_BASE;
          writechar('\a'); // beep...
       }
 
-   };
-
-
+   }
 }
