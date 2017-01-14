@@ -153,7 +153,7 @@ int digit;
       return v;
     }
     v= (v << 4 ) | digit;
-    printk("digit=%x  v=%x\n",digit,v);
+    //printk("digit=%x  v=%x\n",digit,v);
     p++;
   }
   *pp=p;

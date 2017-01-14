@@ -33,7 +33,7 @@ TARGET_LDFLAGS += -m32 -march=$(ARCH) -nostartfiles  \
 	-Wl,--gc-sections
 
 
-OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o
+OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o syscall.o
 
 
 all: monitor.hex

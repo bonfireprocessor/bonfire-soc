@@ -11,11 +11,22 @@
 #include "mempattern.h"
 #include "console.h"
 #include "xmodem.h"
+#include "syscall.h"
 
 
 extern uint8_t *gpioadr;
 
+
+
 #define LOAD_SIZE  DRAM_SIZE-(long)LOAD_BASE
+
+
+static void handle_syscall(trapframe_t* tf)
+{
+  tf->gpr[10] = do_syscall(tf->gpr[10], tf->gpr[11], tf->gpr[12], tf->gpr[13],
+                           tf->gpr[14], tf->gpr[15], tf->gpr[17]);
+  tf->epc += 4;
+}
 
 
 trapframe_t* trap_handler(trapframe_t *ptf)
@@ -24,15 +35,19 @@ char c;
 
 
     *gpioadr = (ptf->cause & 0x0f); // Show trap cause on LEDs
+    
+    if (ptf->cause==11 || ptf->cause==8) // ecall
+        handle_syscall(ptf);
+    else {
 
-    printk("\nTrap cause: %lx\n",ptf->cause);
-    dump_tf(ptf);
-    c=readchar();
-    if (c=='r' || c=='R')
-      ptf->epc=SRAM_BASE; // will cause reset
-    else      
-      ptf->epc+=4;
-      
+        printk("\nTrap cause: %lx\n",ptf->cause);
+        dump_tf(ptf);
+        c=readchar();
+        if (c=='r' || c=='R')
+          ptf->epc=SRAM_BASE; // will cause reset
+        else      
+          ptf->epc+=4;
+    }  
     return ptf;
 }
 
@@ -160,6 +175,7 @@ int nArgs;
        
          write_console("Wait for receive...\n");
          recv_bytes=xmodem_receive((char*)args[0],args[1]);
+         brk_address= ((uint32_t)LOAD_BASE + recv_bytes + 4096) & 0x0fffffffc;
          break;
        case 'E':
          if (recv_bytes>=0)
@@ -185,7 +201,7 @@ int nArgs;
          else
            pfunc=LOAD_BASE;
              
-         pfunc();
+         start_user((uint32_t)pfunc,DRAM_TOP & 0x0fffffffc );
          break;
         
        default:

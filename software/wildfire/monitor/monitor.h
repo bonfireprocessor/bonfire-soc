@@ -1,7 +1,7 @@
 #ifndef __MONITOR_H
 #define __MONITOR_H
 
-#define LOAD_BASE (void*)0x010000
+#define LOAD_BASE ((void*)0x010000)
 
 
 typedef struct
@@ -16,6 +16,8 @@ typedef struct
 
 
 void do_break(uint32_t arg0,...);
+
+void start_user(uint32_t pc,uint32_t sp);
 
 
 #endif

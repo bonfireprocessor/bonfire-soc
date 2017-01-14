@@ -2,12 +2,14 @@
 .global _start
 .global get_impid
 .global do_break
+.global start_user
 .extern main
 .extern _stacktop
 .extern trap_handler
 
 
 #include "bits.h"
+#include "platform.h"
 
  .macro save_tf
   # save gprs
@@ -119,6 +121,10 @@ ret
 do_break:
 sbreak
 ret
+
+start_user:
+mv sp,a1
+jalr a0
 
 
 __trap:
