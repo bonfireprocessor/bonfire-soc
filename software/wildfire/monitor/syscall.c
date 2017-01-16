@@ -91,8 +91,8 @@ size_t sys_brk(size_t pos)
 {
 size_t newbrk;
     
-  printk("sys_brk with arg %x\n",pos); 
-  readchar(); 
+ // printk("sys_brk with arg %x\n",pos); 
+ // readchar(); 
   if (pos>0)
   {
     newbrk=pos;
@@ -101,7 +101,7 @@ size_t newbrk;
     else
       brk_address=newbrk;
   }    
-  printk("new brk address %x\n:",brk_address);  
+ // printk("new brk address %x\n:",brk_address);  
   return brk_address; 
 }
 

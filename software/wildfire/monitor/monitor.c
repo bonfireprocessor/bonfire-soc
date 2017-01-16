@@ -19,6 +19,7 @@ extern uint8_t *gpioadr;
 
 
 #define LOAD_SIZE  DRAM_SIZE-(long)LOAD_BASE
+#define BAUDRATE 500000L
 
 
 static void handle_syscall(trapframe_t* tf)
@@ -88,7 +89,7 @@ long newBaud;
 void printInfo()
 {
 
-  printk("\nBonfire Boot Monitor 0.1g\n");
+  printk("\nBonfire Boot Monitor 0.1h\n");
   printk("Processor ID: %lx \nUART Divisor: %d\nUART Revision %x\n",get_impid(),getDivisor(),getUartRevision());
 
 }
@@ -114,7 +115,7 @@ uint32_t args[3];
 int nArgs;
 
 
-   setBaudRate(38400);
+   setBaudRate(BAUDRATE);
    printInfo();
 
    // Test trap Handler

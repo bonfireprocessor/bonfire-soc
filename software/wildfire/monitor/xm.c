@@ -15,10 +15,11 @@
 // dest: Pointer to memory buffer
 // maxsize: Length of memory buffer
 
-#define XM_PACKSIZE 128
+//#define XM_PACKSIZE 128
 
 // Line control codes
 #define XM_SOH  0x01
+#define XM_STX  0x02
 #define XM_ACK  0x06
 #define XM_NAK  0x15
 #define XM_CAN  0x18
@@ -83,6 +84,7 @@ int retry=XMODEM_RETRY_LIMIT;
 long nBytes=0;
 //uint8_t h1,chksum;
 int indx=0;
+int packsize;
 
 #ifdef XM_DEBUGMODE
     nack_block=dest;
@@ -118,7 +120,11 @@ int indx=0;
                break;
              case XM_SOH:
                xm_state=s_h1;
+               packsize=128;
                break;
+             case XM_STX:
+                xm_state=s_h1; 
+                packsize=1024;
              //default:
            }
            break;
@@ -149,18 +155,18 @@ int indx=0;
            dest[indx++]=(char)recv;
            chksum+=(uint8_t)recv;
 
-           if (indx==XM_PACKSIZE) {
+           if (indx==packsize) {
              xm_state=s_chk;
            }
            break;
          case s_chk:
            recv_chksum=(uint8_t)recv;
            if (recv_chksum==chksum) {
-              dest+=XM_PACKSIZE;
+              dest+=packsize;
  #ifdef XM_DEBUGMODE             
               nack_block=dest;
 #endif              
-              nBytes+=XM_PACKSIZE;
+              nBytes+=packsize;
               if (nBytes > maxsize) {
                 writechar(XM_CAN);
                 return XMODEM_ERROR_OUTOFMEM;
