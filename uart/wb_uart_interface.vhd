@@ -137,7 +137,7 @@ begin
     
     
     -- we do registered read to not induce combinatorial complexity to the wishbone bus
-    -- for a slow device like an UART it does not care that this will create an additonal clock of latency
+    -- for a slow device like an UART it does not matter that this will create an additonal clock of latency
     
     process(clk) begin
     

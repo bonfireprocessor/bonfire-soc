@@ -86,12 +86,17 @@ long newBaud;
    }
 }
 
+
+
+
 void printInfo()
 {
 
-  printk("\nBonfire Boot Monitor 0.1h\n");
-  printk("Processor ID: %lx \nUART Divisor: %d\nUART Revision %x\n",get_impid(),getDivisor(),getUartRevision());
 
+  printk("\nBonfire Boot Monitor 0.1k\n");
+  printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\n",
+         read_csr(mimpid),read_csr(misa),
+         getDivisor(),getUartRevision());
 }
 
 void error(int n)

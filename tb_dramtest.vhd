@@ -46,7 +46,8 @@ ARCHITECTURE behavior OF tb_dramtest IS
      RamFileName : string;-- only used when UseBRAMPrimitives is false
 	  mode : string;       -- only used when UseBRAMPrimitives is false
      Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
-     FakeDRAM : boolean := false -- Use Block RAM instead of DRAM
+     FakeDRAM : boolean := false; -- Use Block RAM instead of DRAM
+     InstructionBurstSize : natural := 8
      );
     PORT(
          sysclk_32m : IN  std_logic;
@@ -130,7 +131,8 @@ BEGIN
         --RamFileName => "../../lxp32-cpu/riscv_test/mult.hex",
         mode=>"H",
         FakeDRAM=>false,
-        Swapbytes=>false
+        Swapbytes=>false,
+        InstructionBurstSize => 8
      )     
    
    

@@ -21,13 +21,12 @@ TOPLEVEL = ~/riscv/ise/bonfire/papilio_pro_dram_toplevel.bit
 PLATFORMDIR=../platform
 
 
-TARGET_CFLAGS += -m32 -march=RV32IM -Wall -Os -g  -fomit-frame-pointer \
-          -msoft-float\
+TARGET_CFLAGS +=  -march=rv32im -Wall -Os -g  -fomit-frame-pointer \
 	-ffreestanding -fno-builtin  \
 	-Wall -Werror=implicit-function-declaration \
 	-D$(PLATFORM) -I$(PLATFORMDIR) -I$(PLATFORMDIR)/$(PLATFORM) 
 
-TARGET_LDFLAGS += -m32 -march=RV32I -nostartfiles  \
+TARGET_LDFLAGS +=  -march=rv32i -nostartfiles  \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-T$(LINKDEF) \
 	-Wl,--gc-sections
 

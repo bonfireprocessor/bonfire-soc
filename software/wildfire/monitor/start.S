@@ -46,11 +46,10 @@
 
   # get sr, epc, badvaddr, cause
   csrr t0,mscratch // orginal SP from trap
-  //csrr   s0,mstatus
-  li s0,0
+  csrr   s0,mstatus
   csrr   t1,mepc
-  //csrr   t2,sbadaddr
-  li t2,0
+  csrr   t2,mbadaddr
+
   csrr   t3,mcause
   STORE  t0,2*REGBYTES(x2)
   STORE  s0,32*REGBYTES(x2)

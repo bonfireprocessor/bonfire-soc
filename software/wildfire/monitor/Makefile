@@ -1,7 +1,8 @@
 
 .PHONY: all clean
 
-ARCH=RV32I
+ARCH=rv32i
+ABI=ilp32
 PLATFORM=PAPRO
 
 
@@ -22,13 +23,12 @@ LINKDEF=$(PLATFORMDIR)/$(PLATFORM)/firmware.ld
 
 
 
-TARGET_CFLAGS += -m32 -march=$(ARCH) -Wall -Og -g  -fomit-frame-pointer \
-          -msoft-float\
+TARGET_CFLAGS += -march=$(ARCH) -mabi=$(ABI)   -Wall -Os -g -fomit-frame-pointer \
 	-ffreestanding -fno-builtin   \
 	-Wall -Werror=implicit-function-declaration \
 	-D$(PLATFORM) -I$(PLATFORMDIR) -I$(PLATFORMDIR)/$(PLATFORM) -I./spiflash_driver/src -I.
 
-TARGET_LDFLAGS += -m32 -march=$(ARCH) -nostartfiles  \
+TARGET_LDFLAGS += -march=$(ARCH) -mabi=$(ABI) -nostartfiles  \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-T$(LINKDEF) \
 	-Wl,--gc-sections
 

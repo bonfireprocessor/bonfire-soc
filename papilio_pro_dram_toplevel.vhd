@@ -183,7 +183,8 @@ begin
        REG_RAM_STYLE => "block",
        START_ADDR => reset_adr(31 downto 2),
        IBUS_BURST_SIZE =>InstructionBurstSize,
-       IBUS_PREFETCH_SIZE =>InstructionBurstSize
+       IBUS_PREFETCH_SIZE =>InstructionBurstSize,
+       ENABLE_ICACHE =>true
      )
 
      PORT MAP(
@@ -284,7 +285,7 @@ DRAM: entity work.wbs_sdram_interface
 generic map (
   wbs_adr_high => mem2_adr'high,
   wbs_burst_length => InstructionBurstSize
-  --wbs_burst_length  => 1
+
 )
 PORT MAP(
 		 clk_i =>clk ,

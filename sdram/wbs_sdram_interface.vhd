@@ -9,6 +9,11 @@
 -- Target Devices: 
 -- Tool versions: 
 -- Description: 
+--   Bonfire CPU 
+--   (c) 2016,2017 Thomas Hornschuh
+--   See license.md for License 
+
+--   Wishbone Interface for Hamsterworks SDRAM Controller, Supports Wishbone Burst mode extensions
 --
 -- Dependencies: 
 --
@@ -217,8 +222,9 @@ end generate;
         read_pending <= '0';
         orphan_read <= '0';
       else
+        next_counter := pending_read_counter;
         if is_read='1' and cmd_ready='1' and cmd_enable='1' then
-          next_counter := pending_read_counter + 1;
+          next_counter := next_counter + 1;
           read_pending <= '1';
         end if;  
         if read_pending = '1' and data_out_ready = '1' then 
