@@ -1,7 +1,7 @@
 
-#ifndef __WILDFIRE_H
+#ifndef __BONFIRE_H
 
-#define __WILDFIRE_H
+#define __BONFIRE_H
 
 #include <stdint.h>
 #include "platform.h"

@@ -46,6 +46,13 @@ NET leds(2)         LOC="P66"  | IOSTANDARD=LVTTL | DRIVE=12;                   
 NET leds(1)         LOC="P67"  | IOSTANDARD=LVTTL | DRIVE=12;                                # A6
 NET leds(0)         LOC="P75"  | IOSTANDARD=LVTTL | DRIVE=12;                                # A7
 
+# SPI flash on Papilio Pro (MX25L6445E)
+NET flash_spi_cs    LOC="P38"  | IOSTANDARD=LVTTL | SLEW=FAST;
+NET flash_spi_clk   LOC="P70"  | IOSTANDARD=LVTTL | SLEW=FAST;
+NET flash_spi_mosi  LOC="P64"  | IOSTANDARD=LVTTL | SLEW=FAST;
+NET flash_spi_miso  LOC="P65"  | IOSTANDARD=LVTTL | SLEW=FAST | PULLUP;
+
+# SDRAM on Papilio Pro (MT48LC4M16)
 NET SDRAM_ADDR(0)  LOC="P140" | IOSTANDARD=LVTTL;                                # SDRAM_ADDR0
 NET SDRAM_ADDR(1)  LOC="P139" | IOSTANDARD=LVTTL;                                # SDRAM_ADDR1
 NET SDRAM_ADDR(2)  LOC="P138" | IOSTANDARD=LVTTL;                                # SDRAM_ADDR2

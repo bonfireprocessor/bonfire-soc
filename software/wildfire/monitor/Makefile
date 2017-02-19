@@ -33,7 +33,7 @@ TARGET_LDFLAGS += -march=$(ARCH) -mabi=$(ABI) -nostartfiles  \
 	-Wl,--gc-sections
 
 
-OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o syscall.o
+OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o syscall.o spi_driver.o
 
 
 all: monitor.hex

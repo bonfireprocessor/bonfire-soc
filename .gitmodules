@@ -1,0 +1,3 @@
+[submodule "software/wildfire/monitor/spiflash_driver"]
+	path = software/wildfire/monitor/spiflash_driver
+	url = git@github.com:pellepl/spiflash_driver.git

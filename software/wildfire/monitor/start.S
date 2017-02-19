@@ -3,6 +3,7 @@
 .global get_impid
 .global do_break
 .global start_user
+.global delay_loop
 .extern main
 .extern _stacktop
 .extern trap_handler
@@ -124,6 +125,12 @@ ret
 start_user:
 mv sp,a1
 jalr a0
+
+delay_loop:
+addi a0,a0,-1
+bnez a0,delay_loop
+ret
+
 
 
 __trap:

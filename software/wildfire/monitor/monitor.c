@@ -13,13 +13,18 @@
 #include "xmodem.h"
 #include "syscall.h"
 
+#include "spi_driver.h"
+
+
 
 extern uint8_t *gpioadr;
 
 
 
-#define LOAD_SIZE  DRAM_SIZE-(long)LOAD_BASE
+#define LOAD_SIZE  (DRAM_SIZE-(long)LOAD_BASE)
 #define BAUDRATE 500000L
+
+#define FLASHSIZE (8192*1024)
 
 
 static void handle_syscall(trapframe_t* tf)
@@ -93,7 +98,7 @@ void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.1k\n");
+  printk("\nBonfire Boot Monitor 0.1l\n");
   printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\n",
          read_csr(mimpid),read_csr(misa),
          getDivisor(),getUartRevision());
@@ -118,6 +123,14 @@ void (*pfunc)();
 
 uint32_t args[3];
 int nArgs;
+spiflash_t *spi=NULL;
+
+int nPages=0;
+uint32_t nFlashbytes;
+uint32_t flashAddress;
+int err;
+
+
 
 
    setBaudRate(BAUDRATE);
@@ -181,11 +194,13 @@ int nArgs;
        
          write_console("Wait for receive...\n");
          recv_bytes=xmodem_receive((char*)args[0],args[1]);
+         nPages= recv_bytes >> 12; // Number of 4096 Byte pages
+         if (nPages % 4096) nPages+=1; // Round up..         
          brk_address= ((uint32_t)LOAD_BASE + recv_bytes + 4096) & 0x0fffffffc;
          break;
        case 'E':
          if (recv_bytes>=0)
-           printk("\n%ld Bytes received\n",recv_bytes);
+           printk("\n%ld Bytes received\n%d(%x) Pages\nBreak Address %x\n",recv_bytes,nPages,nPages,brk_address);
          else {
            printk("\nXmodem Error %ld occured\n",recv_bytes);
            //xmmodem_errrorDump();
@@ -209,6 +224,40 @@ int nArgs;
              
          start_user((uint32_t)pfunc,DRAM_TOP & 0x0fffffffc );
          break;
+       case 'F':
+         spiflash_test();
+         break;  
+       case 'R': // flash read
+         if (!spi) spi=flash_init();
+        
+         // Usage ftarget_adr,flash_page(4K),len (pages)
+         switch(nArgs) {
+           case 0: // No Arugments default...
+             args[0]=(uint32_t)LOAD_BASE;
+             // fall through
+           case 1:  // Only Load Base specified
+             args[1]=0x80; // Start at 512KB in Flash
+             // fall through    
+           case 2:   
+             args[2]=0x80; // Load 512KB
+           
+         }
+        
+         nPages=args[2];
+         flashAddress=args[1] << 12;
+         nFlashbytes=args[2] << 12;
+         if (flashAddress>=FLASHSIZE || (flashAddress+nFlashbytes) >=FLASHSIZE  || nFlashbytes==0) {
+            printk("Invalid args");
+            continue;
+          }   
+       
+         printk("Flash read to %x from Page %p (%d Bytes)...\n",args[0],args[1],nFlashbytes); 
+         err=SPIFLASH_read(spi,flashAddress,nFlashbytes,(uint8_t*)args[0]);
+         if (err!=0) 
+            error(err);
+         else
+           printk("OK");   
+         break; 
         
        default:
          writechar('\a'); // beep...

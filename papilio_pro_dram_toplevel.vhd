@@ -51,21 +51,27 @@ generic (
         -- UART0 signals:
         uart0_txd : out std_logic;
         uart0_rxd : in  std_logic :='1';
+        
+        -- SPI flash chip
+        flash_spi_cs        : out   std_logic;
+        flash_spi_clk       : out   std_logic;
+        flash_spi_mosi      : out   std_logic;
+        flash_spi_miso      : in    std_logic;
 
         -- LED on Papilio Pro Board
         led1 : out std_logic;
    
-       -- SDRAM signals
-      SDRAM_CLK     : out   STD_LOGIC;
-      SDRAM_CKE     : out   STD_LOGIC;
-      SDRAM_CS      : out   STD_LOGIC;
-      SDRAM_RAS     : out   STD_LOGIC;
-      SDRAM_CAS     : out   STD_LOGIC;
-      SDRAM_WE      : out   STD_LOGIC;
-      SDRAM_DQM     : out   STD_LOGIC_VECTOR( 1 downto 0);
-      SDRAM_ADDR    : out   STD_LOGIC_VECTOR(12 downto 0);
-      SDRAM_BA      : out   STD_LOGIC_VECTOR( 1 downto 0);
-      SDRAM_DATA    : inout STD_LOGIC_VECTOR(15 downto 0)
+        -- SDRAM signals
+        SDRAM_CLK     : out   STD_LOGIC;
+        SDRAM_CKE     : out   STD_LOGIC;
+        SDRAM_CS      : out   STD_LOGIC;
+        SDRAM_RAS     : out   STD_LOGIC;
+        SDRAM_CAS     : out   STD_LOGIC;
+        SDRAM_WE      : out   STD_LOGIC;
+        SDRAM_DQM     : out   STD_LOGIC_VECTOR( 1 downto 0);
+        SDRAM_ADDR    : out   STD_LOGIC_VECTOR(12 downto 0);
+        SDRAM_BA      : out   STD_LOGIC_VECTOR( 1 downto 0);
+        SDRAM_DATA    : inout STD_LOGIC_VECTOR(15 downto 0)
     );
 end papilio_pro_dram_toplevel;
 
@@ -150,6 +156,12 @@ signal uart_cyc,uart_stb,uart_we,uart_ack : std_logic;
 signal uart_sel :  std_logic_vector(3 downto 0);
 signal uart_dat_rd,uart_dat_wr : std_logic_vector(7 downto 0);
 signal uart_adr : std_logic_vector(7 downto 0);
+
+-- SPI Flash
+signal flash_cyc,flash_stb,flash_we,flash_ack : std_logic;
+signal flash_sel :  std_logic_vector(3 downto 0);
+signal flash_dat_rd,flash_dat_wr : std_logic_vector(7 downto 0);
+signal flash_adr : std_logic_vector(7 downto 0);
 
 signal irq_i : std_logic_vector(7 downto 0);
 
@@ -236,11 +248,7 @@ begin
         wbs_dat_i =>  mem_dat_wr,
         wbs_dat_o =>  mem_dat_rd,
         wbs_cti_i => mem_cti
-        
---        lli_re_i => '0',
---		  lli_adr_i => (others => '0'),
---		  lli_dat_o => open,
---		  lli_busy_o => open
+
         
     );
 
@@ -374,7 +382,16 @@ end generate;
         m0_ack_i => uart_ack,
         m0_adr_o => uart_adr,
         m0_dat_o => uart_dat_wr ,
-        m0_dat_i => uart_dat_rd
+        m0_dat_i => uart_dat_rd,
+        
+        m1_cyc_o =>  flash_cyc,
+        m1_stb_o => flash_stb,
+        m1_we_o =>  flash_we,
+        m1_ack_i => flash_ack,
+        m1_adr_o => flash_adr,
+        m1_dat_o => flash_dat_wr ,
+        m1_dat_i => flash_dat_rd
+        
     );
 
 
@@ -398,6 +415,24 @@ end generate;
         wb_stb_in => uart_stb,
         wb_ack_out => uart_ack
     );
+    
+    inst_flash : entity work.wb_spi_interface 
+    PORT MAP(
+		clk_i => clk,
+		reset_i => reset,
+		slave_cs_o => flash_spi_cs,
+		slave_clk_o => flash_spi_clk,
+		slave_mosi_o => flash_spi_mosi,
+		slave_miso_i => flash_spi_miso,
+		irq => open,
+		wb_adr_in =>flash_adr ,
+		wb_dat_in => flash_dat_wr,
+		wb_dat_out => flash_dat_rd,
+		wb_we_in => flash_we,
+		wb_cyc_in => flash_cyc,
+		wb_stb_in => flash_stb,
+		wb_ack_out => flash_ack
+	);
 
 
    inst_busconnect:   entity  work.papro_bus PORT MAP(

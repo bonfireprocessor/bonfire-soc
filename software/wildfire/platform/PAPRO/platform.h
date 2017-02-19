@@ -3,6 +3,7 @@
 
 
 #define UART_BASE 0x08000000
+#define SPIFLASH_BASE 0x08000100
 #define GPIO_BASE 0x04000000
 
 #define DRAM_BASE 0x0
@@ -13,5 +14,7 @@
 #define SRAM_TOP  (SRAM_BASE+SRAM_SIZE-1)
 
 #define SYSCLK 96000000
+
+#define CLK_PERIOD (1e+9 / SYSCLK)  // in ns...
 
 #endif

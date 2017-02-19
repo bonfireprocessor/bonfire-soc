@@ -50,23 +50,27 @@ ARCHITECTURE behavior OF tb_dramtest IS
      InstructionBurstSize : natural := 8
      );
     PORT(
-         sysclk_32m : IN  std_logic;
-         I_RESET : IN  std_logic;
-         leds : OUT  std_logic_vector(3 downto 0);
-         uart0_txd : OUT  std_logic;
-         uart0_rxd : IN  std_logic;
-         led1 : OUT  std_logic;
-         SDRAM_CLK : OUT  std_logic;
-         SDRAM_CKE : OUT  std_logic;
-         SDRAM_CS : OUT  std_logic;
-         SDRAM_RAS : OUT  std_logic;
-         SDRAM_CAS : OUT  std_logic;
-         SDRAM_WE : OUT  std_logic;
-         SDRAM_DQM : OUT  std_logic_vector(1 downto 0);
-         SDRAM_ADDR : OUT  std_logic_vector(12 downto 0);
-         SDRAM_BA : OUT  std_logic_vector(1 downto 0);
-         SDRAM_DATA : INOUT  std_logic_vector(15 downto 0)
-        );
+		sysclk_32m : IN std_logic;
+		I_RESET : IN std_logic;
+		uart0_rxd : IN std_logic;
+		flash_spi_miso : IN std_logic;    
+		SDRAM_DATA : INOUT std_logic_vector(15 downto 0);      
+		leds : OUT std_logic_vector(3 downto 0);
+		uart0_txd : OUT std_logic;
+		flash_spi_cs : OUT std_logic;
+		flash_spi_clk : OUT std_logic;
+		flash_spi_mosi : OUT std_logic;
+		led1 : OUT std_logic;
+		SDRAM_CLK : OUT std_logic;
+		SDRAM_CKE : OUT std_logic;
+		SDRAM_CS : OUT std_logic;
+		SDRAM_RAS : OUT std_logic;
+		SDRAM_CAS : OUT std_logic;
+		SDRAM_WE : OUT std_logic;
+		SDRAM_DQM : OUT std_logic_vector(1 downto 0);
+		SDRAM_ADDR : OUT std_logic_vector(12 downto 0);
+		SDRAM_BA : OUT std_logic_vector(1 downto 0)
+		);
     END COMPONENT;
     
    COMPONENT sdram_model
@@ -110,6 +114,8 @@ ARCHITECTURE behavior OF tb_dramtest IS
    signal SDRAM_DQM : std_logic_vector(1 downto 0);
    signal SDRAM_ADDR : std_logic_vector(12 downto 0);
    signal SDRAM_BA : std_logic_vector(1 downto 0);
+   
+   signal flash_spi_cs,flash_spi_clk,flash_spi_loopback : std_logic;
 
    -- Clock period definitions
   constant clock_period : time := 31.25ns;
@@ -143,6 +149,11 @@ BEGIN
           uart0_txd => uart0_txd,
           uart0_rxd => uart0_rxd,
           led1 => led1,
+          flash_spi_cs =>flash_spi_cs ,
+		    flash_spi_clk => flash_spi_clk,
+		    flash_spi_mosi => flash_spi_loopback,
+		    flash_spi_miso => flash_spi_loopback,
+          
           SDRAM_CLK => SDRAM_CLK,
           SDRAM_CKE => SDRAM_CKE,
           SDRAM_CS => SDRAM_CS,
