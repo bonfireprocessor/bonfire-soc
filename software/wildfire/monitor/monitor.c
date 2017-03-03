@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "encoding.h"
 #include "monitor.h"
@@ -22,9 +23,28 @@ extern uint8_t *gpioadr;
 
 
 #define LOAD_SIZE  (DRAM_SIZE-(long)LOAD_BASE)
+#define HEADER_BASE ((void*)(LOAD_BASE-4096)) // Place Flash Header 4KB below LOAD_BASE
+
+typedef struct {
+  uint32_t magic;  
+  uint32_t nPages;
+  uint32_t brkAddress;  
+    
+} t_flash_header;
+
+#define  FLASH_HEADER ((t_flash_header*)HEADER_BASE)
+
+#define C_MAGIC 0x55aaddbb
+
 #define BAUDRATE 500000L
 
-#define FLASHSIZE (8192*1024)
+
+// XModem and spi Flash Variables
+
+int nPages=0;
+long recv_bytes=0;
+
+
 
 
 static void handle_syscall(trapframe_t* tf)
@@ -109,6 +129,41 @@ void error(int n)
   printk("Error %d\n",n);    
 }
 
+
+
+
+void writeBootImage(spiflash_t *spi)
+{
+
+
+uint32_t nFlashBytes;
+uint32_t flashAddress;
+int err;    
+   if (!nPages) 
+     printk("First load Image !");
+   else {
+     flashAddress=FLASH_IMAGEBASE;
+     nFlashBytes = nPages << 12;
+     if ((nFlashBytes+4096) >MAX_FLASH_IMAGESIZE) {
+       printk("Image size %d > %d, abort\n",nFlashBytes+4096,MAX_FLASH_IMAGESIZE);
+       return;
+     }    
+     memset(HEADER_BASE,0,4096);
+     FLASH_HEADER->magic=C_MAGIC;
+     FLASH_HEADER->nPages=nPages;
+     FLASH_HEADER->brkAddress=brk_address;
+     err=flash_Overwrite(spi,FLASH_IMAGEBASE,4096,HEADER_BASE);
+     if (err!=SPIFLASH_OK) return;
+     flashAddress=FLASH_IMAGEBASE+4096;
+     
+     printk("Writing to %x (%d bytes) from %x\n",flashAddress,nFlashBytes,LOAD_BASE);
+     err=flash_Overwrite(spi,flashAddress,nFlashBytes,LOAD_BASE);
+     
+   }       
+    
+}
+
+
 int main()
 {
 
@@ -117,15 +172,16 @@ char *p;
 char xcmd;
 uint32_t *dumpaddress=LOAD_BASE;
 
-long recv_bytes=0;
+
 
 void (*pfunc)();
 
 uint32_t args[3];
 int nArgs;
+
+
 spiflash_t *spi=NULL;
 
-int nPages=0;
 uint32_t nFlashbytes;
 uint32_t flashAddress;
 int err;
@@ -258,6 +314,26 @@ int err;
          else
            printk("OK");   
          break; 
+       case 'W': // flash write
+          if (!spi) spi=flash_init();
+          // Test: Write only 4KB
+         
+         writeBootImage(spi); 
+          
+         //nPages= 1;
+         //flashAddress=0x80 << 12;
+         //nFlashbytes=nPages << 12;
+         //printk("Flash write to Flash Address %x  (%d Bytes)...\n",flashAddress,nFlashbytes);
+         //err=SPIFLASH_erase(spi,flashAddress,nFlashbytes);
+         //if (err==0)
+           //err=SPIFLASH_write(spi,flashAddress,nFlashbytes,(uint8_t*)LOAD_BASE);
+           
+         //if (err!=0) 
+            //error(err);
+         //else
+           //printk("OK");   
+         //break; 
+        
         
        default:
          writechar('\a'); // beep...

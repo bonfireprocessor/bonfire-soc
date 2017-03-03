@@ -17,4 +17,11 @@
 
 #define CLK_PERIOD (1e+9 / SYSCLK)  // in ns...
 
+
+// Parameters for SPI Flash 
+
+#define FLASHSIZE (8192*1024)
+#define MAX_FLASH_IMAGESIZE (1024*512) // Max 512KB of flash used for boot image
+#define FLASH_IMAGEBASE (1024*512)  // Boot Image starts at 512KB in Flash
+
 #endif

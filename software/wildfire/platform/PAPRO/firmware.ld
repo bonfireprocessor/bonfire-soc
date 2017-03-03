@@ -1,6 +1,6 @@
 MEMORY
 {
-    RAM (rwx)    : ORIGIN = 0x0C000000, LENGTH = 16384
+    RAM (rwx)    : ORIGIN = 0x0C000000, LENGTH = 32768
 }
 
 
@@ -29,7 +29,7 @@ SECTIONS
      end = .; _end = .; __end = .;
       
  } > RAM
-  _stacktop = 0x0C003ff0; 
+  _stacktop = 0x0C007ff0; 
 
 }
 

@@ -37,7 +37,8 @@ generic (
      mode : string := "H";       -- only used when UseBRAMPrimitives is false
      Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
      FakeDRAM : boolean := false; -- Use Block RAM instead of DRAM
-     InstructionBurstSize : natural := 8
+     InstructionBurstSize : natural := 8;
+     CacheSizeWords : natural := 4096 -- 16KB Instruction Cache 
    );
    port(
         sysclk_32m  : in  std_logic;
@@ -77,8 +78,12 @@ end papilio_pro_dram_toplevel;
 
 architecture Behavioral of papilio_pro_dram_toplevel is
 
- constant ram_adr_width : natural := 12;
- constant ram_size : natural := 4096;
+ --constant ram_adr_width : natural := 12;
+ --constant ram_size : natural := 4096;
+ 
+ constant ram_adr_width : natural := 13;
+ constant ram_size : natural := 8192;
+ 
  
  constant reset_adr : std_logic_vector(31 downto 0) :=X"0C000000";
 
@@ -196,7 +201,8 @@ begin
        START_ADDR => reset_adr(31 downto 2),
        IBUS_BURST_SIZE =>InstructionBurstSize,
        IBUS_PREFETCH_SIZE =>InstructionBurstSize,
-       ENABLE_ICACHE =>true
+       ENABLE_ICACHE =>true,
+       CACHE_SIZE_WORDS=>CacheSizeWords
      )
 
      PORT MAP(

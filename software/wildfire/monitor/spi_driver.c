@@ -192,3 +192,39 @@ uint32_t  jedec_id;
     return &spif; 
 }
 
+int flash_print_spiresult(int code)
+{
+  if (code==SPIFLASH_OK)  
+    printk("...success\n"); 
+  else 
+    printk("SPIFLASH err %x\n",code);
+    
+   return code;    
+}
+
+int flash_Overwrite(spiflash_t *spi, uint32_t addr, uint32_t len, const uint8_t *buf)
+{
+int res;    
+int nBlocks,i;
+   
+   nBlocks = len >> 12;
+   if (nBlocks % 4096) nBlocks++;
+
+   printk("Erasing %d 4KB Blocks at %x...\n",nBlocks,addr);
+   res=SPIFLASH_erase(spi,addr,len);
+   flash_print_spiresult(res);
+   if (res!=SPIFLASH_OK) return res;
+   
+   for(i=0;i<nBlocks && res==SPIFLASH_OK ;i++) {
+     printk("Writing mem %x to flash %x\n",buf,addr);
+     res=SPIFLASH_write(spi,addr,4096,buf);
+     addr+=4096; buf+=4096;
+  }
+   
+  return flash_print_spiresult(res);
+   
+}
+
+
+
+

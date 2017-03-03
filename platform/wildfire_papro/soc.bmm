@@ -1,4 +1,4 @@
-ADDRESS_SPACE ram RAMB16   [0x0C000000:0x0C003fff]
+ADDRESS_SPACE ram RAMB16   [0x0C000000:0x0C007fff]
 
 
         BUS_BLOCK
@@ -31,6 +31,39 @@ ADDRESS_SPACE ram RAMB16   [0x0C000000:0x0C003fff]
         
         BUS_BLOCK
            Firmware/ram/Mram_ram8 [31:0];
+        END_BUS_BLOCK;
+        
+        
+         BUS_BLOCK
+           Firmware/ram/Mram_ram9 [31:0];
+        END_BUS_BLOCK;
+        
+        BUS_BLOCK
+           Firmware/ram/Mram_ram10 [31:0];
+        END_BUS_BLOCK;
+        
+        BUS_BLOCK
+           Firmware/ram/Mram_ram11 [31:0];
+        END_BUS_BLOCK;
+        
+        BUS_BLOCK
+           Firmware/ram/Mram_ram12 [31:0];
+        END_BUS_BLOCK;
+        
+        BUS_BLOCK
+           Firmware/ram/Mram_ram13 [31:0];
+        END_BUS_BLOCK;
+        
+        BUS_BLOCK
+           Firmware/ram/Mram_ram14 [31:0];
+        END_BUS_BLOCK;
+        
+        BUS_BLOCK
+           Firmware/ram/Mram_ram15 [31:0];
+        END_BUS_BLOCK;
+        
+        BUS_BLOCK
+           Firmware/ram/Mram_ram16 [31:0];
         END_BUS_BLOCK;
         
 END_ADDRESS_SPACE;

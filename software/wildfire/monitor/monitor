@@ -28,17 +28,17 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=9
-FILE_NAME_0=1972;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.c;0;4
+current_page=0
+FILE_NAME_0=6298;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.c;0;4
 FILE_NAME_1=1013;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2FMakefile;0;4
 FILE_NAME_2=251;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fencoding.h;0;4
-FILE_NAME_3=23277;ASM;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Fprojects%2Fretro80%2Fsoftware%2Fmonitor%2Fmonitor.asm;0;4
-FILE_NAME_4=1509;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fspi_driver.c;0;4
-FILE_NAME_5=96383;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.lst;0;4
-FILE_NAME_6=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fconsole.h;0;4
-FILE_NAME_7=113;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fplatform%2FPAPRO%2Fplatform.h;0;4
-FILE_NAME_8=99;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fspi_driver.h;0;4
-FILE_NAME_9=12670;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fspiflash_driver%2Fsrc%2Fspiflash.c;0;4
+FILE_NAME_3=3541;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fspi_driver.c;0;4
+FILE_NAME_4=175815;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.lst;0;4
+FILE_NAME_5=6388;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fspiflash_driver%2Fsrc%2Fspiflash.c;0;4
+FILE_NAME_6=234;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.h;0;4
+FILE_NAME_7=9780;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fspiflash_driver%2Fsrc%2Fspiflash.h;0;4
+FILE_NAME_8=135;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fspi_driver.h;0;4
+FILE_NAME_9=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fconsole.c;0;4
 
 [VTE]
 last_dir=/home/thomas/riscv/lxp32soc/software/wildfire/monitor
