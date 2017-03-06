@@ -26,10 +26,10 @@ extern uint8_t *gpioadr;
 #define HEADER_BASE ((void*)(LOAD_BASE-4096)) // Place Flash Header 4KB below LOAD_BASE
 
 typedef struct {
-  uint32_t magic;  
+  uint32_t magic;
   uint32_t nPages;
-  uint32_t brkAddress;  
-    
+  uint32_t brkAddress;
+
 } t_flash_header;
 
 #define  FLASH_HEADER ((t_flash_header*)HEADER_BASE)
@@ -61,7 +61,7 @@ char c;
 
 
     *gpioadr = (ptf->cause & 0x0f); // Show trap cause on LEDs
-    
+
     if (ptf->cause==11 || ptf->cause==8) // ecall
         handle_syscall(ptf);
     else {
@@ -71,9 +71,9 @@ char c;
         c=readchar();
         if (c=='r' || c=='R')
           ptf->epc=SRAM_BASE; // will cause reset
-        else      
+        else
           ptf->epc+=4;
-    }  
+    }
     return ptf;
 }
 
@@ -118,7 +118,7 @@ void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.1l\n");
+  printk("\nBonfire Boot Monitor 0.2a\n");
   printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\n",
          read_csr(mimpid),read_csr(misa),
          getDivisor(),getUartRevision());
@@ -126,7 +126,7 @@ void printInfo()
 
 void error(int n)
 {
-  printk("Error %d\n",n);    
+  printk("Error %d\n",n);
 }
 
 
@@ -138,8 +138,8 @@ void writeBootImage(spiflash_t *spi)
 
 uint32_t nFlashBytes;
 uint32_t flashAddress;
-int err;    
-   if (!nPages) 
+int err;
+   if (!nPages)
      printk("First load Image !");
    else {
      flashAddress=FLASH_IMAGEBASE;
@@ -147,7 +147,8 @@ int err;
      if ((nFlashBytes+4096) >MAX_FLASH_IMAGESIZE) {
        printk("Image size %d > %d, abort\n",nFlashBytes+4096,MAX_FLASH_IMAGESIZE);
        return;
-     }    
+     }
+     printk("Saving Image to Flash Address %x (%d bytes) \n",flashAddress,nFlashBytes);
      memset(HEADER_BASE,0,4096);
      FLASH_HEADER->magic=C_MAGIC;
      FLASH_HEADER->nPages=nPages;
@@ -155,12 +156,37 @@ int err;
      err=flash_Overwrite(spi,FLASH_IMAGEBASE,4096,HEADER_BASE);
      if (err!=SPIFLASH_OK) return;
      flashAddress=FLASH_IMAGEBASE+4096;
-     
-     printk("Writing to %x (%d bytes) from %x\n",flashAddress,nFlashBytes,LOAD_BASE);
+
+
      err=flash_Overwrite(spi,flashAddress,nFlashBytes,LOAD_BASE);
-     
-   }       
-    
+
+   }
+
+}
+
+
+int readBootImage(spiflash_t *spi)
+{
+int err;
+
+  printk("Reading Header\n");
+  err=SPIFLASH_read(spi,FLASH_IMAGEBASE,4096,HEADER_BASE);
+  if (flash_print_spiresult(err)!=SPIFLASH_OK) return err;
+  // Check Header
+  if (FLASH_HEADER->magic == C_MAGIC) {
+    uint32_t nFlashBytes = FLASH_HEADER->nPages << 12;
+    printk("Boot Image found, length %d Bytes, Break Address: %x\n",nFlashBytes,FLASH_HEADER->brkAddress);
+    err=SPIFLASH_read(spi,FLASH_IMAGEBASE+4096,nFlashBytes,LOAD_BASE);
+    if (flash_print_spiresult(err)!=SPIFLASH_OK) return err;
+    nPages=FLASH_HEADER->nPages;
+    brk_address= FLASH_HEADER->brkAddress;
+    return SPIFLASH_OK;
+
+  } else {
+
+    printk("Invalid Boot Image header\n");
+    return -1;
+  }
 }
 
 
@@ -180,7 +206,7 @@ uint32_t args[3];
 int nArgs;
 
 
-spiflash_t *spi=NULL;
+spiflash_t *spi;
 
 uint32_t nFlashbytes;
 uint32_t flashAddress;
@@ -191,23 +217,19 @@ int err;
 
    setBaudRate(BAUDRATE);
    printInfo();
-
-   // Test trap Handler
-   //do_break((uint32_t)buff,1,2,3);
-   //writestr("\r\nReturn from break");
-   //do_break(sizeof(trapframe_t),5,6);
+   spi=flash_init();
 
    while(1) {
-     restart:  
+     restart:
      write_console("\n>");
      if (readBuffer(cmd,sizeof(cmd))) {
         p=cmd;
         skipWhiteSpace(&p);
         if (*p!='\0' && isalpha(*p)) {
           xcmd=toupper(*p++);
-          skipWhiteSpace(&p);    
+          skipWhiteSpace(&p);
         }  else {
-          error(1);  
+          error(1);
           continue;
         }
         nArgs=0;
@@ -218,10 +240,10 @@ int err;
           } else {
             error(2);
             goto restart;
-          }    
+          }
         };
-     } else continue;           
-         
+     } else continue;
+
      switch(xcmd) {
        case 'D': // Dump command
 
@@ -239,19 +261,19 @@ int err;
             case 1:
               if (args[0]>=DRAM_TOP) {
                  error(3);
-                 continue;   
-              }    
+                 continue;
+              }
               args[1]=DRAM_SIZE-args[0];
               break;
             default:
               error(4);
-              continue;       
-         };    
-       
+              continue;
+         };
+
          write_console("Wait for receive...\n");
          recv_bytes=xmodem_receive((char*)args[0],args[1]);
          nPages= recv_bytes >> 12; // Number of 4096 Byte pages
-         if (nPages % 4096) nPages+=1; // Round up..         
+         if (nPages % 4096) nPages+=1; // Round up..
          brk_address= ((uint32_t)LOAD_BASE + recv_bytes + 4096) & 0x0fffffffc;
          break;
        case 'E':
@@ -265,7 +287,6 @@ int err;
        case 'T':
          test_dram();
          break;
-       case 'C':
       case 'B':
         changeBaudRate();
         break;
@@ -273,19 +294,15 @@ int err;
         printInfo();
         break;
        case 'G':
-         if (nArgs>=1) 
+         if (nArgs>=1)
            pfunc=(void*)args[0];
          else
            pfunc=LOAD_BASE;
-             
+
          start_user((uint32_t)pfunc,DRAM_TOP & 0x0fffffffc );
          break;
-       case 'F':
-         spiflash_test();
-         break;  
-       case 'R': // flash read
-         if (!spi) spi=flash_init();
-        
+
+       case 'F': // flash read
          // Usage ftarget_adr,flash_page(4K),len (pages)
          switch(nArgs) {
            case 0: // No Arugments default...
@@ -293,33 +310,38 @@ int err;
              // fall through
            case 1:  // Only Load Base specified
              args[1]=0x80; // Start at 512KB in Flash
-             // fall through    
-           case 2:   
+             // fall through
+           case 2:
              args[2]=0x80; // Load 512KB
-           
+
          }
-        
+
          nPages=args[2];
          flashAddress=args[1] << 12;
          nFlashbytes=args[2] << 12;
          if (flashAddress>=FLASHSIZE || (flashAddress+nFlashbytes) >=FLASHSIZE  || nFlashbytes==0) {
             printk("Invalid args");
             continue;
-          }   
-       
-         printk("Flash read to %x from Page %p (%d Bytes)...\n",args[0],args[1],nFlashbytes); 
+          }
+
+         printk("Flash read to %x from Page %p (%d Bytes)...\n",args[0],args[1],nFlashbytes);
          err=SPIFLASH_read(spi,flashAddress,nFlashbytes,(uint8_t*)args[0]);
-         if (err!=0) 
+         if (err!=0)
             error(err);
          else
-           printk("OK");   
-         break; 
+           printk("OK");
+         break;
+
+       case 'R': // Load Boot Image from Flash and run
+         if (readBootImage(spi)==SPIFLASH_OK) start_user((uint32_t)LOAD_BASE,DRAM_TOP & 0x0fffffffc );;
+         break;
+
        case 'W': // flash write
-          if (!spi) spi=flash_init();
-          // Test: Write only 4KB
-         
-         writeBootImage(spi); 
-          
+
+
+
+         writeBootImage(spi);
+
          //nPages= 1;
          //flashAddress=0x80 << 12;
          //nFlashbytes=nPages << 12;
@@ -327,14 +349,14 @@ int err;
          //err=SPIFLASH_erase(spi,flashAddress,nFlashbytes);
          //if (err==0)
            //err=SPIFLASH_write(spi,flashAddress,nFlashbytes,(uint8_t*)LOAD_BASE);
-           
-         //if (err!=0) 
+
+         //if (err!=0)
             //error(err);
          //else
-           //printk("OK");   
-         //break; 
-        
-        
+           //printk("OK");
+         //break;
+
+
        default:
          writechar('\a'); // beep...
       }

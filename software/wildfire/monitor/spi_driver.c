@@ -8,7 +8,7 @@
 -- base+4   -- status register; bit 0 indicates "transmitter busy"
 -- base+8   -- transmitter: write a byte here, starts SPI bus transaction
 -- base+0x0C   -- receiver: last byte received (updated on each transation)
--- base+0x10   -- clock divider: SPI CLK is clk_i/2*(1+n) ie for 128MHz clock, divisor 0 is 64MHz, 1 is 32MHz, 3 is 16MHz etc
+-- base+0x10   -- clock divider: SPI CLK is clk_i/2*(1+n) ie for 96MHz clock, divisor 0 is 48MHz, 2 is 24MHz, 3 is 12MHz etc
 */
 
 #define SPI_CHIPSELECT  0
@@ -30,30 +30,30 @@ static volatile uint32_t *spiflash = (void*)SPIFLASH_BASE;
 
 static inline void spiflash_init()
 {
-   spiflash[SPI_DIVISOR]=1;  
-    
+   spiflash[SPI_DIVISOR]=1;
+
 }
 
 static inline void spiflash_select()
 {
-  spiflash[SPI_CHIPSELECT]=0x0fe;   
+  spiflash[SPI_CHIPSELECT]=0x0fe;
 }
 
 static inline void spiflash_deslect()
 {
-    spiflash[SPI_CHIPSELECT]=0x0ff;   
+    spiflash[SPI_CHIPSELECT]=0x0ff;
 }
 
 
 static inline void spi_tx(uint8_t txbyte)
 {
-   spiflash[SPI_TX]=txbyte; 
+   spiflash[SPI_TX]=txbyte;
 }
 
 static inline uint8_t spi_rx()
 {
-  spiflash[SPI_TX]=0; // send dummy byte   
-  return (uint8_t) (spiflash[SPI_RX] & 0x0ff);    
+  spiflash[SPI_TX]=0; // send dummy byte
+  return (uint8_t) (spiflash[SPI_RX] & 0x0ff);
 }
 
 
@@ -62,23 +62,23 @@ static inline uint8_t spi_rx()
 void spiflash_getid(t_flashid *pflashid)
 {
   spiflash_select();
-  spi_tx(0x9f);      //identify/RDID command  
-  
+  spi_tx(0x9f);      //identify/RDID command
+
   spi_tx(0);
   spi_tx(0);
   spi_tx(0);
-  (*pflashid)[0]=spi_rx();    
+  (*pflashid)[0]=spi_rx();
   (*pflashid)[1]=spi_rx();
-  (*pflashid)[2]=spi_rx();  
-  
+  (*pflashid)[2]=spi_rx();
+
   spiflash_deslect();
-  
+
 }
 
 
 void delay_1ms()
 {
-  delay_loop(1000000 / LOOP_TIME);        
+  delay_loop(1000000 / LOOP_TIME);
 }
 
 
@@ -87,9 +87,9 @@ int impl_spiflash_spi_txrx(spiflash_t *spi, const uint8_t *tx_data,
       uint32_t tx_len, uint8_t *rx_data, uint32_t rx_len) {
   int res = SPIFLASH_OK;
   int i;
-  
-  
-  
+
+
+
   if (tx_len > 0) {
     // first transmit tx_len bytes from tx_data if needed
     for(i=0;i<tx_len;i++) spi_tx(tx_data[i]);
@@ -118,8 +118,8 @@ void impl_spiflash_spi_cs(spiflash_t *spi, uint8_t cs) {
 void impl_spiflash_wait(spiflash_t *spi, uint32_t ms) {
   while(ms) {
     delay_1ms();
-    ms--;    
-  }    
+    ms--;
+  }
 }
 
 static const spiflash_hal_t my_spiflash_hal = {
@@ -132,7 +132,7 @@ const spiflash_cmd_tbl_t my_spiflash_cmds = SPIFLASH_CMD_TBL_STANDARD;
 
 
 const spiflash_config_t my_spiflash_config = {
-  .sz = 1024*1024*8, // 8MB 
+  .sz = 1024*1024*8, // 8MB
   .page_sz = 256, // normally 256 byte pages
   .addr_sz = 3, // normally 3 byte addressing
   .addr_dummy_sz = 0, // using single line data, not quad or something
@@ -149,7 +149,7 @@ const spiflash_config_t my_spiflash_config = {
 
 static spiflash_t spif;
 
- 
+
 
 
 bool spiflash_test()
@@ -157,28 +157,28 @@ bool spiflash_test()
 t_flashid id;
 
 //int i;
-    
+
     //printk("wait 5 Seconds...");
     //for(i=0;i<5000;i++) delay_1ms();
     //printk("ok\n");
-    
+
     spiflash_init();
     spiflash_getid(&id);
     printk("Flash id %x %x %x\n",id[0],id[1],id[2]);
-    
-   
-    
-    
-    
+
+
+
+
+
     return (id[0]==FLASH_MAN && id[1]==FLASH_DEV1 && id[2]==FLASH_DEV2);
-   
+
 }
 
 spiflash_t* flash_init()
 {
 uint32_t  jedec_id;
-    
-   spiflash_init(); 
+
+   spiflash_init();
    SPIFLASH_init(&spif,
                 &my_spiflash_config,
                 &my_spiflash_cmds,
@@ -186,43 +186,43 @@ uint32_t  jedec_id;
                 0,
                 SPIFLASH_SYNCHRONOUS,
                 NULL);
-    
+
     SPIFLASH_read_jedec_id(&spif,&jedec_id);
-    printk("JEDEC ID: %x\n",jedec_id);    
-    return &spif; 
+    printk("SPI Flash JEDEC ID: %x\n",jedec_id);
+    return &spif;
 }
 
 int flash_print_spiresult(int code)
 {
-  if (code==SPIFLASH_OK)  
-    printk("...success\n"); 
-  else 
+  if (code==SPIFLASH_OK)
+    printk("...OK\n");
+  else
     printk("SPIFLASH err %x\n",code);
-    
-   return code;    
+
+   return code;
 }
 
 int flash_Overwrite(spiflash_t *spi, uint32_t addr, uint32_t len, const uint8_t *buf)
 {
-int res;    
+int res;
 int nBlocks,i;
-   
+
    nBlocks = len >> 12;
-   if (nBlocks % 4096) nBlocks++;
+   if (len % 4096) nBlocks++;
 
    printk("Erasing %d 4KB Blocks at %x...\n",nBlocks,addr);
    res=SPIFLASH_erase(spi,addr,len);
    flash_print_spiresult(res);
    if (res!=SPIFLASH_OK) return res;
-   
+
    for(i=0;i<nBlocks && res==SPIFLASH_OK ;i++) {
      printk("Writing mem %x to flash %x\n",buf,addr);
      res=SPIFLASH_write(spi,addr,4096,buf);
      addr+=4096; buf+=4096;
   }
-   
+
   return flash_print_spiresult(res);
-   
+
 }
 
 
