@@ -5,6 +5,7 @@
 #define UART_BASE 0x08000000
 #define SPIFLASH_BASE 0x08000100
 #define GPIO_BASE 0x04000000
+#define MTIME_BASE 0x0FFFF0000
 
 #define DRAM_BASE 0x0
 #define DRAM_SIZE (8192*1024) // 8 Megabytes

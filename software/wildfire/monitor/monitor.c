@@ -38,6 +38,12 @@ typedef struct {
 
 #define BAUDRATE 500000L
 
+// Offset of mtime for 1ms 
+#define TIME_OFFS (SYSCLK / 1000 ) 
+
+int uptime = 0; // Uptime in ms
+volatile uint32_t *pmtime = (uint32_t*)MTIME_BASE;
+
 
 // XModem and spi Flash Variables
 
@@ -60,7 +66,7 @@ trapframe_t* trap_handler(trapframe_t *ptf)
 char c;
 
 
-    *gpioadr = (ptf->cause & 0x0f); // Show trap cause on LEDs
+    //*gpioadr = (ptf->cause & 0x0f); // Show trap cause on LEDs
 
     if (ptf->cause==11 || ptf->cause==8) // ecall
         handle_syscall(ptf);
@@ -72,7 +78,7 @@ char c;
         if (c=='r' || c=='R')
           ptf->epc=SRAM_BASE; // will cause reset
         else
-          ptf->epc+=4;
+          if (((long)ptf->cause)>0) ptf->epc+=4;
     }
     return ptf;
 }
@@ -113,12 +119,11 @@ long newBaud;
 
 
 
-
 void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.2a\n");
+  printk("\nBonfire Boot Monitor 0.2b\n");
   printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\n",
          read_csr(mimpid),read_csr(misa),
          getDivisor(),getUartRevision());
@@ -212,10 +217,8 @@ uint32_t nFlashbytes;
 uint32_t flashAddress;
 int err;
 
-
-
-
    setBaudRate(BAUDRATE);
+  
    printInfo();
    spi=flash_init();
 
@@ -273,7 +276,7 @@ int err;
          write_console("Wait for receive...\n");
          recv_bytes=xmodem_receive((char*)args[0],args[1]);
          nPages= recv_bytes >> 12; // Number of 4096 Byte pages
-         if (nPages % 4096) nPages+=1; // Round up..
+         if (recv_bytes % 4096) nPages+=1; // Round up..
          brk_address= ((uint32_t)LOAD_BASE + recv_bytes + 4096) & 0x0fffffffc;
          break;
        case 'E':
@@ -298,7 +301,7 @@ int err;
            pfunc=(void*)args[0];
          else
            pfunc=LOAD_BASE;
-
+         clear_csr(mstatus,MSTATUS_MIE);
          start_user((uint32_t)pfunc,DRAM_TOP & 0x0fffffffc );
          break;
 
@@ -333,29 +336,14 @@ int err;
          break;
 
        case 'R': // Load Boot Image from Flash and run
-         if (readBootImage(spi)==SPIFLASH_OK) start_user((uint32_t)LOAD_BASE,DRAM_TOP & 0x0fffffffc );;
+         if (readBootImage(spi)==SPIFLASH_OK) {
+            clear_csr(mstatus,MSTATUS_MIE); 
+            start_user((uint32_t)LOAD_BASE,DRAM_TOP & 0x0fffffffc );
+         }     
          break;
 
        case 'W': // flash write
-
-
-
          writeBootImage(spi);
-
-         //nPages= 1;
-         //flashAddress=0x80 << 12;
-         //nFlashbytes=nPages << 12;
-         //printk("Flash write to Flash Address %x  (%d Bytes)...\n",flashAddress,nFlashbytes);
-         //err=SPIFLASH_erase(spi,flashAddress,nFlashbytes);
-         //if (err==0)
-           //err=SPIFLASH_write(spi,flashAddress,nFlashbytes,(uint8_t*)LOAD_BASE);
-
-         //if (err!=0)
-            //error(err);
-         //else
-           //printk("OK");
-         //break;
-
 
        default:
          writechar('\a'); // beep...
