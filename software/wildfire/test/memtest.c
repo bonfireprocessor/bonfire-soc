@@ -61,7 +61,7 @@ const int blocksz = 64;
 char buff[32];
 
    //setDivisor(16);
-   setBaudRate(115200);
+   setBaudRate(500000);
    writestr("Memory test program 3.0\r\nProcessor ID: ");
    writeHex(get_impid());
    writestr("\r\nUART Divisor: ");

@@ -7,7 +7,6 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-#include "encoding.h"
 #include "monitor.h"
 #include "mempattern.h"
 #include "console.h"
@@ -25,6 +24,10 @@ extern uint8_t *gpioadr;
 #define LOAD_SIZE  (DRAM_SIZE-(long)LOAD_BASE)
 #define HEADER_BASE ((void*)(LOAD_BASE-4096)) // Place Flash Header 4KB below LOAD_BASE
 
+ // Important: Stack must be aligned modulo 8, otherwiese the varargs of doubles did not work
+// Searched for this nearly a day, wondering why printf of doubles did not work...
+#define USER_STACK (DRAM_TOP & 0x0fffffff8)
+
 typedef struct {
   uint32_t magic;
   uint32_t nPages;
@@ -38,8 +41,8 @@ typedef struct {
 
 #define BAUDRATE 500000L
 
-// Offset of mtime for 1ms 
-#define TIME_OFFS (SYSCLK / 1000 ) 
+// Offset of mtime for 1ms
+#define TIME_OFFS (SYSCLK / 1000 )
 
 int uptime = 0; // Uptime in ms
 volatile uint32_t *pmtime = (uint32_t*)MTIME_BASE;
@@ -123,7 +126,7 @@ void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.2b\n");
+  printk("\nBonfire Boot Monitor 0.2c\n");
   printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\n",
          read_csr(mimpid),read_csr(misa),
          getDivisor(),getUartRevision());
@@ -218,7 +221,7 @@ uint32_t flashAddress;
 int err;
 
    setBaudRate(BAUDRATE);
-  
+
    printInfo();
    spi=flash_init();
 
@@ -302,7 +305,7 @@ int err;
          else
            pfunc=LOAD_BASE;
          clear_csr(mstatus,MSTATUS_MIE);
-         start_user((uint32_t)pfunc,DRAM_TOP & 0x0fffffffc );
+         start_user((uint32_t)pfunc,USER_STACK );
          break;
 
        case 'F': // flash read
@@ -337,9 +340,10 @@ int err;
 
        case 'R': // Load Boot Image from Flash and run
          if (readBootImage(spi)==SPIFLASH_OK) {
-            clear_csr(mstatus,MSTATUS_MIE); 
-            start_user((uint32_t)LOAD_BASE,DRAM_TOP & 0x0fffffffc );
-         }     
+            clear_csr(mstatus,MSTATUS_MIE);
+           
+            start_user((uint32_t)LOAD_BASE,USER_STACK );
+         }
          break;
 
        case 'W': // flash write

@@ -1,12 +1,15 @@
 
 .PHONY: all clean
 
+ARCH=rv32i
+ABI=ilp32
+
 PLATFORM=PAPRO
 
 BOOTLINK=wildfboot.ld
 
-#LINKDEF=wildfboot.ld
-LINKDEF=wildfdram.ld
+LINKDEF?=wildfboot.ld
+#LINKDEF=wildfdram.ld
 
 TARGET_PREFIX ?= riscv32-unknown-elf
 TARGET_CC := $(TARGET_PREFIX)-gcc
@@ -21,12 +24,12 @@ TOPLEVEL = ~/riscv/ise/bonfire/papilio_pro_dram_toplevel.bit
 PLATFORMDIR=../platform
 
 
-TARGET_CFLAGS +=  -march=rv32im -Wall -Os -g  -fomit-frame-pointer \
+TARGET_CFLAGS +=  -march=$(ARCH) -mabi=$(ABI) -Wall -Os -g  -fomit-frame-pointer \
 	-ffreestanding -fno-builtin  \
 	-Wall -Werror=implicit-function-declaration \
 	-D$(PLATFORM) -I$(PLATFORMDIR) -I$(PLATFORMDIR)/$(PLATFORM) 
 
-TARGET_LDFLAGS +=  -march=rv32i -nostartfiles  \
+TARGET_LDFLAGS += -march=$(ARCH) -mabi=$(ABI) -nostartfiles   \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-T$(LINKDEF) \
 	-Wl,--gc-sections
 

@@ -166,10 +166,6 @@ t_flashid id;
     spiflash_getid(&id);
     printk("Flash id %x %x %x\n",id[0],id[1],id[2]);
 
-
-
-
-
     return (id[0]==FLASH_MAN && id[1]==FLASH_DEV1 && id[2]==FLASH_DEV2);
 
 }

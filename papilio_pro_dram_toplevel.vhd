@@ -182,7 +182,7 @@ signal irq_i : std_logic_vector(7 downto 0);
 		);
 	END COMPONENT;
   
- signal sysclk_sram_we, sysclk_sram_wen, clkgen_rst: std_logic;  
+ signal  clkgen_rst: std_logic;  
 
 
 
@@ -519,9 +519,9 @@ end generate;
     clkin   => clk32Mhz,
     rstin   => '0'  ,
     clkout  => clk,
-    clkout1  => sysclk_sram_we,
-    clkout2  => sysclk_sram_wen,
-	 clk32Mhz_out => uart_clk,
+    clkout1  => open,
+    clkout2  => open,
+	 clk32Mhz_out => open,
     rstout  => clkgen_rst
   );
 

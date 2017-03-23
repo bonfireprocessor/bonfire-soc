@@ -39,7 +39,7 @@ int x,y,result;
 uint32_t impid;
 
   //setBaudRate(115200);
-  setBaudRate(38400);
+  setBaudRate(500000);
   
   impid=get_impid();
   
