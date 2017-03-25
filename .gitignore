@@ -24,3 +24,4 @@
 /software/wildfire/test/mult.vhd
 /spartan9/mult.vhd
 /software/wildfire/monitor/monitor.vhd
+/software/wildfire/dhrystone/dhrystone_bram.vhd

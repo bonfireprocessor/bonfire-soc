@@ -10,9 +10,9 @@ ENTRY(_start)
 SECTIONS
 {
   _rombase = 0x0C000000;
-  
+
   . = 0x0;
-  
+
   .text : {
     *(.init)
     *(.text.*)
@@ -25,11 +25,18 @@ SECTIONS
      *(.eh_frame)
      *(.sdata)
      *(.data)
+     *(.sbss)
+     *(.sbss.*)
+     *(.gnu.linkonce.sb.*)
      *(.bss)
-     end = .; _end = .; __end = .;
-      
+     *(.bss.*)
+     *(.gnu.linkonce.b.*)
+     *(COMMON)
+
+      end = .; _end = .; __end = .;
+
  } > RAM
-  _stacktop = 0x0C007ff0; 
+  _stacktop = 0x0C007ff0;
 
 }
 
