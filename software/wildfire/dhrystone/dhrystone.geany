@@ -28,14 +28,14 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=0
-FILE_NAME_0=8142;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhry_1.c;0;4
+current_page=5
+FILE_NAME_0=463;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhry_1.c;0;4
 FILE_NAME_1=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhry_2.c;0;4
-FILE_NAME_2=637;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhry_stubs.c;0;4
-FILE_NAME_3=685;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2FMakefile;0;4
+FILE_NAME_2=466;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhry_stubs.c;0;4
+FILE_NAME_3=471;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2FMakefile;0;4
 FILE_NAME_4=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhry.h;0;4
-FILE_NAME_5=96865;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhrystone.lst;0;4
-FILE_NAME_6=222146;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhrystone.dmp;0;4
+FILE_NAME_5=165554;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Fdhrystone_bram.lst;0;4
+FILE_NAME_6=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fdhrystone%2Flibwrap%2Fsbrk.c;0;4
 
 [VTE]
 last_dir=/home/thomas/riscv/lxp32soc/software/wildfire/dhrystone

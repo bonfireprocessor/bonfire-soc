@@ -17,6 +17,7 @@
 
 #include "dhry.h"
 
+
 /* Global Variables: */
 
 Rec_Pointer     Ptr_Glob,
@@ -53,6 +54,8 @@ extern  int     times ();
 #ifdef TIME
 extern long     time();
                 /* see library function "time"  */
+
+extern uint64_t get_timer_value();
 #define Too_Small_Time 2
                 /* Measurements should last at least 2 seconds */
 #endif
@@ -62,6 +65,8 @@ long            Begin_Time,
                 User_Time;
 float           Microseconds,
                 Dhrystones_Per_Second;
+
+double tt;
 
 /* end of variables for time measurement */
 
@@ -134,6 +139,8 @@ main ()
 #endif
 #ifdef TIME
   Begin_Time = time ( (long *) 0);
+  tt=(double)get_timer_value();
+  printf("%f  %ld\n",tt,Begin_Time);
 #endif
 
   for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
@@ -192,6 +199,8 @@ main ()
 #endif
 #ifdef TIME
   End_Time = time ( (long *) 0);
+  tt=(double)get_timer_value();
+  printf("%f  %ld\n",tt,End_Time);
 #endif
 
   printf ("Execution ends\n");
@@ -249,7 +258,7 @@ main ()
 
 
   User_Time = End_Time - Begin_Time;
-  printf("Total Runtime %ld secs \n",User_Time);
+  printf("Total Runtime %ld- %ld =   %ld secs \n",End_Time,Begin_Time, User_Time);
 
   if (User_Time < Too_Small_Time)
   {

@@ -31,7 +31,7 @@ long time(void)
 // set the number of dhrystone iterations
 void __wrap_scanf(const char* fmt, int* n)
 {
-  *n = 1000000;
+  *n = 10000000;
 }
 
 
