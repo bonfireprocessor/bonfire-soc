@@ -1,5 +1,5 @@
 
-.PHONY: all clean
+.PHONY: all clean run
 
 ARCH=rv32i
 ABI=ilp32
@@ -13,6 +13,7 @@ TARGET_SIZE := $(TARGET_PREFIX)-size
 TARGET_OBJCOPY := $(TARGET_PREFIX)-objcopy
 HEXDUMP ?= hexdump
 DATA2MEM = /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/data2mem
+PROG?=papilio-prog -v -f
 
 SOFTROOT = ../..
 PROJROOT = $(SOFTROOT)/..
@@ -35,8 +36,10 @@ TARGET_LDFLAGS += -march=$(ARCH) -mabi=$(ABI) -nostartfiles  \
 
 OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o syscall.o spi_driver.o
 
+run: monitor.bit
+	$(PROG) $<
 
-all: monitor.hex
+all: monitor.hex monitor.bin
 
 %.bit: %.elf $(TOPLEVEL)
 	$(DATA2MEM) -bm $(PROJROOT)/platform/wildfire_papro/soc_bd.bmm  -bd $< -bt $(TOPLEVEL)  -o hb $(basename $@)

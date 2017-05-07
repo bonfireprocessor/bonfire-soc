@@ -2,68 +2,68 @@ ADDRESS_SPACE ram RAMB16   [0x0C000000:0x0C007fff]
 
 
         BUS_BLOCK
-           Firmware/ram/Mram_ram1 [31:0];
+           ram/Mram_ram1 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram2 [31:0];
+           ram/Mram_ram2 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram3 [31:0];
+           ram/Mram_ram3 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram4 [31:0];
+           ram/Mram_ram4 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram5 [31:0];
+           ram/Mram_ram5 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram6 [31:0];
+           ram/Mram_ram6 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram7 [31:0];
+           ram/Mram_ram7 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram8 [31:0];
+           ram/Mram_ram8 [31:0];
         END_BUS_BLOCK;
         
         
          BUS_BLOCK
-           Firmware/ram/Mram_ram9 [31:0];
+           ram/Mram_ram9 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram10 [31:0];
+           ram/Mram_ram10 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram11 [31:0];
+           ram/Mram_ram11 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram12 [31:0];
+           ram/Mram_ram12 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram13 [31:0];
+           ram/Mram_ram13 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram14 [31:0];
+           ram/Mram_ram14 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram15 [31:0];
+           ram/Mram_ram15 [31:0];
         END_BUS_BLOCK;
         
         BUS_BLOCK
-           Firmware/ram/Mram_ram16 [31:0];
+           ram/Mram_ram16 [31:0];
         END_BUS_BLOCK;
         
 END_ADDRESS_SPACE;

@@ -41,12 +41,6 @@ typedef struct {
 
 #define BAUDRATE 500000L
 
-// Offset of mtime for 1ms
-#define TIME_OFFS (SYSCLK / 1000 )
-
-int uptime = 0; // Uptime in ms
-volatile uint32_t *pmtime = (uint32_t*)MTIME_BASE;
-
 
 // XModem and spi Flash Variables
 
@@ -126,10 +120,10 @@ void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.2c\n");
-  printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\n",
+  printk("\nBonfire Boot Monitor 0.2d\n");
+  printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\nUptime %d sec\n",
          read_csr(mimpid),read_csr(misa),
-         getDivisor(),getUartRevision());
+         getDivisor(),getUartRevision(),sys_time(NULL));
 }
 
 void error(int n)

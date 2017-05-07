@@ -96,22 +96,6 @@ signal clk32Mhz,   -- buffered osc clock
 
 signal reset,res1,res2  : std_logic;
 
--- Instruction Bus
---signal  ib_data : std_logic_vector(31 downto 0);
---signal  ib_busy,ib_rden : std_logic;
---signal  ib_adr : std_logic_vector(29 downto 0);
-
--- Instruction Bus Master
-signal ibus_cyc_o:  std_logic;
-signal ibus_stb_o:  std_logic;
-signal ibus_cti_o:  std_logic_vector(2 downto 0);
-signal ibus_bte_o:  std_logic_vector(1 downto 0);
-signal ibus_ack_i:  std_logic;
-signal ibus_adr_o:  std_logic_vector(29 downto 0);
-signal ibus_dat_i:  std_logic_vector(31 downto 0);
-
-
-
 -- Data Bus Master
 signal  dbus_cyc_o :  std_logic;
 signal  dbus_stb_o :  std_logic;
@@ -121,6 +105,8 @@ signal  dbus_adr_o :  std_logic_vector(31 downto 2);
 signal  dbus_dat_o :  std_logic_vector(31 downto 0);
 signal  dbus_ack_i :  std_logic;
 signal  dbus_dat_i :  std_logic_vector(31 downto 0);
+signal  dbus_cti_o:  std_logic_vector(2 downto 0);
+signal  dbus_bte_o:  std_logic_vector(1 downto 0);
 
 -- Slaves
 constant slave_adr_high : natural := 25;
@@ -138,6 +124,23 @@ signal mem2_sel :  std_logic_vector(3 downto 0);
 signal mem2_dat_rd,mem2_dat_wr : std_logic_vector(31 downto 0);
 signal mem2_adr : std_logic_vector(slave_adr_high downto 2);
 signal mem2_cti : std_logic_vector(2 downto 0);
+
+
+-- Interface to  dual port Block RAM
+-- Port A R/W, Byte Level Access, for Data
+     
+signal      bram_dba_i :  std_logic_vector(31 downto 0);
+signal      bram_dba_o :  std_logic_vector(31 downto 0);
+signal      bram_adra_o : std_logic_vector(ram_adr_width-1 downto 0);
+signal      bram_ena_o :  std_logic;
+signal      bram_wrena_o :std_logic_vector (3 downto 0);  
+      
+-- Port B Read Only, Word level access, for Code 
+signal      bram_dbb_i :  std_logic_vector(31 downto 0);
+signal      bram_adrb_o : std_logic_vector(ram_adr_width-1 downto 0);
+signal      bram_enb_o :  std_logic;
+
+
 
 -- gpio bus
 signal gpio_cyc,gpio_stb,gpio_we,gpio_ack : std_logic;
@@ -193,75 +196,66 @@ begin
 
 
 
-    cpu_top: entity work.lxp32c_top
+    cpu_top: entity work.bonfire_cpu_top
      generic map (
-       USE_RISCV => true,
        MUL_ARCH => "spartandsp",
        REG_RAM_STYLE => "block",
        START_ADDR => reset_adr(31 downto 2),
-       IBUS_BURST_SIZE =>InstructionBurstSize,
-       IBUS_PREFETCH_SIZE =>InstructionBurstSize,
-       ENABLE_ICACHE =>true,
-       CACHE_SIZE_WORDS=>CacheSizeWords
+       CACHE_LINE_SIZE_WORDS =>InstructionBurstSize,
+       CACHE_SIZE_WORDS=>CacheSizeWords,
+       BRAM_PORT_ADR_SIZE=>ram_adr_width
      )
 
      PORT MAP(
         clk_i => clk,
         rst_i => reset,
 
-        ibus_cyc_o => ibus_cyc_o,
-        ibus_stb_o => ibus_stb_o,
-        ibus_cti_o => ibus_cti_o,
-        ibus_bte_o => ibus_bte_o,
-        ibus_ack_i => ibus_ack_i,
-        ibus_adr_o => ibus_adr_o,
-        ibus_dat_i => ibus_dat_i,
-
-        dbus_cyc_o => dbus_cyc_o,
-        dbus_stb_o => dbus_stb_o,
-        dbus_we_o => dbus_we_o,
-        dbus_sel_o => dbus_sel_o,
-        dbus_ack_i => dbus_ack_i,
-        dbus_adr_o => dbus_adr_o,
-        dbus_dat_o => dbus_dat_o,
-        dbus_dat_i => dbus_dat_i,
-        irq_i  => irq_i
+        bram_dba_i => bram_dba_i,
+		  bram_dba_o => bram_dba_o,
+		  bram_adra_o => bram_adra_o,
+		  bram_ena_o =>  bram_ena_o,
+		  bram_wrena_o => bram_wrena_o,
+		  bram_dbb_i =>  bram_dbb_i,
+		  bram_adrb_o => bram_adrb_o,
+		  bram_enb_o =>  bram_enb_o,
+		  wb_cyc_o => dbus_cyc_o,
+		  wb_stb_o => dbus_stb_o,
+		  wb_we_o =>  dbus_we_o,
+		  wb_sel_o => dbus_sel_o,
+		  wb_ack_i => dbus_ack_i,
+		  wb_adr_o => dbus_adr_o,
+		  wb_dat_o => dbus_dat_o,
+		  wb_dat_i => dbus_dat_i,
+		  wb_cti_o => dbus_cti_o,
+		  wb_bte_o => dbus_bte_o,
+		  irq_i => irq_i
     );
 
 
- -- Block RAM with Boot Code
+ram: entity work.MainMemory 
+        generic map (
+           ADDR_WIDTH =>ram_adr_width,
+           SIZE => ram_size,
+           RamFileName => RamFileName,
+           mode => mode,
+           Swapbytes => Swapbytes,
+           EnableSecondPort => true            
+        )
+           
+      PORT MAP(
+         DBOut =>   bram_dba_i,
+         DBIn =>    bram_dba_o,
+         AdrBus =>  bram_adra_o,
+         ENA =>     bram_ena_o,
+         WREN =>    bram_wrena_o,
+         CLK =>     clk,
+         CLKB =>    clk,
+         ENB =>     bram_enb_o,
+         AdrBusB => bram_adrb_o,
+         DBOutB =>  bram_dbb_i
+      );
  
-   Firmware:  entity work.wbs_memory_interface
-    GENERIC MAP (
-        ram_adr_width => ram_adr_width,
-        ram_size => ram_size,
-        RamFileName => RamFileName,
-        mode => mode,
-        Swapbytes => Swapbytes,
-        wbs_adr_high => slave_adr_high
 
-    )
-
-    PORT MAP(
-        clk_i =>clk ,
-        rst_i => reset,
-        wbs_cyc_i =>  mem_cyc,
-        wbs_stb_i =>  mem_stb,
-        wbs_we_i =>    mem_we,
-        wbs_sel_i =>  mem_sel,
-        wbs_ack_o =>  mem_ack,
-        wbs_adr_i =>  mem_adr,
-        wbs_dat_i =>  mem_dat_wr,
-        wbs_dat_o =>  mem_dat_rd,
-        wbs_cti_i => mem_cti
-
-        
-    );
-
-
-
--- Will later be the DRAM
--- for the moment we just use also block RAM here 
 
 simulate_dram: if FakeDRAM generate
 
@@ -454,25 +448,14 @@ end generate;
         s0_adr_i => dbus_adr_o,
         s0_dat_i => dbus_dat_o,
         s0_dat_o => dbus_dat_i,
-        s0_cti_i => "000",
+        s0_cti_i => dbus_cti_o,
+        s0_bte_i => dbus_bte_o,
 
-        -- Instruction Bus
-
-        s1_cyc_i => ibus_cyc_o,
-        s1_stb_i =>  ibus_stb_o,
-        s1_we_i => '0',
-        s1_sel_i => "0000" ,
-        s1_ack_o => ibus_ack_i,
-        s1_adr_i => ibus_adr_o,
-        s1_dat_i => (others=>'0'),
-        s1_dat_o => ibus_dat_i,
-        s1_cti_i => ibus_cti_o,
-
-
+       
           -- DRAM at address   0x00000000-0x03FFFFFF
         m0_cyc_o =>  mem2_cyc,
         m0_stb_o =>  mem2_stb,
-        m0_we_o =>    mem2_we,
+        m0_we_o =>   mem2_we,
         m0_sel_o =>  mem2_sel,
         m0_ack_i =>  mem2_ack,
         m0_adr_o =>  mem2_adr,
@@ -480,35 +463,28 @@ end generate;
         m0_dat_i =>  mem2_dat_rd,
         m0_cti_o =>  mem2_cti,
         --IO Space 1: 0x04000000-0x07FFFFF (Decode 0000 01)
-        m1_cyc_o => gpio_cyc,
-        m1_stb_o => gpio_stb,
-        m1_we_o =>  gpio_we,
+        m1_cyc_o =>  gpio_cyc,
+        m1_stb_o =>  gpio_stb,
+        m1_we_o =>   gpio_we,
         m1_sel_o =>  gpio_sel,
         m1_ack_i =>  gpio_ack,
         m1_adr_o =>  gpio_adr,
         m1_dat_o =>  gpio_dat_wr,
         m1_dat_i =>  gpio_dat_rd,
+        m1_cti_o =>  open,
+        m1_bte_o =>  open,
         
         -- IO Space 2:  0x08000000-0x0BFFFFFF (Decode 0000 10)
-        m2_cyc_o => lpc_cyc,
-        m2_stb_o => lpc_stb,
+        m2_cyc_o =>  lpc_cyc,
+        m2_stb_o =>  lpc_stb,
         m2_we_o =>   lpc_we,
         m2_sel_o =>  lpc_sel,
         m2_ack_i =>  lpc_ack,
-        m2_adr_o => lpc_adr,
+        m2_adr_o =>  lpc_adr,
         m2_dat_o =>  lpc_dat_wr,
-        m2_dat_i => lpc_dat_rd,   
-        
-         --ROM/Block RAM: 0x0C000000-0x0FFFFFFF
-        m3_cyc_o =>  mem_cyc,
-        m3_stb_o =>  mem_stb,
-        m3_we_o =>   mem_we,
-        m3_sel_o =>  mem_sel,
-        m3_ack_i =>  mem_ack,
-        m3_adr_o =>  mem_adr,
-        m3_dat_o =>  mem_dat_wr,
-        m3_dat_i =>  mem_dat_rd,
-        m3_cti_o =>  mem_cti        
+        m2_dat_i =>  lpc_dat_rd,
+        m2_cti_o =>  open,
+		m2_bte_o =>  open 
     );
 
 

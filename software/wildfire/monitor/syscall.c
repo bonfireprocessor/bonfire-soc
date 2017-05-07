@@ -1,6 +1,6 @@
 // See LICENSE for license details.
 
-#include "platform.h"
+#include "bonfire.h"
 #include <sys/errno.h>
 #include "syscall.h"
 #include "file.h"
@@ -8,6 +8,8 @@
 #include "uart.h"
 #include "console.h"
 #include <string.h>
+
+
 
 typedef long (*syscall_t)(long, long, long, long, long, long, long);
 
@@ -148,22 +150,33 @@ uintptr_t sys_mprotect(uintptr_t addr, size_t length, int prot)
    return  -EBADF;
 }
 
+uint64_t get_timer_value()
+{
+#if __riscv_xlen == 32
+  while (1) {
+    uint32_t hi = read_csr(mcycleh);
+    uint32_t lo = read_csr(mcycle);
+    if (hi == read_csr(mcycleh))
+      return ((uint64_t)hi << 32) | lo;
+  }
+#else
+  return read_csr(mcycle);
+#endif
+}
 
 
 long sys_time(long* loc)
 {
-  //uintptr_t t = rdcycle() / CLOCK_FREQ;
-  //if (loc)
-    //*loc = t;
-  long t=0;  
+  long t = get_timer_value() / SYSCLK;
+  if (loc) *loc = t;
+ 
   return t;
 }
 
 int sys_times(long* loc)
 {
-  //uintptr_t t = rdcycle();
-  //kassert(CLOCK_FREQ % 1000000 == 0);
-  loc[0] =  0; //t / (CLOCK_FREQ / 1000000);
+  uint64_t t=get_timer_value();
+  loc[0] = t / (SYSCLK / 1000000);
   loc[1] = 0;
   loc[2] = 0;
   loc[3] = 0;
@@ -173,9 +186,9 @@ int sys_times(long* loc)
 
 int sys_gettimeofday(long* loc)
 {
-  //uintptr_t t = rdcycle();
-  loc[0] = 0; // = t / CLOCK_FREQ;
-  loc[1] = 0; // (t % CLOCK_FREQ) / (CLOCK_FREQ / 1000000);
+uint64_t t=get_timer_value();
+  loc[0]  = t / SYSCLK;
+  loc[1] = (t % SYSCLK) / (SYSCLK / 1000000);
   
   return 0;
 }
