@@ -1,0 +1,61 @@
+[editor]
+line_wrapping=false
+line_break_column=72
+auto_continue_multiline=true
+
+[file_prefs]
+final_new_line=true
+ensure_convert_new_lines=false
+strip_trailing_spaces=true
+replace_tabs=true
+
+[indentation]
+indent_width=4
+indent_type=0
+indent_hard_tab_width=8
+detect_indent=false
+detect_indent_width=false
+indent_mode=2
+
+[project]
+name=samples
+base_path=/home/thomas/riscv/lxp32soc/software/wildfire/user/
+description=
+file_patterns=
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72
+
+[files]
+current_page=2
+FILE_NAME_0=474;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fuser%2Ffptest.c;0;4
+FILE_NAME_1=683;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fuser%2FMakefile;0;4
+FILE_NAME_2=349;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fuser%2Ffptest.lst;0;4
+FILE_NAME_3=193011;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fuser%2Ffptest.dmp;0;4
+FILE_NAME_4=673;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fuser%2Fstart.S;0;4
+FILE_NAME_5=882;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fuser%2Fftoa.c;0;4
+
+[VTE]
+last_dir=/home/thomas/riscv/lxp32soc/software/wildfire/user
+
+[build-menu]
+NF_00_LB=_Make
+NF_00_CM=make all
+NF_00_WD=
+NF_01_LB=Make Custom _Target...
+NF_01_CM=make %e.hex
+NF_01_WD=
+CFT_00_LB=_Compile
+CFT_00_CM=make -B  %e.o
+CFT_00_WD=
+CFT_01_LB=_Build
+CFT_01_CM=make %e.elf
+CFT_01_WD=
+filetypes=C;Make;
+MakeFT_00_LB=_Compile
+MakeFT_00_CM=make -B  %e.o
+MakeFT_00_WD=
+MakeFT_01_LB=_Build
+MakeFT_01_CM=make %e.elf
+MakeFT_01_WD=
