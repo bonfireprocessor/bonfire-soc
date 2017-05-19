@@ -1,9 +1,9 @@
 
 .PHONY: all clean run
 
-ARCH=rv32i
+ARCH ?= rv32im
 ABI=ilp32
-PLATFORM=PAPRO
+PLATFORM ?= PAPRO
 
 
 TARGET_PREFIX ?= riscv32-unknown-elf
@@ -12,7 +12,7 @@ TARGET_LD := $(TARGET_PREFIX)-gcc
 TARGET_SIZE := $(TARGET_PREFIX)-size
 TARGET_OBJCOPY := $(TARGET_PREFIX)-objcopy
 HEXDUMP ?= hexdump
-DATA2MEM = /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/data2mem
+DATA2MEM ?= /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/data2mem
 PROG?=papilio-prog -v -f
 
 SOFTROOT = ../..
