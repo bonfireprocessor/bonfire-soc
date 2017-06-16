@@ -56,7 +56,7 @@ port(
 		wbs_adr_i: in std_logic_vector(wbs_adr_high downto 2);
 		wbs_dat_i: in std_logic_vector(31 downto 0);
 		wbs_dat_o: out std_logic_vector(31 downto 0);
-      wbs_cti_i: in std_logic_vector(2 downto 0)
+        wbs_cti_i: in std_logic_vector(2 downto 0)
 		
 	);
 end wbs_memory_interface;

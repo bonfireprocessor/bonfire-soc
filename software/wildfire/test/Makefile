@@ -1,15 +1,14 @@
 
 .PHONY: all clean
 
-ARCH=rv32i
+ARCH ?= rv32im
 ABI=ilp32
-
-PLATFORM=PAPRO
+PLATFORM ?= PAPRO
 
 BOOTLINK=wildfboot.ld
 
-LINKDEF?=wildfboot.ld
-#LINKDEF=wildfdram.ld
+
+
 
 TARGET_PREFIX ?= riscv32-unknown-elf
 TARGET_CC := $(TARGET_PREFIX)-gcc
@@ -22,6 +21,8 @@ DATA2MEM = /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/data2mem
 PROJROOT = ../../..
 TOPLEVEL = ~/riscv/ise/bonfire/papilio_pro_dram_toplevel.bit
 PLATFORMDIR=../platform
+
+LINKDEF?=$(PLATFORMDIR)/$(PLATFORM)/firmware.ld
 
 
 TARGET_CFLAGS +=  -march=$(ARCH) -mabi=$(ABI) -Wall -Os -g  -fomit-frame-pointer \

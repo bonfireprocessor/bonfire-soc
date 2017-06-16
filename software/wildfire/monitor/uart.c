@@ -139,7 +139,7 @@ void _setDivisor(uint32_t divisor){
 void setDivisor(uint32_t divisor)
 {
     _setDivisor(divisor);   
-    wait(1000000);
+//    wait(1000000);
 }
 
 uint32_t getDivisor()

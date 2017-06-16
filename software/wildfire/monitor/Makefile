@@ -22,6 +22,7 @@ TOPLEVEL = ~/riscv/ise/bonfire/papilio_pro_dram_toplevel.bit
 PLATFORMDIR=../platform
 LINKDEF=$(PLATFORMDIR)/$(PLATFORM)/firmware.ld
 
+TARGET_NAME=$(PLATFORM)_monitor
 
 
 TARGET_CFLAGS += -march=$(ARCH) -mabi=$(ABI)   -Wall -Os -g -fomit-frame-pointer \
@@ -36,10 +37,10 @@ TARGET_LDFLAGS += -march=$(ARCH) -mabi=$(ABI) -nostartfiles  \
 
 OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o syscall.o spi_driver.o
 
-run: monitor.bit
+run: $(TARGET_NAME).bit
 	$(PROG) $<
 
-all: monitor.hex monitor.bin
+all: $(TARGET_NAME).hex $(TARGET_NAME).bin
 
 %.bit: %.elf $(TOPLEVEL)
 	$(DATA2MEM) -bm $(PROJROOT)/platform/wildfire_papro/soc_bd.bmm  -bd $< -bt $(TOPLEVEL)  -o hb $(basename $@)
@@ -67,7 +68,7 @@ spiflash.o : spiflash_driver/src/spiflash.c
 
 
 	
-monitor.elf : $(OBJECTS) $(LINKDEF)
+$(TARGET_NAME).elf : $(OBJECTS) $(LINKDEF)
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS)  $(OBJECTS)
 
 
