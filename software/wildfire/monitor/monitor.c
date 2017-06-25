@@ -120,10 +120,12 @@ void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.2d\n");
+  printk("\nBonfire Boot Monitor 0.2e\n");
   printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\nUptime %d sec\n",
          read_csr(mimpid),read_csr(misa),
          getDivisor(),getUartRevision(),sys_time(NULL));
+         
+  printk("DRAM Size %ld\n",DRAM_SIZE);       
 }
 
 void error(int n)

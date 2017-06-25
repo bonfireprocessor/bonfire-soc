@@ -128,6 +128,7 @@ main ()
   printf ("\n");
 
   printf ("Execution starts, %d runs through Dhrystone\n", Number_Of_Runs);
+  printf("SYSCLK Frequency %8.3f Mhz\n",((double)get_timer_freq())/1000000.0);
 
   /***************/
   /* Start timer */

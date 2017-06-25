@@ -28,14 +28,13 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=6
+current_page=5
 FILE_NAME_0=59;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.c;0;4
 FILE_NAME_1=225;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Fplatform%2FARTY%2Fplatform.h;0;4
 FILE_NAME_2=57;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Ftest%2Fdram_codesim.c;0;4
 FILE_NAME_3=153;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Ftest%2Fdram_codesim.lst;0;4
 FILE_NAME_4=0;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
 FILE_NAME_5=145;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.lst;0;4
-FILE_NAME_6=0;XML;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2F.cache%2F.fr-2YPote%2Fbonfire_ip_test%2Fbonfire_ip_test.xpr;0;4
 
 [VTE]
 last_dir=/home/thomas/Vivado/bonfire_axi_soc/lib/bonfire-soc/software/wildfire/monitor
