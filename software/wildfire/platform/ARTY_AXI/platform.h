@@ -19,6 +19,8 @@
 #define SRAM_SIZE (32*1024)
 #define SRAM_TOP  (SRAM_BASE+SRAM_SIZE-1)
 
+#define DCACHE_SIZE (8192*4)  // D Cache Size in Bytes
+
 #define SYSCLK 83333333  
 
 #define CLK_PERIOD (1e+9 / SYSCLK)  // in ns...

@@ -87,13 +87,28 @@ void xm_send(u8 c)
 }
 
 
-void test_dram()
+void test_dram(uint32_t sz)
 {
-   printk("\nTesting %d Kilobytes of DRAM...\n",DRAM_SIZE/1024);
-   writepattern((void*)DRAM_BASE,DRAM_SIZE/4);
+   printk("\nTesting %d Kilobytes of DRAM...\n",sz/1024);
+   writepattern((void*)DRAM_BASE,sz/4);
    printk("Verifying...\n");
-   printk("Found %d errors\n",verifypattern((void*)DRAM_BASE,DRAM_SIZE/4));
+   printk("Found %d errors\n",verifypattern((void*)DRAM_BASE,sz/4));
 }
+
+void flush_dache()
+{
+#ifdef DCACHE_SIZE
+uint32_t *pmem = (void*)(DRAM_TOP-DCACHE_SIZE+1);
+static volatile uint32_t sum=0; // To avoid optimizing away code below 
+
+  printk("Cache Flush read from %lx\n",pmem);
+  while ((uint32_t)pmem < DRAM_TOP) {
+    sum+= *pmem++;    
+  }    
+
+#endif    
+        
+}    
 
 
 void changeBaudRate()
@@ -120,7 +135,7 @@ void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.2e\n");
+  printk("\nBonfire Boot Monitor 0.2g\n");
   printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\nUptime %d sec\n",
          read_csr(mimpid),read_csr(misa),
          getDivisor(),getUartRevision(),sys_time(NULL));
@@ -277,6 +292,7 @@ int err;
          nPages= recv_bytes >> 12; // Number of 4096 Byte pages
          if (recv_bytes % 4096) nPages+=1; // Round up..
          brk_address= ((uint32_t)LOAD_BASE + recv_bytes + 4096) & 0x0fffffffc;
+         flush_dache();
          break;
        case 'E':
          if (recv_bytes>=0)
@@ -287,7 +303,7 @@ int err;
          }
          break;
        case 'T':
-         test_dram();
+         test_dram(nArgs>=1?args[0]:DRAM_TOP);
          break;
       case 'B':
         changeBaudRate();
@@ -332,10 +348,12 @@ int err;
             error(err);
          else
            printk("OK");
+         flush_dache();  
          break;
 
        case 'R': // Load Boot Image from Flash and run
          if (readBootImage(spi)==SPIFLASH_OK) {
+            flush_dache(); 
             clear_csr(mstatus,MSTATUS_MIE);
            
             start_user((uint32_t)LOAD_BASE,USER_STACK );

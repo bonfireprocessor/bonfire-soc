@@ -28,16 +28,21 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=5
+current_page=10
 FILE_NAME_0=59;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.c;0;4
-FILE_NAME_1=225;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Fplatform%2FARTY%2Fplatform.h;0;4
-FILE_NAME_2=57;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Ftest%2Fdram_codesim.c;0;4
-FILE_NAME_3=153;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Ftest%2Fdram_codesim.lst;0;4
-FILE_NAME_4=0;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
-FILE_NAME_5=145;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.lst;0;4
+FILE_NAME_1=145;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Fmonitor%2Fmonitor.lst;0;4
+FILE_NAME_2=790;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Ftest_sw%2FMakefile;0;4
+FILE_NAME_3=132;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Ftest_sw%2Fmemsim.c;0;4
+FILE_NAME_4=17;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Ftest_sw%2Fmempattern.c;0;4
+FILE_NAME_5=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Ftest_sw%2Fmemsim.lst;0;4
+FILE_NAME_6=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Fbonfire_axi_soc.sim%2Fsim_axi%2Fbehav%2Felaborate.log;0;4
+FILE_NAME_7=0;VHDL;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fuart%2Ftb_soc_uart.vhd;0;4
+FILE_NAME_8=4237;VHDL;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fspi%2Ftb_spi_interface.vhd;0;4
+FILE_NAME_9=34;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Fsrc%2Fdcache_map.txt;0;4
+FILE_NAME_10=464;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2FVivado%2Fbonfire_axi_soc%2Flib%2Fbonfire-soc%2Fsoftware%2Fwildfire%2Fplatform%2FARTY_AXI%2Fplatform.h;0;4
 
 [VTE]
-last_dir=/home/thomas/Vivado/bonfire_axi_soc/lib/bonfire-soc/software/wildfire/monitor
+last_dir=/home/thomas/Vivado/bonfire_axi_soc/test_sw
 
 [build-menu]
 CFT_00_LB=_Compile
