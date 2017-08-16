@@ -99,16 +99,16 @@ void flush_dache()
 {
 #ifdef DCACHE_SIZE
 uint32_t *pmem = (void*)(DRAM_TOP-DCACHE_SIZE+1);
-static volatile uint32_t sum=0; // To avoid optimizing away code below 
+static volatile uint32_t sum=0; // To avoid optimizing away code below
 
-  printk("Cache Flush read from %lx\n",pmem);
+  printk("Cache %d K Flush read from %lx\n",DCACHE_SIZE,pmem);
   while ((uint32_t)pmem < DRAM_TOP) {
-    sum+= *pmem++;    
-  }    
+    sum+= *pmem++;
+  }
 
-#endif    
-        
-}    
+#endif
+
+}
 
 
 void changeBaudRate()
@@ -130,25 +130,22 @@ long newBaud;
 }
 
 
-
 void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.2g\n");
+  printk("\nBonfire Boot Monitor 0.2f\n");
   printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\nUptime %d sec\n",
          read_csr(mimpid),read_csr(misa),
          getDivisor(),getUartRevision(),sys_time(NULL));
-         
-  printk("DRAM Size %ld\n",DRAM_SIZE);       
+
+  printk("DRAM Size %ld\n",DRAM_SIZE);
 }
 
 void error(int n)
 {
   printk("Error %d\n",n);
 }
-
-
 
 
 void writeBootImage(spiflash_t *spi)
@@ -348,14 +345,14 @@ int err;
             error(err);
          else
            printk("OK");
-         flush_dache();  
+         flush_dache();
          break;
 
        case 'R': // Load Boot Image from Flash and run
          if (readBootImage(spi)==SPIFLASH_OK) {
-            flush_dache(); 
+            flush_dache();
             clear_csr(mstatus,MSTATUS_MIE);
-           
+
             start_user((uint32_t)LOAD_BASE,USER_STACK );
          }
          break;
