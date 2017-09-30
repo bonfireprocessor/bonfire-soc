@@ -27,7 +27,9 @@ generic (
      Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
      FakeDRAM : boolean := false; -- Use Block RAM instead of DRAM
      InstructionBurstSize : natural := 8;
-     CacheSizeWords : natural := 4096 -- 16KB Instruction Cache
+     CacheSizeWords : natural := 4096; -- 16KB Instruction Cache
+     EnableDCache : boolean := true;
+     DCacheSizeWords : natural := 2048
    );
 END tb_dramtest;
 
@@ -42,7 +44,11 @@ ARCHITECTURE behavior OF tb_dramtest IS
      mode : string;
      Swapbytes : boolean := true;
      FakeDRAM : boolean := false;
-     InstructionBurstSize : natural := 8
+     InstructionBurstSize : natural := 8;
+
+     CacheSizeWords : natural := 2048; -- 8KB Instruction Cache
+     EnableDCache : boolean := true;
+     DCacheSizeWords : natural := 2048
      );
     PORT(
         sysclk_32m : IN std_logic;
@@ -120,14 +126,18 @@ BEGIN
    uut: papilio_pro_dram_toplevel
 
     generic map (
+
         RamFileName => RamFileName,
 
         mode=>mode,
         FakeDRAM=>FakeDRAM,
         Swapbytes=>Swapbytes,
-        InstructionBurstSize =>InstructionBurstSize
-     )
+        CacheSizeWords => CacheSizeWords,
+        InstructionBurstSize =>InstructionBurstSize,
+        EnableDCache => EnableDCache,
+        DCacheSizeWords=>DCacheSizeWords
 
+     )
 
    PORT MAP (
           sysclk_32m => sysclk_32m,

@@ -1,7 +1,7 @@
 CAPI=1
 [main]
 name = ::bonfire-soc:0
-depend = ::bonfire-cpu:0 ::bonfire-util:0
+depend = ::bonfire-cpu:0 ::bonfire-util:0 ::bonfire-dcache:0
 backend = ise
 simulators=isim
 

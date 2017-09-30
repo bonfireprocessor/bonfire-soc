@@ -13,6 +13,7 @@
 /spartan9/soc_bd.bmm
 /platform/wildfire_papro/soc_bd.bmm
 /spartan9/memtest.vhd
+<<<<<<< HEAD
 /platform/wildfire_papro/*.vhd
 /software/wildfire/test/*.vhd
 /spartan9/*
@@ -20,3 +21,4 @@
 /software/wildfire/dhrystone/*.vhd
 /build/*
 /fusesoc.log
+*.geany

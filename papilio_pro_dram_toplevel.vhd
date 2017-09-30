@@ -37,7 +37,10 @@ generic (
      Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
      FakeDRAM : boolean := false; -- Use Block RAM instead of DRAM
      InstructionBurstSize : natural := 8;
-     CacheSizeWords : natural := 4096 -- 16KB Instruction Cache
+     CacheSizeWords : natural := 2048; -- 8KB Instruction Cache
+     EnableDCache : boolean := true;
+     DCacheSizeWords : natural := 2048
+
    );
    port(
         sysclk_32m  : in  std_logic;
@@ -96,7 +99,7 @@ signal clk32Mhz,   -- buffered osc clock
 signal reset,res1,res2  : std_logic;
 
 
--- Instruction Bus Master
+-- Instruction Bus Master from CPU
 signal ibus_cyc_o:  std_logic;
 signal ibus_stb_o:  std_logic;
 signal ibus_cti_o:  std_logic_vector(2 downto 0);
@@ -105,7 +108,7 @@ signal ibus_ack_i:  std_logic;
 signal ibus_adr_o:  std_logic_vector(29 downto 0);
 signal ibus_dat_i:  std_logic_vector(31 downto 0);
 
--- Data Bus Master
+-- Data Bus Master from CPU
 signal  dbus_cyc_o :  std_logic;
 signal  dbus_stb_o :  std_logic;
 signal  dbus_we_o :  std_logic;
@@ -119,7 +122,9 @@ signal  dbus_dat_i :  std_logic_vector(31 downto 0);
 
 -- Slaves
 constant slave_adr_high : natural := 25;
--- Memory bus
+
+
+-- Common bus to DRAM controller
 signal mem_cyc,mem_stb,mem_we,mem_ack : std_logic;
 signal mem_sel :  std_logic_vector(3 downto 0);
 signal mem_dat_rd,mem_dat_wr : std_logic_vector(31 downto 0);
@@ -127,12 +132,21 @@ signal mem_adr : std_logic_vector(slave_adr_high downto 2);
 signal mem_cti : std_logic_vector(2 downto 0);
 
 
--- Memory 2 bus
+-- Data bus to DRAM
 signal dbmem_cyc,dbmem_stb,dbmem_we,dbmem_ack : std_logic;
 signal dbmem_sel :  std_logic_vector(3 downto 0);
 signal dbmem_dat_rd,dbmem_dat_wr : std_logic_vector(31 downto 0);
 signal dbmem_adr : std_logic_vector(slave_adr_high downto 2);
 signal dbmem_cti : std_logic_vector(2 downto 0);
+
+
+-- "CPU" Side of Data Cache
+signal dcm_cyc,dcm_stb,dcm_we,dcm_ack : std_logic;
+signal dcm_sel :  std_logic_vector(3 downto 0);
+signal dcm_dat_rd,dcm_dat_wr : std_logic_vector(31 downto 0);
+signal dcm_adr : std_logic_vector(slave_adr_high downto 2);
+signal dcm_cti : std_logic_vector(2 downto 0);
+signal dcm_bte : std_logic_vector(1 downto 0);
 
 
 -- Interface to  dual port Block RAM
@@ -500,21 +514,77 @@ end generate;
         m2_dat_i =>  lpc_dat_rd
     );
 
+
+ no_dcache: if not EnableDCache generate
+      dcm_cyc <=   dbmem_cyc;
+      dcm_stb <= dbmem_stb;
+      dcm_adr <= dbmem_adr;
+      dcm_we <= dbmem_we;
+      dcm_sel <= dbmem_sel;
+      dcm_cti <= "000";
+      dcm_bte <= "00";
+      dcm_adr <= dbmem_adr;
+      dcm_dat_wr <= dbmem_dat_wr;
+
+      dbmem_dat_rd <= dcm_dat_rd;
+      dbmem_ack <=dcm_ack;
+
+   end generate;
+
+dache: if EnableDCache generate
+   Inst_bonfire_dcache: entity work.bonfire_dcache
+   GENERIC MAP (
+     MASTER_DATA_WIDTH => 32,
+     LINE_SIZE => InstructionBurstSize,
+     CACHE_SIZE => DCacheSizeWords,
+     ADDRESS_BITS => dcm_adr'length
+   )
+
+   PORT MAP(
+        clk_i => clk,
+        rst_i => reset,
+        wbs_cyc_i => dbmem_cyc,
+        wbs_stb_i => dbmem_stb,
+        wbs_we_i =>  dbmem_we,
+        wbs_sel_i => dbmem_sel,
+        wbs_ack_o => dbmem_ack,
+        wbs_adr_i => dbmem_adr,
+        wbs_dat_o => dbmem_dat_rd,
+        wbs_dat_i => dbmem_dat_wr,
+
+        wbm_cyc_o => dcm_cyc,
+        wbm_stb_o => dcm_stb,
+        wbm_we_o =>  dcm_we,
+        wbm_cti_o => dcm_cti,
+        wbm_bte_o => dcm_bte,
+        wbm_sel_o => dcm_sel,
+        wbm_ack_i => dcm_ack,
+        wbm_adr_o => dcm_adr,
+        wbm_dat_i => dcm_dat_rd,
+        wbm_dat_o => dcm_dat_wr
+    );
+
+
+   end generate;
+
+
 -- Combine Dbus and ibus mem masters to one for interface to DRAM
 Inst_dram_arbiter:  entity work.dram_arbiter PORT MAP(
         clk_i => clk,
         rst_i => reset,
         -- DBUS has higher prio
-        s0_cyc_i => dbmem_cyc,
-        s0_stb_i => dbmem_stb,
-        s0_we_i =>  dbmem_we,
-        s0_sel_i => dbmem_sel,
-        s0_cti_i => "000",
-        s0_bte_i => "00",
-        s0_ack_o => dbmem_ack,
-        s0_adr_i => dbmem_adr,
-        s0_dat_i => dbmem_dat_wr,
-        s0_dat_o => dbmem_dat_rd,
+
+        s0_cyc_i => dcm_cyc,
+        s0_stb_i => dcm_stb,
+        s0_we_i =>  dcm_we,
+        s0_sel_i => dcm_sel,
+        s0_cti_i => dcm_cti,
+        s0_bte_i => dcm_bte,
+        s0_ack_o => dcm_ack,
+        s0_adr_i => dcm_adr,
+        s0_dat_i => dcm_dat_wr,
+        s0_dat_o => dcm_dat_rd,
+
         -- IBUS
         s1_cyc_i => ibus_cyc_o ,
         s1_stb_i => ibus_stb_o,
