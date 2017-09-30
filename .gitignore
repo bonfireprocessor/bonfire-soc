@@ -21,3 +21,6 @@
 /build/*
 /fusesoc.log
 *.geany
+*.vhd.old
+
+
