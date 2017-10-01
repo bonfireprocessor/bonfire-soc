@@ -35,7 +35,7 @@ TARGET_LDFLAGS += -march=$(ARCH) -mabi=$(ABI) -nostartfiles  \
 	-Wl,--gc-sections
 
 
-OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o syscall.o spi_driver.o
+OBJECTS = start.o monitor.o uart.o snprintf.o string.o console.o mempattern.o xm.o spiflash.o syscall.o spi_driver.o testdcache.o
 
 run: $(TARGET_NAME).bit
 	$(PROG) $<

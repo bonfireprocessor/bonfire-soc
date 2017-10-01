@@ -26,4 +26,6 @@ void delay_loop(uint32_t count);
 
 #define LOOP_TIME (CLK_PERIOD * 6)
 
+void test_dcache(int n);
+
 #endif

@@ -359,6 +359,10 @@ int err;
 
        case 'W': // flash write
          writeBootImage(spi);
+         break;
+       case 'C':
+         test_dcache(nArgs?args[0]:8192);
+         break;  
 
        default:
          writechar('\a'); // beep...

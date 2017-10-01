@@ -1,5 +1,7 @@
 #include "bonfire.h"
 
+#include "console.h"
+
 #define PATTERN 0x0ABCD
 
 
@@ -17,7 +19,7 @@ uint32_t t = p  >> 12; // shift uppper nibble to lowest nibble
 // Lower 16 Bit is a rotating pattern of Hex ABCD rotated by one nibble in every cell
 void writepattern(void *mem,int len)
 {
-uint32_t *pmem = mem;
+volatile uint32_t *pmem = mem;
 int i;
 uint16_t magic = PATTERN;
 
@@ -31,7 +33,7 @@ uint16_t magic = PATTERN;
 
 int verifypattern(void *mem, int len)
 {
-uint32_t *pmem = mem;
+volatile uint32_t *pmem = mem;
 int i;
 uint32_t magic = PATTERN;
 uint32_t comp;
@@ -41,7 +43,13 @@ int errcount=0;
    for(i=0;i<len;i++) {
      
      comp =  ((uint32_t)&pmem[i] << 16   & 0x0ffff0000 ) | magic; 
-     if (pmem[i] != comp) errcount++;
+     if (pmem[i] != comp) {
+         errcount++;
+         if (errcount <= 5) {
+           printk("%lx (%lx) ",&pmem[i],pmem[i]);
+           if ((errcount % 5 )==0) printk("\n");
+         }  
+     }    
      magic = rotate4(magic);       
    }     
    return errcount; 
