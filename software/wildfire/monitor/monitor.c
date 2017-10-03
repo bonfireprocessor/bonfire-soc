@@ -101,7 +101,7 @@ void flush_dache()
 uint32_t *pmem = (void*)(DRAM_TOP-DCACHE_SIZE+1);
 static volatile uint32_t sum=0; // To avoid optimizing away code below
 
-  printk("Cache %d K Flush read from %lx\n",DCACHE_SIZE,pmem);
+  printk("Cache %d bytes Flush read from %lx\n",DCACHE_SIZE,pmem);
   while ((uint32_t)pmem < DRAM_TOP) {
     sum+= *pmem++;
   }
@@ -134,12 +134,15 @@ void printInfo()
 {
 
 
-  printk("\nBonfire Boot Monitor 0.2f\n");
+  printk("\nBonfire Boot Monitor 0.2g\n");
   printk("MIMPID: %lx\nMISA: %lx\nUART Divisor: %d\nUART Revision %x\nUptime %d sec\n",
          read_csr(mimpid),read_csr(misa),
          getDivisor(),getUartRevision(),sys_time(NULL));
 
-  printk("DRAM Size %ld\n",DRAM_SIZE);
+  printk("DRAM Size %ld bytes\n",DRAM_SIZE);
+#ifdef DCACHE_SIZE
+  print_cache_size();
+#endif
 }
 
 void error(int n)
@@ -360,10 +363,11 @@ int err;
        case 'W': // flash write
          writeBootImage(spi);
          break;
+#ifdef DCACHE_SIZE
        case 'C':
-         test_dcache(nArgs?args[0]:8192);
-         break;  
-
+         test_dcache(nArgs?args[0]:DCACHE_SIZE);
+         break;
+#endif
        default:
          writechar('\a'); // beep...
       }

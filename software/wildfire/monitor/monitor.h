@@ -21,11 +21,12 @@ void start_user(uint32_t pc,uint32_t sp);
 
 long sys_time(long* loc); // implemented in syscall.c
 
-// RAM independant delay loop which takes 6 clocks/count 
-void delay_loop(uint32_t count); 
+// RAM independant delay loop which takes 6 clocks/count
+void delay_loop(uint32_t count);
 
 #define LOOP_TIME (CLK_PERIOD * 6)
 
 void test_dcache(int n);
+void print_cache_size();
 
 #endif

@@ -4,6 +4,8 @@
 ARCH ?= rv32im
 ABI=ilp32
 PLATFORM ?= PAPRO
+TOPLEVEL ?= ~/riscv/ise/bonfire/papilio_pro_dram_toplevel.bit
+
 
 
 TARGET_PREFIX ?= riscv32-unknown-elf
@@ -18,7 +20,9 @@ PROG?=papilio-prog -v -f
 SOFTROOT = ../..
 PROJROOT = $(SOFTROOT)/..
 
-TOPLEVEL = ~/riscv/ise/bonfire/papilio_pro_dram_toplevel.bit
+BMMFILE ?= $(PROJROOT)/platform/wildfire_papro/soc_bd.bmm
+
+
 PLATFORMDIR=../platform
 LINKDEF=$(PLATFORMDIR)/$(PLATFORM)/firmware.ld
 
@@ -43,7 +47,7 @@ run: $(TARGET_NAME).bit
 all: $(TARGET_NAME).hex $(TARGET_NAME).bin
 
 %.bit: %.elf $(TOPLEVEL)
-	$(DATA2MEM) -bm $(PROJROOT)/platform/wildfire_papro/soc_bd.bmm  -bd $< -bt $(TOPLEVEL)  -o hb $(basename $@)
+	$(DATA2MEM) -bm $(BMMFILE) -bd $< -bt $(TOPLEVEL)  -o hb $(basename $@)
 	$(TARGET_PREFIX)-objdump -S -d $< >$(basename $@).lst
 	$(TARGET_PREFIX)-size  $<
 
@@ -63,11 +67,11 @@ all: $(TARGET_NAME).hex $(TARGET_NAME).bin
 	$(TARGET_PREFIX)-size  $<
 
 
-spiflash.o : spiflash_driver/src/spiflash.c 
+spiflash.o : spiflash_driver/src/spiflash.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -c $<
 
 
-	
+
 $(TARGET_NAME).elf : $(OBJECTS) $(LINKDEF)
 	$(TARGET_LD) -o $@ $(TARGET_LDFLAGS)  $(OBJECTS)
 
