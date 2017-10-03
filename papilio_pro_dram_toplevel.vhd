@@ -47,7 +47,7 @@ generic (
         I_RESET   : in  std_logic;
 
         -- GPIOs:
-        -- 4x LEDs
+        -- 4x LEDs on Arcade Megawing
         leds : out   std_logic_vector(3 downto 0);
 
 
@@ -196,6 +196,8 @@ signal flash_adr : std_logic_vector(7 downto 0);
 
 signal irq_i : std_logic_vector(7 downto 0);
 
+signal leds_o : std_logic_vector(4 downto 0);
+
   COMPONENT clkgen
     PORT(
         clkin : IN std_logic;
@@ -215,7 +217,8 @@ signal irq_i : std_logic_vector(7 downto 0);
 begin
 
    irq_i <= (others=>'0'); -- currently no interrupts
-   led1<='1';
+   led1<=leds_o(4);
+   leds<=leds_o(3 downto 0);
 
 
 
@@ -293,8 +296,8 @@ simulate_dram: if FakeDRAM generate
 
     DRAM:  entity work.wbs_memory_interface
     GENERIC MAP (
-        ram_adr_width => ram_adr_width,
-        ram_size => ram_size,
+        ram_adr_width => 12,
+        ram_size => 4096,
         RamFileName => RamFileName,
         mode => mode,
         wbs_adr_high => slave_adr_high,
@@ -360,7 +363,7 @@ end generate;
 
      generic map (  wbs_adr_high => slave_adr_high)
      PORT MAP(
-        leds => leds ,
+        leds => leds_o ,
         clk_i =>clk ,
         rst_i => reset,
         wbs_cyc_i => gpio_cyc ,
@@ -532,12 +535,19 @@ end generate;
    end generate;
 
 dache: if EnableDCache generate
+
+   assert DCacheSizeWords=2048
+     report "Due to XST synthesis bugs DCache Size will be hard coded to 2048*32Bit (8KByte)"
+     severity warning;
+
+
    Inst_bonfire_dcache: entity work.bonfire_dcache
    GENERIC MAP (
      MASTER_DATA_WIDTH => 32,
      LINE_SIZE => InstructionBurstSize,
-     CACHE_SIZE => DCacheSizeWords,
-     ADDRESS_BITS => dcm_adr'length
+     CACHE_SIZE => 2048,  -- hard coded currently
+     ADDRESS_BITS => dcm_adr'length,
+     DEVICE_FAMILY => "SPARTAN6" -- hard coded work around...
    )
 
    PORT MAP(

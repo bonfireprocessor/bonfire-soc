@@ -28,7 +28,7 @@ LINKDEF?=$(PLATFORMDIR)/$(PLATFORM)/firmware.ld
 TARGET_CFLAGS +=  -march=$(ARCH) -mabi=$(ABI) -Wall -Os -g  -fomit-frame-pointer \
 	-ffreestanding -fno-builtin  \
 	-Wall -Werror=implicit-function-declaration \
-	-D$(PLATFORM) -I$(PLATFORMDIR) -I$(PLATFORMDIR)/$(PLATFORM) 
+	-D$(PLATFORM) -I$(PLATFORMDIR) -I$(PLATFORMDIR)/$(PLATFORM) -I../riscv
 
 TARGET_LDFLAGS += -march=$(ARCH) -mabi=$(ABI) -nostartfiles   \
 	-Wl,-m,elf32lriscv --specs=nosys.specs -Wl,-T$(LINKDEF) \

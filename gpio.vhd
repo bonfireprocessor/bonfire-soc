@@ -36,7 +36,7 @@ generic(
 port(
       -- output
 		
-      leds: out std_logic_vector(3 downto 0);		
+      leds: out std_logic_vector(4 downto 0);		
 
       -- bus interface
 		clk_i: in std_logic;
@@ -64,12 +64,12 @@ begin
    process(clk_i) begin
      if rising_edge(clk_i) then
 	    if rst_i='1' then
-		   leds<="0000";
+		   leds<="00000";
 	    end if; 
 		 
 	    if wbs_cyc_i='1' and wbs_stb_i='1' then
-			if wbs_we_i='1' and wbs_sel_i="0001" then
-			  leds <= wbs_dat_i(3 downto 0);
+			if wbs_we_i='1' and wbs_sel_i(0)='1' then
+			  leds <= wbs_dat_i(4 downto 0);
 		  end if;
 		  wbs_ack_o<='1';
 	   else
