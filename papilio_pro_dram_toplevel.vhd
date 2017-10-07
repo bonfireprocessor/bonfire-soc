@@ -31,14 +31,13 @@ use UNISIM.VComponents.all;
 
 entity papilio_pro_dram_toplevel is
 generic (
-     -- generics are set by the simulator only, when instaniating from a testbench
-     -- when Design is physically build than the defaults are used
-     RamFileName : string := ""; -- only used when UseBRAMPrimitives is false
+
+     RamFileName : string :=  "../src/bonfire-soc_0/compiled_code/monitor.hex";
      mode : string := "H";       -- only used when UseBRAMPrimitives is false
      Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
      FakeDRAM : boolean := false; -- Use Block RAM instead of DRAM
      InstructionBurstSize : natural := 8;
-     CacheSizeWords : natural := 4096 -- 16KB Instruction Cache 
+     CacheSizeWords : natural := 4096 -- 16KB Instruction Cache
    );
    port(
         sysclk_32m  : in  std_logic;
@@ -52,7 +51,7 @@ generic (
         -- UART0 signals:
         uart0_txd : out std_logic;
         uart0_rxd : in  std_logic :='1';
-        
+
         -- SPI flash chip
         flash_spi_cs        : out   std_logic;
         flash_spi_clk       : out   std_logic;
@@ -61,7 +60,7 @@ generic (
 
         -- LED on Papilio Pro Board
         led1 : out std_logic;
-   
+
         -- SDRAM signals
         SDRAM_CLK     : out   STD_LOGIC;
         SDRAM_CKE     : out   STD_LOGIC;
@@ -80,19 +79,19 @@ architecture Behavioral of papilio_pro_dram_toplevel is
 
  --constant ram_adr_width : natural := 12;
  --constant ram_size : natural := 4096;
- 
+
  constant ram_adr_width : natural := 13;
  constant ram_size : natural := 8192;
- 
- 
+
+
  constant reset_adr : std_logic_vector(31 downto 0) :=X"0C000000";
 
 
 signal clk32Mhz,   -- buffered osc clock
        clk,        -- logical CPU clock
-       
-       uart_clk    : std_logic;  
-       
+
+       uart_clk    : std_logic;
+
 
 signal reset,res1,res2  : std_logic;
 
@@ -138,14 +137,14 @@ signal dbmem_cti : std_logic_vector(2 downto 0);
 
 -- Interface to  dual port Block RAM
 -- Port A R/W, Byte Level Access, for Data
-     
+
 signal      bram_dba_i :  std_logic_vector(31 downto 0);
 signal      bram_dba_o :  std_logic_vector(31 downto 0);
 signal      bram_adra_o : std_logic_vector(ram_adr_width-1 downto 0);
 signal      bram_ena_o :  std_logic;
-signal      bram_wrena_o :std_logic_vector (3 downto 0);  
-      
--- Port B Read Only, Word level access, for Code 
+signal      bram_wrena_o :std_logic_vector (3 downto 0);
+
+-- Port B Read Only, Word level access, for Code
 signal      bram_dbb_i :  std_logic_vector(31 downto 0);
 signal      bram_adrb_o : std_logic_vector(ram_adr_width-1 downto 0);
 signal      bram_enb_o :  std_logic;
@@ -184,18 +183,18 @@ signal flash_adr : std_logic_vector(7 downto 0);
 signal irq_i : std_logic_vector(7 downto 0);
 
   COMPONENT clkgen
-	PORT(
-		clkin : IN std_logic;
-		rstin : IN std_logic;          
-		clkout : OUT std_logic;
-		clkout1 : OUT std_logic;
-		clkout2 : OUT std_logic;
-		clk32Mhz_out : OUT std_logic;
-		rstout : OUT std_logic
-		);
-	END COMPONENT;
-  
- signal  clkgen_rst: std_logic;  
+    PORT(
+        clkin : IN std_logic;
+        rstin : IN std_logic;
+        clkout : OUT std_logic;
+        clkout1 : OUT std_logic;
+        clkout2 : OUT std_logic;
+        clk32Mhz_out : OUT std_logic;
+        rstout : OUT std_logic
+        );
+    END COMPONENT;
+
+ signal  clkgen_rst: std_logic;
 
 
 
@@ -222,45 +221,45 @@ begin
         rst_i => reset,
 
         bram_dba_i => bram_dba_i,
-		  bram_dba_o => bram_dba_o,
-		  bram_adra_o => bram_adra_o,
-		  bram_ena_o =>  bram_ena_o,
-		  bram_wrena_o => bram_wrena_o,
-		  bram_dbb_i =>  bram_dbb_i,
-		  bram_adrb_o => bram_adrb_o,
-		  bram_enb_o =>  bram_enb_o,
-		  
-		  wb_ibus_cyc_o => ibus_cyc_o ,
-		  wb_ibus_stb_o => ibus_stb_o,
-		  wb_ibus_cti_o => ibus_cti_o,
-		  wb_ibus_bte_o => ibus_bte_o,
-		  wb_ibus_ack_i => ibus_ack_i,
-		  wb_ibus_adr_o => ibus_adr_o,
-		  wb_ibus_dat_i => ibus_dat_i,
-		 
-		  wb_dbus_cyc_o => dbus_cyc_o,
-		  wb_dbus_stb_o => dbus_stb_o,
-		  wb_dbus_we_o =>  dbus_we_o,
-		  wb_dbus_sel_o => dbus_sel_o,
-		  wb_dbus_ack_i => dbus_ack_i,
-		  wb_dbus_adr_o => dbus_adr_o,
-		  wb_dbus_dat_o => dbus_dat_o,
-		  wb_dbus_dat_i => dbus_dat_i,
-		  
-		  irq_i => irq_i
+          bram_dba_o => bram_dba_o,
+          bram_adra_o => bram_adra_o,
+          bram_ena_o =>  bram_ena_o,
+          bram_wrena_o => bram_wrena_o,
+          bram_dbb_i =>  bram_dbb_i,
+          bram_adrb_o => bram_adrb_o,
+          bram_enb_o =>  bram_enb_o,
+
+          wb_ibus_cyc_o => ibus_cyc_o ,
+          wb_ibus_stb_o => ibus_stb_o,
+          wb_ibus_cti_o => ibus_cti_o,
+          wb_ibus_bte_o => ibus_bte_o,
+          wb_ibus_ack_i => ibus_ack_i,
+          wb_ibus_adr_o => ibus_adr_o,
+          wb_ibus_dat_i => ibus_dat_i,
+
+          wb_dbus_cyc_o => dbus_cyc_o,
+          wb_dbus_stb_o => dbus_stb_o,
+          wb_dbus_we_o =>  dbus_we_o,
+          wb_dbus_sel_o => dbus_sel_o,
+          wb_dbus_ack_i => dbus_ack_i,
+          wb_dbus_adr_o => dbus_adr_o,
+          wb_dbus_dat_o => dbus_dat_o,
+          wb_dbus_dat_i => dbus_dat_i,
+
+          irq_i => irq_i
     );
 
 
-ram: entity work.MainMemory 
+ram: entity work.MainMemory
         generic map (
            ADDR_WIDTH =>ram_adr_width,
            SIZE => ram_size,
            RamFileName => RamFileName,
            mode => mode,
            Swapbytes => Swapbytes,
-           EnableSecondPort => true            
+           EnableSecondPort => true
         )
-           
+
       PORT MAP(
          DBOut =>   bram_dba_i,
          DBIn =>    bram_dba_o,
@@ -273,7 +272,7 @@ ram: entity work.MainMemory
          AdrBusB => bram_adrb_o,
          DBOutB =>  bram_dbb_i
       );
- 
+
 
 
 simulate_dram: if FakeDRAM generate
@@ -300,7 +299,7 @@ simulate_dram: if FakeDRAM generate
         wbs_dat_i =>  mem_dat_wr,
         wbs_dat_o =>  mem_dat_rd,
         wbs_cti_i => mem_cti
-               
+
     );
 
 end generate;
@@ -308,14 +307,14 @@ end generate;
 dram: if not FakeDRAM generate
 
 
-DRAM: entity work.wbs_sdram_interface 
+DRAM: entity work.wbs_sdram_interface
 generic map (
   wbs_adr_high => mem_adr'high,
   wbs_burst_length => InstructionBurstSize
 
 )
 PORT MAP(
-		 clk_i =>clk ,
+         clk_i =>clk ,
        rst_i => reset,
        wbs_cyc_i =>  mem_cyc,
        wbs_stb_i =>  mem_stb,
@@ -325,26 +324,26 @@ PORT MAP(
        wbs_adr_i =>  mem_adr,
        wbs_dat_i =>  mem_dat_wr,
        wbs_dat_o =>  mem_dat_rd,
-       wbs_cti_i =>  mem_cti, 
-		
-		SDRAM_CLK => SDRAM_CLK,
-		SDRAM_CKE => SDRAM_CKE,
-		SDRAM_CS => SDRAM_CS,
-		SDRAM_RAS => SDRAM_RAS,
-		SDRAM_CAS => SDRAM_CAS,
-		SDRAM_WE => SDRAM_WE,
-		SDRAM_DQM => SDRAM_DQM,
-		SDRAM_ADDR => SDRAM_ADDR,
-		SDRAM_BA => SDRAM_BA,
-		SDRAM_DATA => SDRAM_DATA
-	);
+       wbs_cti_i =>  mem_cti,
+
+        SDRAM_CLK => SDRAM_CLK,
+        SDRAM_CKE => SDRAM_CKE,
+        SDRAM_CS => SDRAM_CS,
+        SDRAM_RAS => SDRAM_RAS,
+        SDRAM_CAS => SDRAM_CAS,
+        SDRAM_WE => SDRAM_WE,
+        SDRAM_DQM => SDRAM_DQM,
+        SDRAM_ADDR => SDRAM_ADDR,
+        SDRAM_BA => SDRAM_BA,
+        SDRAM_DATA => SDRAM_DATA
+    );
 
 
 end generate;
 
 
-     Inst_gpio: entity work.gpio 
-     
+     Inst_gpio: entity work.gpio
+
      generic map (  wbs_adr_high => slave_adr_high)
      PORT MAP(
         leds => leds ,
@@ -359,8 +358,8 @@ end generate;
         wbs_dat_i => gpio_dat_wr,
         wbs_dat_o => gpio_dat_rd
     );
-    
-    
+
+
 -- "Low Pin Count bus"
 --  Byte addressable 8 Bit Wishbone Bus for slow devices like UARTs
 --  TODO: Byte adressing is not complete, because data are not shifted to the right position on the bus...
@@ -384,7 +383,7 @@ end generate;
     end process;
 
 
- 
+
    inst_lpcbus:  entity work.papro_lpc PORT MAP(
         clk_i => clk,
         rst_i => reset,
@@ -402,7 +401,7 @@ end generate;
         m0_adr_o => uart_adr,
         m0_dat_o => uart_dat_wr ,
         m0_dat_i => uart_dat_rd,
-        
+
         m1_cyc_o =>  flash_cyc,
         m1_stb_o => flash_stb,
         m1_we_o =>  flash_we,
@@ -410,16 +409,16 @@ end generate;
         m1_adr_o => flash_adr,
         m1_dat_o => flash_dat_wr ,
         m1_dat_i => flash_dat_rd
-        
+
     );
 
 
    inst_uart:  entity work.wb_uart_interface
    generic map(
-   
+
          FIFO_DEPTH => 64 )
-   
-   
+
+
    PORT MAP(
         clk =>clk ,
         reset => reset,
@@ -434,24 +433,24 @@ end generate;
         wb_stb_in => uart_stb,
         wb_ack_out => uart_ack
     );
-    
-    inst_flash : entity work.wb_spi_interface 
+
+    inst_flash : entity work.wb_spi_interface
     PORT MAP(
-		clk_i => clk,
-		reset_i => reset,
-		slave_cs_o => flash_spi_cs,
-		slave_clk_o => flash_spi_clk,
-		slave_mosi_o => flash_spi_mosi,
-		slave_miso_i => flash_spi_miso,
-		irq => open,
-		wb_adr_in =>flash_adr ,
-		wb_dat_in => flash_dat_wr,
-		wb_dat_out => flash_dat_rd,
-		wb_we_in => flash_we,
-		wb_cyc_in => flash_cyc,
-		wb_stb_in => flash_stb,
-		wb_ack_out => flash_ack
-	);
+        clk_i => clk,
+        reset_i => reset,
+        slave_cs_o => flash_spi_cs,
+        slave_clk_o => flash_spi_clk,
+        slave_mosi_o => flash_spi_mosi,
+        slave_miso_i => flash_spi_miso,
+        irq => open,
+        wb_adr_in =>flash_adr ,
+        wb_dat_in => flash_dat_wr,
+        wb_dat_out => flash_dat_rd,
+        wb_we_in => flash_we,
+        wb_cyc_in => flash_cyc,
+        wb_stb_in => flash_stb,
+        wb_ack_out => flash_ack
+    );
 
 
    inst_busconnect:   entity  work.cpu_dbus_connect PORT MAP(
@@ -467,8 +466,8 @@ end generate;
         s0_adr_i => dbus_adr_o,
         s0_dat_i => dbus_dat_o,
         s0_dat_o => dbus_dat_i,
-        
-       
+
+
           -- DRAM at address   0x00000000-0x03FFFFFF
         m0_cyc_o =>  dbmem_cyc,
         m0_stb_o =>  dbmem_stb,
@@ -478,7 +477,7 @@ end generate;
         m0_adr_o =>  dbmem_adr,
         m0_dat_o =>  dbmem_dat_wr,
         m0_dat_i =>  dbmem_dat_rd,
-       
+
         --IO Space 1: 0x04000000-0x07FFFFF (Decode 0000 01)
         m1_cyc_o =>  gpio_cyc,
         m1_stb_o =>  gpio_stb,
@@ -488,8 +487,8 @@ end generate;
         m1_adr_o =>  gpio_adr,
         m1_dat_o =>  gpio_dat_wr,
         m1_dat_i =>  gpio_dat_rd,
-        
-        
+
+
         -- IO Space 2:  0x08000000-0x0BFFFFFF (Decode 0000 10)
         m2_cyc_o =>  lpc_cyc,
         m2_stb_o =>  lpc_stb,
@@ -498,47 +497,47 @@ end generate;
         m2_ack_i =>  lpc_ack,
         m2_adr_o =>  lpc_adr,
         m2_dat_o =>  lpc_dat_wr,
-        m2_dat_i =>  lpc_dat_rd 
+        m2_dat_i =>  lpc_dat_rd
     );
 
 -- Combine Dbus and ibus mem masters to one for interface to DRAM
 Inst_dram_arbiter:  entity work.dram_arbiter PORT MAP(
-		clk_i => clk,
-		rst_i => reset,
-		-- DBUS has higher prio
-		s0_cyc_i => dbmem_cyc,
-		s0_stb_i => dbmem_stb,
-		s0_we_i =>  dbmem_we,
-		s0_sel_i => dbmem_sel,
-		s0_cti_i => "000",
-		s0_bte_i => "00",
-		s0_ack_o => dbmem_ack,
-		s0_adr_i => dbmem_adr,
-		s0_dat_i => dbmem_dat_wr,
-		s0_dat_o => dbmem_dat_rd,
-		-- IBUS
-		s1_cyc_i => ibus_cyc_o ,
-		s1_stb_i => ibus_stb_o,
-		s1_we_i =>  '0',
-		s1_sel_i => "1111",
-		s1_cti_i => ibus_cti_o,
-		s1_bte_i => ibus_bte_o,
-		s1_ack_o => ibus_ack_i,
-		s1_adr_i => ibus_adr_o(ibus_adr_o'low+23 downto ibus_adr_o'low),
-		s1_dat_i => (others=>'0'),
-		s1_dat_o => ibus_dat_i,
-		-- Interace to memory controller
-		m0_cyc_o => mem_cyc,
-		m0_stb_o => mem_stb,
-		m0_we_o =>  mem_we,
-		m0_sel_o => mem_sel,
-		m0_cti_o => mem_cti,
-		m0_bte_o => open,
-		m0_ack_i => mem_ack,
-		m0_adr_o => mem_adr,
-		m0_dat_o => mem_dat_wr,
-		m0_dat_i => mem_dat_rd
-	);
+        clk_i => clk,
+        rst_i => reset,
+        -- DBUS has higher prio
+        s0_cyc_i => dbmem_cyc,
+        s0_stb_i => dbmem_stb,
+        s0_we_i =>  dbmem_we,
+        s0_sel_i => dbmem_sel,
+        s0_cti_i => "000",
+        s0_bte_i => "00",
+        s0_ack_o => dbmem_ack,
+        s0_adr_i => dbmem_adr,
+        s0_dat_i => dbmem_dat_wr,
+        s0_dat_o => dbmem_dat_rd,
+        -- IBUS
+        s1_cyc_i => ibus_cyc_o ,
+        s1_stb_i => ibus_stb_o,
+        s1_we_i =>  '0',
+        s1_sel_i => "1111",
+        s1_cti_i => ibus_cti_o,
+        s1_bte_i => ibus_bte_o,
+        s1_ack_o => ibus_ack_i,
+        s1_adr_i => ibus_adr_o(ibus_adr_o'low+23 downto ibus_adr_o'low),
+        s1_dat_i => (others=>'0'),
+        s1_dat_o => ibus_dat_i,
+        -- Interace to memory controller
+        m0_cyc_o => mem_cyc,
+        m0_stb_o => mem_stb,
+        m0_we_o =>  mem_we,
+        m0_sel_o => mem_sel,
+        m0_cti_o => mem_cti,
+        m0_bte_o => open,
+        m0_ack_i => mem_ack,
+        m0_adr_o => mem_adr,
+        m0_dat_o => mem_dat_wr,
+        m0_dat_i => mem_dat_rd
+    );
 
 
 
@@ -551,7 +550,7 @@ Inst_dram_arbiter:  entity work.dram_arbiter PORT MAP(
     clkout  => clk,
     clkout1  => open,
     clkout2  => open,
-	 clk32Mhz_out => open,
+     clk32Mhz_out => open,
     rstout  => clkgen_rst
   );
 

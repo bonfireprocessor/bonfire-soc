@@ -34,7 +34,7 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-use work.util.all;
+use work.log2.all;
 
 entity wbs_sdram_interface is
 generic (

@@ -32,7 +32,7 @@ use work.util.all;
 entity sdram_model is
 generic (
      RamFileName : string := "meminit.ram";
-     mode : string := "H";
+     mode : string := "N";
      DRAM_pagesize : natural :=256
     );
     Port ( CLK     : in  STD_LOGIC;
@@ -84,21 +84,22 @@ architecture Behavioral of sdram_model is
 
 
    begin
-
-       I:=0;
-       while not endfile(RamFile) loop
-         readline (RamFile, RamFileLine);
-         if mode="H" then 
-            hread (RamFileLine, word); -- alternative: HEX read 
-         else  	
-            read(RamFileLine,word);  -- Binary read
-         end if;
-         
-         r(I) := word(15 downto 0);
-         r(I+1) := word(31 downto 16);
-         I:=I+2;         
-         
-       end loop;     
+       
+       if mode="H" or mode="B" then 
+           I:=0;
+           while not endfile(RamFile) loop
+             readline (RamFile, RamFileLine);
+             if mode="H" then 
+                hread (RamFileLine, word); -- alternative: HEX read 
+             else  	
+                read(RamFileLine,word);  -- Binary read
+             end if;
+             
+             r(I) := word(15 downto 0);
+             r(I+1) := word(31 downto 16);
+             I:=I+2;         
+           end loop; 
+       end if;        
     
      return r; 
    end function;
