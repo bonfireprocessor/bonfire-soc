@@ -26,8 +26,6 @@ use IEEE.std_logic_textio.all;
 library STD;
 use STD.textio.all;
 
-use work.log2.all;
-
 
 entity sdram_model is
 generic (
@@ -48,6 +46,21 @@ generic (
 end sdram_model;
 
 architecture Behavioral of sdram_model is
+
+function LOG2(C:INTEGER) return INTEGER is -- C should be >0
+variable TEMP,COUNT:INTEGER;
+begin
+  TEMP:=0;
+  COUNT:=C;
+  while COUNT>1 loop
+    TEMP:=TEMP+1;
+    COUNT:=COUNT/2;
+  end loop;
+
+  return TEMP;
+end;
+
+
    type decode is (unsel_c, lmr_c, ref_c, pre_c, act_c, wr_c, rd_c, term_c, nop_c);
    signal command : decode;
 
