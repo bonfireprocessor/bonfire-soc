@@ -1,5 +1,5 @@
 -- Memory module to be synthesized as block RAM
--- can be initalized with a file 
+-- can be initalized with a file
 
 -- New "single process" version as recommended by Xilinx XST user guide
 
@@ -20,21 +20,19 @@ use IEEE.NUMERIC_STD.ALL;
 library STD;
 use STD.textio.all;
 
-
-
 entity MainMemory is
     generic (RamFileName : string := "meminit.ram";
-	          mode : string := "B";
+              mode : string := "B";
              ADDR_WIDTH: integer;
              SIZE : integer;
-             Swapbytes : boolean; -- SWAP Bytes in RAM word in low byte first order to use data2mem  
-             EnableSecondPort : boolean := true -- enable inference of the second port 
+             Swapbytes : boolean; -- SWAP Bytes in RAM word in low byte first order to use data2mem
+             EnableSecondPort : boolean := true -- enable inference of the second port
             );
     Port ( DBOut : out  STD_LOGIC_VECTOR (31 downto 0);
            DBIn : in  STD_LOGIC_VECTOR (31 downto 0);
            AdrBus : in  STD_LOGIC_VECTOR (ADDR_WIDTH-1 downto 0);
            ENA : in  STD_LOGIC;
-           WREN : in  STD_LOGIC_VECTOR (3 downto 0);        
+           WREN : in  STD_LOGIC_VECTOR (3 downto 0);
               CLK : in  STD_LOGIC;
            -- Second Port ( read only)
               CLKB : in STD_LOGIC;
@@ -57,46 +55,49 @@ subtype tWord is std_logic_vector(31 downto 0);
 
 
 signal DOA,DOB,DIA : tWord;
-signal WEA : STD_LOGIC_VECTOR (3 downto 0);  
+signal WEA : STD_LOGIC_VECTOR (3 downto 0);
 
 
 function doSwapBytes(d : tWord) return tWord is
 begin
-  
+
     return d(7 downto 0)&d(15 downto 8)&d(23 downto 16)&d(31 downto 24);
-  
+
 end;
 
 
 -- Design time code...
 -- Initalizes block RAM form memory file
 -- The file does either contain hex values (mode = 'H') or binary values
- 
+
 impure function InitFromFile  return tRam is
-FILE RamFile : text is in RamFileName;
+FILE RamFile : text; -- is in RamFileName;
 variable RamFileLine : line;
 variable word : tWord;
 variable r : tRam;
 
 begin
+  report "RamFileName is " & RamFileName;
+  file_open(RamFile,RamFileName,READ_MODE);
   for I in tRam'range loop
     if not endfile(RamFile) then
       readline (RamFile, RamFileLine);
-		if mode="H" then 
-		   hread (RamFileLine, word); -- alternative: HEX read 
-		else  	
-         read(RamFileLine,word);  -- Binary read
-      end if;		  
-       if SwapBytes then 
-         r(I) :=  DoSwapBytes(word);
-       else
-         r(I) := word;
-       end if;         
-     else
-       r(I) := (others=>'0'); 
-    end if;     
+      if mode="H" then
+        hread (RamFileLine, word); -- alternative: HEX read
+      else
+        read(RamFileLine,word);  -- Binary read
+      end if;
+      if SwapBytes then
+        r(I) :=  DoSwapBytes(word);
+      else
+        r(I) := word;
+      end if;
+    else
+      r(I) := (others=>'0');
+    end if;
   end loop;
-  return r; 
+  file_close(RamFile);
+  return r;
 end function;
 
 signal ram : tRam:= InitFromFile;
@@ -106,79 +107,79 @@ attribute ram_style of ram: signal is "block";
 
 
 -- helper component
--- for byte swapping 
+-- for byte swapping
 COMPONENT byte_swapper
-	PORT(
-		din : IN std_logic_vector(31 downto 0);          
-		dout : OUT std_logic_vector(31 downto 0)
-		);
-	END COMPONENT;
+    PORT(
+        din : IN std_logic_vector(31 downto 0);
+        dout : OUT std_logic_vector(31 downto 0)
+        );
+    END COMPONENT;
 
 
 
 begin
-   
+
    swap: if SwapBytes generate
      -- The Data input bus is swapped with the helper component to avoid
      -- confusing the xilinx synthesis tools which sometimes infer distributed
      -- instead of block RAM
      -- It is important that the byte swapper component has set the keep_hierarchy attribute to TRUE
-     -- this will make the byte swap of the input bus invisble for the RAM inference      
+     -- this will make the byte swap of the input bus invisble for the RAM inference
      bs: byte_swapper PORT MAP(
-		din => DBIn,
-		dout => DIA
-	  );
-          
+        din => DBIn,
+        dout => DIA
+      );
+
      DBOut<=DoSwapBytes(DOA);
      DBOutB<=DoSwapBytes(DOB);
      WEA(0)<=WREN(3);
      WEA(1)<=WREN(2);
      WEA(2)<=WREN(1);
      WEA(3)<=WREN(0);
-     
-   end generate;   
+
+   end generate;
 
    noswap: if not SwapBytes generate
      DIA<=DBIn;
      DBOut<=DOA;
      DBOutB<=DOB;
      WEA<=WREN;
-   end generate;   
+   end generate;
 
 
-  
 
-  process(clk) 
+
+  process(clk)
   variable adr : integer;
   begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if ena = '1' then
-           adr :=  to_integer(unsigned(AdrBus));       
+           adr :=  to_integer(unsigned(AdrBus));
 
            for i in 0 to 3 loop
              if WEA(i) = '1' then
                 ram(adr)((i+1)*8-1 downto i*8)<= DIA((i+1)*8-1 downto i*8);
              end if;
            end loop;
-                         
+
            DOA <= ram(adr);
-                    
-         end if;    
+
+         end if;
      end if;
-  
+
   end process;
-  
+
   portb:  if EnableSecondPort generate
-  
+
      process(clkb) begin
         if rising_edge(clkb) then
             if ENB='1' then
                DOB <= ram(to_integer(unsigned(AdrBusB)));
-             end if;    
+             end if;
          end if;
      end process;
-     
+
   end generate;
-   
+
 end Behavioral;
 

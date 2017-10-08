@@ -22,14 +22,17 @@ USE ieee.std_logic_1164.ALL;
 
 ENTITY tb_dramtest IS
 generic (
-     RamFileName : string := "../src/bonfire-soc_0/compiled_code/monitor.hex";
+     RamFileName : string := "compiled_code/monitor.hex";
+     --RamFileName : string :="../../../bonfire-soc/compiled_code/monitor.hex";
      mode : string := "H";       -- only used when UseBRAMPrimitives is false
-     Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
+     Swapbytes : boolean := false; -- SWAP Bytes in RAM word in low byte first order to use data2mem
      FakeDRAM : boolean := false; -- Use Block RAM instead of DRAM
-     InstructionBurstSize : natural := 8;
+     BurstSize : natural := 8;
      CacheSizeWords : natural := 4096; -- 16KB Instruction Cache
      EnableDCache : boolean := true;
-     DCacheSizeWords : natural := 2048
+     DCacheSizeWords : natural := 2048;
+     MUL_ARCH: string := "spartandsp";
+     REG_RAM_STYLE : string := "block"
    );
 END tb_dramtest;
 
@@ -44,11 +47,13 @@ ARCHITECTURE behavior OF tb_dramtest IS
      mode : string;
      Swapbytes : boolean := true;
      FakeDRAM : boolean := false;
-     InstructionBurstSize : natural := 8;
+     BurstSize : natural := 8;
 
      CacheSizeWords : natural := 2048; -- 8KB Instruction Cache
      EnableDCache : boolean := true;
-     DCacheSizeWords : natural := 2048
+     DCacheSizeWords : natural := 2048;
+     MUL_ARCH: string := "spartandsp";
+     REG_RAM_STYLE : string := "block"
      );
     PORT(
         sysclk_32m : IN std_logic;
@@ -133,10 +138,11 @@ BEGIN
         FakeDRAM=>FakeDRAM,
         Swapbytes=>Swapbytes,
         CacheSizeWords => CacheSizeWords,
-        InstructionBurstSize =>InstructionBurstSize,
+        BurstSize =>BurstSize,
         EnableDCache => EnableDCache,
-        DCacheSizeWords=>DCacheSizeWords
-
+        DCacheSizeWords=>DCacheSizeWords,
+        MUL_ARCH=>MUL_ARCH,
+        REG_RAM_STYLE=>REG_RAM_STYLE
      )
 
 

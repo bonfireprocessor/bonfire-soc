@@ -1,20 +1,20 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    22:11:26 09/20/2013 
--- Design Name: 
--- Module Name:    sdram_model - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
+-- Company:
+-- Engineer:
 --
--- Dependencies: 
+-- Create Date:    22:11:26 09/20/2013
+-- Design Name:
+-- Module Name:    sdram_model - Behavioral
+-- Project Name:
+-- Target Devices:
+-- Tool versions:
+-- Description:
 --
--- Revision: 
+-- Dependencies:
+--
+-- Revision:
 -- Revision 0.01 - File Created
--- Additional Comments: 
+-- Additional Comments:
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -26,7 +26,7 @@ use IEEE.std_logic_textio.all;
 library STD;
 use STD.textio.all;
 
-use work.util.all;
+use work.log2.all;
 
 
 entity sdram_model is
@@ -50,33 +50,33 @@ end sdram_model;
 architecture Behavioral of sdram_model is
    type decode is (unsel_c, lmr_c, ref_c, pre_c, act_c, wr_c, rd_c, term_c, nop_c);
    signal command : decode;
- 
+
    signal dqm_sr : std_logic_vector(3 downto 0) := (others => '0');
-   
+
    signal selected_bank : std_logic_vector( 1 downto 0);
    signal column        : std_logic_vector( log2(DRAM_pagesize)-1 downto 0) := (others => '0');
 
    -- Only eight rows of four banks are modeled
    type   memory_array is array (0 to 8 * DRAM_pagesize * 4 -1 ) of std_logic_vector( 15 downto 0);
    type   row_array    is array (0 to       3) of std_logic_vector(2 downto 0);
-   
-  
+
+
    signal active_row    : row_array;
    signal is_row_active : std_logic_vector(3 downto 0);
    signal mode_reg      : std_logic_vector(12 downto 0);
    signal data_delay1   : std_logic_vector(15 downto 0);
    signal data_delay2   : std_logic_vector(15 downto 0);
    signal data_delay3   : std_logic_vector(15 downto 0);
-   signal addr_index    : STD_LOGIC_VECTOR(log2(memory_array'length)-1 downto 0);         
-   
+   signal addr_index    : STD_LOGIC_VECTOR(log2(memory_array'length)-1 downto 0);
+
    signal wr_mask       : std_logic_vector( 1 downto 0);
    signal wr_data       : std_logic_vector(15 downto 0);
    signal wr_burst      : std_logic_vector( 8 downto 0);
    signal rd_burst      : std_logic_vector( 9 downto 0);
-   
-   
+
+
    impure function InitFromFile  return memory_array is
-   FILE RamFile : text is in RamFileName;
+   FILE RamFile : text; -- is in RamFileName;
    variable RamFileLine : line;
    variable word : std_logic_vector(31 downto 0);
    variable r : memory_array;
@@ -84,30 +84,32 @@ architecture Behavioral of sdram_model is
 
 
    begin
-       
-       if mode="H" or mode="B" then 
+
+       if mode="H" or mode="B" then
+           file_open(RamFile,RamFileName,READ_MODE);
            I:=0;
            while not endfile(RamFile) loop
              readline (RamFile, RamFileLine);
-             if mode="H" then 
-                hread (RamFileLine, word); -- alternative: HEX read 
-             else  	
+             if mode="H" then
+                hread (RamFileLine, word); -- alternative: HEX read
+             else
                 read(RamFileLine,word);  -- Binary read
              end if;
-             
+
              r(I) := word(15 downto 0);
              r(I+1) := word(31 downto 16);
-             I:=I+2;         
-           end loop; 
-       end if;        
-    
-     return r; 
+             I:=I+2;
+           end loop;
+           file_close(RamFile);
+       end if;
+
+     return r;
    end function;
-   
+
    signal memory  : memory_array:=InitFromFile;
-   
-   
-   
+
+
+
 begin
    addr_index <= active_row(to_integer(unsigned(selected_bank))) & selected_bank & column;
 
@@ -118,7 +120,7 @@ decode_proc: process(CS_N, RAS_N, CAS_N, WE_N)
          command <= unsel_c;
       else
          cmd := RAS_N & CAS_N & WE_N;
-         case cmd is 
+         case cmd is
             when "000"  => command <= LMR_c;
             when "001"  => command <= REF_c;
             when "010"  => command <= PRE_c;
@@ -126,19 +128,19 @@ decode_proc: process(CS_N, RAS_N, CAS_N, WE_N)
             when "100"  => command <= WR_c;
             when "101"  => command <= RD_c;
             when "110"  => command <= TERM_c;
-            when others => command <= NOP_c;         
+            when others => command <= NOP_c;
          end case;
       end if;
    end process;
- 
+
 data_process : process(clk)
    begin
       if rising_edge(clk) then
-        
+
          -- this implements the data masks, gets updated when a read command is sent
          rd_burst(8 downto 0) <= rd_burst(9 downto 1);
          column <= std_logic_vector(unsigned(column)+1);
-         
+
          wr_burst(7 downto 0) <= wr_burst(8 downto 1);
 
          -- Process any pending writes
@@ -147,7 +149,7 @@ data_process : process(clk)
          end if;
          if wr_burst(0) = '1' and wr_mask(1) = '1' then
             memory(to_integer(unsigned(addr_index)))(15 downto 8) <= wr_data(15 downto 8);
-         end if;            
+         end if;
          wr_data       <= dq;
 
          -- default is not to write
@@ -156,7 +158,7 @@ data_process : process(clk)
             rd_burst <= (others => '0');
             column        <= addr(column'high downto 0);
             selected_bank <= ba;
-            if mode_reg(9) = '1' then 
+            if mode_reg(9) = '1' then
                wr_burst <= "000000001";
             else
                case mode_reg(2 downto 0) is
@@ -192,27 +194,27 @@ data_process : process(clk)
                when others =>
                   -- full page not implemnted
             end case;
-         end if;         
+         end if;
 
          -- This is the logic that implements the CAS delay. Here is enough for CAS=2
          if mode_reg(6 downto 4) = "010" then
             data_delay1 <= memory(to_integer(unsigned(addr_index)));
          elsif mode_reg(6 downto 4) = "011" then
             data_delay1 <=  data_delay2;
-            data_delay2 <= memory(to_integer(unsigned(addr_index)));         
+            data_delay2 <= memory(to_integer(unsigned(addr_index)));
          else
             data_delay1 <=  data_delay2;
             data_delay2 <=  data_delay3;
             data_delay3 <= memory(to_integer(unsigned(addr_index)));
          end if;
 
-         -- Output masks lag a cycle 
+         -- Output masks lag a cycle
          dqm_sr  <= dqm & dqm_sr(3 downto 2);
          wr_mask <= not dqm;
 
       end if;
    end process;
-      
+
 data2_process : process(clk)
    begin
       if rising_edge(clk) then

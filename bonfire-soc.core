@@ -15,7 +15,7 @@ files = byte_swapper.vhd sdram/SDRAM_Controller.vhd
 file_type=vhdlSource
 
 [fileset sim]
-files=tb_dramtest.vhd
+files=tb_dramtest.vhd sdram/sdram_model.vhd
 file_type=vhdlSource
 usage=sim
 scope = private
@@ -28,14 +28,17 @@ usage=synth
 [fileset code]
 files=compiled_code/monitor.hex
 scope=private
+file_type=user
 
 [parameter RamFileName]
 datatype=file
-default=compiled_code/monitor.hex
-descripton=Initial boot RAM contents (in hex)
-paramtype=generic
-usage=sim
+default=\"compiled_code/monitor.hex\"
+description=Initial boot RAM contents (in hex)
+#paramtype=generic
+paramtype=vlogparam
 scope=public
+
+
 
 
 [ise]

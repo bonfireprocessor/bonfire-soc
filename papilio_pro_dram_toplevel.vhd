@@ -31,15 +31,16 @@ use UNISIM.VComponents.all;
 
 entity papilio_pro_dram_toplevel is
 generic (
-
-     RamFileName : string :=  "../src/bonfire-soc_0/compiled_code/monitor.hex";
+     RamFileName : string;    -- :="compiled_code/monitor.hex";
      mode : string := "H";       -- only used when UseBRAMPrimitives is false
      Swapbytes : boolean := true; -- SWAP Bytes in RAM word in low byte first order to use data2mem
      FakeDRAM : boolean := false; -- Use Block RAM instead of DRAM
-     InstructionBurstSize : natural := 8;
+     BurstSize : natural := 8;
      CacheSizeWords : natural := 2048; -- 8KB Instruction Cache
      EnableDCache : boolean := true;
-     DCacheSizeWords : natural := 2048
+     DCacheSizeWords : natural := 2048;
+     MUL_ARCH: string := "spartandsp";
+     REG_RAM_STYLE : string := "block"
 
    );
    port(
@@ -224,10 +225,10 @@ begin
 
     cpu_top: entity work.bonfire_cpu_top
      generic map (
-       MUL_ARCH => "spartandsp",
-       REG_RAM_STYLE => "block",
+       MUL_ARCH => MUL_ARCH,
+       REG_RAM_STYLE => REG_RAM_STYLE,
        START_ADDR => reset_adr(31 downto 2),
-       CACHE_LINE_SIZE_WORDS =>InstructionBurstSize,
+       CACHE_LINE_SIZE_WORDS =>BurstSize,
        CACHE_SIZE_WORDS=>CacheSizeWords,
        BRAM_PORT_ADR_SIZE=>ram_adr_width,
        ENABLE_TIMER=>true
@@ -327,7 +328,7 @@ dram: if not FakeDRAM generate
 DRAM: entity work.wbs_sdram_interface
 generic map (
   wbs_adr_high => mem_adr'high,
-  wbs_burst_length => InstructionBurstSize
+  wbs_burst_length => BurstSize
 
 )
 PORT MAP(
@@ -544,7 +545,7 @@ dache: if EnableDCache generate
    Inst_bonfire_dcache: entity work.bonfire_dcache
    GENERIC MAP (
      MASTER_DATA_WIDTH => 32,
-     LINE_SIZE => InstructionBurstSize,
+     LINE_SIZE => BurstSize,
      CACHE_SIZE => 2048,  -- hard coded currently
      ADDRESS_BITS => dcm_adr'length,
      DEVICE_FAMILY => "SPARTAN6" -- hard coded work around...
