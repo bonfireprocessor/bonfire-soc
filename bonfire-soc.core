@@ -32,7 +32,7 @@ file_type=user
 
 [parameter RamFileName]
 datatype=file
-default=\"compiled_code/monitor.hex\"
+default=compiled_code/monitor.hex
 description=Initial boot RAM contents (in hex)
 #paramtype=generic
 paramtype=vlogparam
