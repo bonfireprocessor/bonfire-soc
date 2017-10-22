@@ -28,14 +28,16 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=3
+current_page=5
 FILE_NAME_0=393;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fuart.h;0;4
 FILE_NAME_1=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmult.c;0;4
-FILE_NAME_2=766;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
-FILE_NAME_3=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmemsim.c;0;4
+FILE_NAME_2=1932;Make;0;EUTF-8;1;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2FMakefile;0;4
+FILE_NAME_3=48;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmemsim.c;0;4
+FILE_NAME_4=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Ftest%2Fmemsim.lst;0;4
+FILE_NAME_5=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fthomas%2Friscv%2Flxp32soc%2Fsoftware%2Fwildfire%2Fplatform%2FPAPRO%2Fplatform.h;0;4
 
 [VTE]
-last_dir=/home/thomas/riscv/lxp32soc/software/wildfire/dhrystone
+last_dir=/home/thomas/riscv/lxp32soc/software/wildfire/test
 
 [build-menu]
 CFT_00_LB=_Compile
