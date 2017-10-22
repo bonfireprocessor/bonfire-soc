@@ -20,15 +20,17 @@ file_type=vhdlSource
 usage=sim
 scope = private
 
-[fileset bmm]
-files=soc.bmm
-scope=private
-usage=synth
-
 [fileset code]
 files=compiled_code/monitor.hex
 scope=private
 file_type=user
+
+[fileset bmm]
+files=soc.bmm[copyto=soc.bmm]
+file_type=BMM
+usage=synth
+scope=private
+
 
 [parameter RamFileName]
 datatype=file
@@ -39,10 +41,9 @@ paramtype=vlogparam
 scope=public
 
 
-
-
 [ise]
 ucf_files = ppro_dram.ucf
+#bmm_files = soc.bmm
 family = spartan6
 device = xc6slx9
 package = tqg144

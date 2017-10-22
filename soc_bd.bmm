@@ -1,0 +1,78 @@
+// BMM LOC annotation file.
+//
+// Release 14.6 -  P.20131013, build 3.0.10 Apr 3, 2013
+// Copyright (c) 1995-2017 Xilinx, Inc.  All rights reserved.
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Address space 'ram' 0x0C000000:0x0C007FFF (32 KBytes).
+//
+///////////////////////////////////////////////////////////////////////////////
+
+ADDRESS_SPACE ram RAMB16 [0x0C000000:0x0C007FFF]
+    BUS_BLOCK
+        ram/Mram_ram1 RAMB16 [31:0] [0:511] PLACED = X0Y10;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram2 RAMB16 [31:0] [512:1023] PLACED = X0Y8;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram3 RAMB16 [31:0] [1024:1535] PLACED = X0Y12;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram4 RAMB16 [31:0] [1536:2047] PLACED = X0Y18;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram5 RAMB16 [31:0] [2048:2559] PLACED = X1Y22;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram6 RAMB16 [31:0] [2560:3071] PLACED = X1Y20;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram7 RAMB16 [31:0] [3072:3583] PLACED = X1Y16;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram8 RAMB16 [31:0] [3584:4095] PLACED = X1Y14;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram9 RAMB16 [31:0] [4096:4607] PLACED = X0Y22;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram10 RAMB16 [31:0] [4608:5119] PLACED = X0Y20;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram11 RAMB16 [31:0] [5120:5631] PLACED = X0Y14;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram12 RAMB16 [31:0] [5632:6143] PLACED = X0Y16;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram13 RAMB16 [31:0] [6144:6655] PLACED = X1Y8;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram14 RAMB16 [31:0] [6656:7167] PLACED = X1Y10;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram15 RAMB16 [31:0] [7168:7679] PLACED = X1Y18;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        ram/Mram_ram16 RAMB16 [31:0] [7680:8191] PLACED = X1Y12;
+    END_BUS_BLOCK;
+END_ADDRESS_SPACE;
+
