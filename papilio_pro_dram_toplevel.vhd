@@ -56,6 +56,10 @@ generic (
         uart0_txd : out std_logic;
         uart0_rxd : in  std_logic :='1';
 
+        -- UART1 signals:
+        uart1_txd : out std_logic;
+        uart1_rxd : in  std_logic :='1';
+
         -- SPI flash chip
         flash_spi_cs        : out   std_logic;
         flash_spi_clk       : out   std_logic;
@@ -81,8 +85,7 @@ end papilio_pro_dram_toplevel;
 
 architecture Behavioral of papilio_pro_dram_toplevel is
 
- --constant ram_adr_width : natural := 12;
- --constant ram_size : natural := 4096;
+
 
  constant ram_adr_width : natural := 13;
  constant ram_size : natural := 8192;
@@ -149,6 +152,12 @@ signal dcm_adr : std_logic_vector(slave_adr_high downto 2);
 signal dcm_cti : std_logic_vector(2 downto 0);
 signal dcm_bte : std_logic_vector(1 downto 0);
 
+--I/O Bus
+signal io_cyc,io_stb,io_we,io_ack : std_logic;
+signal io_sel :  std_logic_vector(3 downto 0);
+signal io_dat_rd,io_dat_wr : std_logic_vector(31 downto 0);
+signal io_adr : std_logic_vector(slave_adr_high downto 2);
+
 
 -- Interface to  dual port Block RAM
 -- Port A R/W, Byte Level Access, for Data
@@ -165,35 +174,29 @@ signal      bram_adrb_o : std_logic_vector(ram_adr_width-1 downto 0);
 signal      bram_enb_o :  std_logic;
 
 
+--TODO:Remove obsolete
 
--- gpio bus
-signal gpio_cyc,gpio_stb,gpio_we,gpio_ack : std_logic;
-signal gpio_sel :  std_logic_vector(3 downto 0);
-signal gpio_dat_rd,gpio_dat_wr : std_logic_vector(31 downto 0);
-signal gpio_adr : std_logic_vector(slave_adr_high downto 2);
+---- lpc bus
+--signal lpc_cyc,lpc_stb,lpc_stb0, lpc_we,lpc_ack : std_logic;
+--signal lpc_sel :  std_logic_vector(3 downto 0);
+--signal lpc_dat_rd,lpc_dat_wr : std_logic_vector(31 downto 0);
+--signal lpc_adr : std_logic_vector(slave_adr_high downto 2);
 
+--signal lpcio_adr : std_logic_vector(slave_adr_high downto 0);
+--signal lpc_dat_rd8, lpc_dat_wr8 : std_logic_vector(7 downto 0);
 
--- lpc bus
-signal lpc_cyc,lpc_stb,lpc_stb0, lpc_we,lpc_ack : std_logic;
-signal lpc_sel :  std_logic_vector(3 downto 0);
-signal lpc_dat_rd,lpc_dat_wr : std_logic_vector(31 downto 0);
-signal lpc_adr : std_logic_vector(slave_adr_high downto 2);
+---- lpc slaves
+---- uart bus
+--signal uart_cyc,uart_stb,uart_we,uart_ack : std_logic;
+--signal uart_sel :  std_logic_vector(3 downto 0);
+--signal uart_dat_rd,uart_dat_wr : std_logic_vector(7 downto 0);
+--signal uart_adr : std_logic_vector(7 downto 0);
 
-signal lpcio_adr : std_logic_vector(slave_adr_high downto 0);
-signal lpc_dat_rd8, lpc_dat_wr8 : std_logic_vector(7 downto 0);
-
--- lpc slaves
--- uart bus
-signal uart_cyc,uart_stb,uart_we,uart_ack : std_logic;
-signal uart_sel :  std_logic_vector(3 downto 0);
-signal uart_dat_rd,uart_dat_wr : std_logic_vector(7 downto 0);
-signal uart_adr : std_logic_vector(7 downto 0);
-
--- SPI Flash
-signal flash_cyc,flash_stb,flash_we,flash_ack : std_logic;
-signal flash_sel :  std_logic_vector(3 downto 0);
-signal flash_dat_rd,flash_dat_wr : std_logic_vector(7 downto 0);
-signal flash_adr : std_logic_vector(7 downto 0);
+---- SPI Flash
+--signal flash_cyc,flash_stb,flash_we,flash_ack : std_logic;
+--signal flash_sel :  std_logic_vector(3 downto 0);
+--signal flash_dat_rd,flash_dat_wr : std_logic_vector(7 downto 0);
+--signal flash_adr : std_logic_vector(7 downto 0);
 
 signal irq_i : std_logic_vector(7 downto 0);
 
@@ -217,7 +220,7 @@ signal leds_o : std_logic_vector(4 downto 0);
 
 begin
 
-   irq_i <= (others=>'0'); -- currently no interrupts
+   --irq_i <= (others=>'0'); -- currently no interrupts
    led1<=leds_o(4);
    leds<=leds_o(3 downto 0);
 
@@ -239,32 +242,32 @@ begin
         rst_i => reset,
 
         bram_dba_i => bram_dba_i,
-          bram_dba_o => bram_dba_o,
-          bram_adra_o => bram_adra_o,
-          bram_ena_o =>  bram_ena_o,
-          bram_wrena_o => bram_wrena_o,
-          bram_dbb_i =>  bram_dbb_i,
-          bram_adrb_o => bram_adrb_o,
-          bram_enb_o =>  bram_enb_o,
+        bram_dba_o => bram_dba_o,
+        bram_adra_o => bram_adra_o,
+        bram_ena_o =>  bram_ena_o,
+        bram_wrena_o => bram_wrena_o,
+        bram_dbb_i =>  bram_dbb_i,
+        bram_adrb_o => bram_adrb_o,
+        bram_enb_o =>  bram_enb_o,
 
-          wb_ibus_cyc_o => ibus_cyc_o ,
-          wb_ibus_stb_o => ibus_stb_o,
-          wb_ibus_cti_o => ibus_cti_o,
-          wb_ibus_bte_o => ibus_bte_o,
-          wb_ibus_ack_i => ibus_ack_i,
-          wb_ibus_adr_o => ibus_adr_o,
-          wb_ibus_dat_i => ibus_dat_i,
+        wb_ibus_cyc_o => ibus_cyc_o ,
+        wb_ibus_stb_o => ibus_stb_o,
+        wb_ibus_cti_o => ibus_cti_o,
+        wb_ibus_bte_o => ibus_bte_o,
+        wb_ibus_ack_i => ibus_ack_i,
+        wb_ibus_adr_o => ibus_adr_o,
+        wb_ibus_dat_i => ibus_dat_i,
 
-          wb_dbus_cyc_o => dbus_cyc_o,
-          wb_dbus_stb_o => dbus_stb_o,
-          wb_dbus_we_o =>  dbus_we_o,
-          wb_dbus_sel_o => dbus_sel_o,
-          wb_dbus_ack_i => dbus_ack_i,
-          wb_dbus_adr_o => dbus_adr_o,
-          wb_dbus_dat_o => dbus_dat_o,
-          wb_dbus_dat_i => dbus_dat_i,
+        wb_dbus_cyc_o => dbus_cyc_o,
+        wb_dbus_stb_o => dbus_stb_o,
+        wb_dbus_we_o =>  dbus_we_o,
+        wb_dbus_sel_o => dbus_sel_o,
+        wb_dbus_ack_i => dbus_ack_i,
+        wb_dbus_adr_o => dbus_adr_o,
+        wb_dbus_dat_o => dbus_dat_o,
+        wb_dbus_dat_i => dbus_dat_i,
 
-          irq_i => irq_i
+        irq_i => irq_i
     );
 
 
@@ -360,115 +363,8 @@ PORT MAP(
 end generate;
 
 
-     Inst_gpio: entity work.gpio
-
-     generic map (  wbs_adr_high => slave_adr_high)
-     PORT MAP(
-        leds => leds_o ,
-        clk_i =>clk ,
-        rst_i => reset,
-        wbs_cyc_i => gpio_cyc ,
-        wbs_stb_i => gpio_stb,
-        wbs_we_i => gpio_we,
-        wbs_sel_i => gpio_sel,
-        wbs_ack_o => gpio_ack,
-        wbs_adr_i => gpio_adr,
-        wbs_dat_i => gpio_dat_wr,
-        wbs_dat_o => gpio_dat_rd
-    );
 
 
--- "Low Pin Count bus"
---  Byte addressable 8 Bit Wishbone Bus for slow devices like UARTs
---  TODO: Byte adressing is not complete, because data are not shifted to the right position on the bus...
-
-    lpc_dat_wr8<= lpc_dat_wr(7 downto 0);
-    lpc_dat_rd<=  X"000000"&lpc_dat_rd8;
-
-
-    -- extend Adress bus with lower two bits
-   process(lpc_adr,lpc_sel)
-      variable lowadr : std_logic_vector( 1 downto 0);
-      begin
-        case lpc_sel is
-           when "0001" => lowadr:="00";
-           when "0010" =>lowadr:="01";
-           when "0100"=>lowadr:="10";
-           when "1000"=>lowadr:="11";
-           when others => lowadr:="00";
-        end case;
-       lpcio_adr<=lpc_adr & lowadr;
-    end process;
-
-
-
-   inst_lpcbus:  entity work.papro_lpc PORT MAP(
-        clk_i => clk,
-        rst_i => reset,
-        s0_cyc_i => lpc_cyc,
-        s0_stb_i => lpc_stb,
-        s0_we_i =>  lpc_we,
-        s0_ack_o => lpc_ack,
-        s0_adr_i =>  lpcio_adr,
-        s0_dat_i =>  lpc_dat_wr8,
-        s0_dat_o =>  lpc_dat_rd8,
-        m0_cyc_o =>  uart_cyc,
-        m0_stb_o => uart_stb,
-        m0_we_o =>  uart_we,
-        m0_ack_i => uart_ack,
-        m0_adr_o => uart_adr,
-        m0_dat_o => uart_dat_wr ,
-        m0_dat_i => uart_dat_rd,
-
-        m1_cyc_o =>  flash_cyc,
-        m1_stb_o => flash_stb,
-        m1_we_o =>  flash_we,
-        m1_ack_i => flash_ack,
-        m1_adr_o => flash_adr,
-        m1_dat_o => flash_dat_wr ,
-        m1_dat_i => flash_dat_rd
-
-    );
-
-
-   inst_uart:  entity work.wb_uart_interface
-   generic map(
-
-         FIFO_DEPTH => 64 )
-
-
-   PORT MAP(
-        clk =>clk ,
-        reset => reset,
-        txd => uart0_txd,
-        rxd => uart0_rxd,
-        irq => open,
-        wb_adr_in => uart_adr,
-        wb_dat_in => uart_dat_wr,
-        wb_dat_out => uart_dat_rd,
-        wb_we_in => uart_we,
-        wb_cyc_in => uart_cyc,
-        wb_stb_in => uart_stb,
-        wb_ack_out => uart_ack
-    );
-
-    inst_flash : entity work.wb_spi_interface
-    PORT MAP(
-        clk_i => clk,
-        reset_i => reset,
-        slave_cs_o => flash_spi_cs,
-        slave_clk_o => flash_spi_clk,
-        slave_mosi_o => flash_spi_mosi,
-        slave_miso_i => flash_spi_miso,
-        irq => open,
-        wb_adr_in =>flash_adr ,
-        wb_dat_in => flash_dat_wr,
-        wb_dat_out => flash_dat_rd,
-        wb_we_in => flash_we,
-        wb_cyc_in => flash_cyc,
-        wb_stb_in => flash_stb,
-        wb_ack_out => flash_ack
-    );
 
 
    inst_busconnect:   entity  work.cpu_dbus_connect PORT MAP(
@@ -496,27 +392,17 @@ end generate;
         m0_dat_o =>  dbmem_dat_wr,
         m0_dat_i =>  dbmem_dat_rd,
 
-        --IO Space 1: 0x04000000-0x07FFFFF (Decode 0000 01)
-        m1_cyc_o =>  gpio_cyc,
-        m1_stb_o =>  gpio_stb,
-        m1_we_o =>   gpio_we,
-        m1_sel_o =>  gpio_sel,
-        m1_ack_i =>  gpio_ack,
-        m1_adr_o =>  gpio_adr,
-        m1_dat_o =>  gpio_dat_wr,
-        m1_dat_i =>  gpio_dat_rd,
-
-
-        -- IO Space 2:  0x08000000-0x0BFFFFFF (Decode 0000 10)
-        m2_cyc_o =>  lpc_cyc,
-        m2_stb_o =>  lpc_stb,
-        m2_we_o =>   lpc_we,
-        m2_sel_o =>  lpc_sel,
-        m2_ack_i =>  lpc_ack,
-        m2_adr_o =>  lpc_adr,
-        m2_dat_o =>  lpc_dat_wr,
-        m2_dat_i =>  lpc_dat_rd
+        --IO Space : 0x04000000-0x07FFFFF (Decode 0000 01)
+        m1_cyc_o =>  io_cyc,
+        m1_stb_o =>  io_stb,
+        m1_we_o =>   io_we,
+        m1_sel_o =>  io_sel,
+        m1_ack_i =>  io_ack,
+        m1_adr_o =>  io_adr,
+        m1_dat_o =>  io_dat_wr,
+        m1_dat_i =>  io_dat_rd
     );
+
 
 
  no_dcache: if not EnableDCache generate
@@ -622,6 +508,39 @@ Inst_dram_arbiter:  entity work.dram_arbiter PORT MAP(
 
 
 
+Inst_bonfire_soc_io: entity  work.bonfire_soc_io
+GENERIC MAP (
+  NUM_GPIO_BITS => leds_o'length,
+  ADR_HIGH => io_adr'high
+
+)
+PORT MAP(
+        uart0_txd => uart0_txd,
+        uart0_rxd => uart0_rxd,
+        uart1_txd => uart1_txd,
+        uart1_rxd => uart1_rxd,
+        gpio_o => leds_o ,
+        gpio_i => (others=>'0'),
+        gpio_t =>  open,
+        flash_spi_cs => flash_spi_cs,
+        flash_spi_clk => flash_spi_clk,
+        flash_spi_mosi => flash_spi_mosi,
+        flash_spi_miso => flash_spi_miso,
+        irq_o => irq_i,
+        clk_i => clk,
+        rst_i => reset,
+        wb_cyc_i => io_cyc,
+        wb_stb_i => io_stb,
+        wb_we_i =>  io_we,
+        wb_sel_i => io_sel,
+        wb_ack_o => io_ack,
+        wb_adr_i => io_adr,
+        wb_dat_i => io_dat_wr,
+        wb_dat_o => io_dat_rd
+    );
+
+
+
 -- Clock
 
  clkgen_inst: clkgen
@@ -643,9 +562,6 @@ Inst_dram_arbiter:  entity work.dram_arbiter PORT MAP(
   port map
    (O => clk32Mhz,
     I => sysclk_32m);
-
-
- --   clk<=clk32Mhz; -- for the moment we set the CPU clock to the OSC.
 
 
     process(clk) begin

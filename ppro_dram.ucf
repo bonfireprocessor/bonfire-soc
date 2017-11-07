@@ -39,6 +39,10 @@ NET sysclk_32m     LOC="P94"  | IOSTANDARD=LVTTL | PERIOD=31.25ns;              
 NET uart0_rxd      LOC="P101" | IOSTANDARD=LVTTL;                                # RX
 NET uart0_txd      LOC="P105" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW; 			# TX
 
+#UART 1 at WING C Pins C15 and C14
+NET uart1_rxd      LOC="P133" | IOSTANDARD=LVTTL;                                # RX (C14)
+NET uart1_txd      LOC="P134" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW; 			# TX (C15)
+
 NET I_RESET        LOC="P85"  | IOSTANDARD=LVTTL | PULLDOWN;                     # A11
 NET LED1           LOC="P112" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW;          # LED1
 

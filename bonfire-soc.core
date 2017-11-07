@@ -1,16 +1,14 @@
 CAPI=1
 [main]
 name = ::bonfire-soc:0
-depend = ::bonfire-cpu:0 ::bonfire-util:0 ::bonfire-dcache:0
+depend = ::bonfire-cpu:0 ::bonfire-util:0 ::bonfire-dcache:0 ::bonfire-soc-io
 backend = ise
 simulators=isim
 
 [fileset rtl]
 files = byte_swapper.vhd sdram/SDRAM_Controller.vhd
-        MainMemory.vhd wishbone_burst_mem_interface.vhd sdram/wbs_sdram_interface.vhd gpio.vhd
-        uart/fifo.vhd uart/uart.vhd uart/wb_uart_interface.vhd
-        spi/spimaster.vhd spi/wb_spi_interface.vhd
-        cpu_dbus_connect.vhd  papro_lpc.vhd dram_arbiter.vhd clkgen.vhd
+        MainMemory.vhd wishbone_burst_mem_interface.vhd sdram/wbs_sdram_interface.vhd
+        cpu_dbus_connect.vhd  dram_arbiter.vhd clkgen.vhd
         papilio_pro_dram_toplevel.vhd
 file_type=vhdlSource
 
