@@ -32,7 +32,8 @@ generic (
      EnableDCache : boolean := true;
      DCacheSizeWords : natural := 2048;
      MUL_ARCH: string := "spartandsp";
-     REG_RAM_STYLE : string := "block"
+     REG_RAM_STYLE : string := "block";
+     DRAM_INIT_FILE : string :=""
    );
 END tb_dramtest;
 
@@ -81,7 +82,8 @@ ARCHITECTURE behavior OF tb_dramtest IS
 
    COMPONENT sdram_model
    GENERIC (
-     mode : string := "N" -- no init file
+     mode : string := "H";
+     RamFileName : string
    );
     PORT(
         CLK : IN std_logic;
@@ -173,7 +175,8 @@ BEGIN
 
   Inst_sdram_model: sdram_model
     GENERIC MAP (
-       mode=>"N" -- no init file
+       mode=>"H",
+       RamFileName => DRAM_INIT_FILE
     )
     PORT MAP(
         CLK => SDRAM_CLK,

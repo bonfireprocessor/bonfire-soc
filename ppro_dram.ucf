@@ -27,7 +27,7 @@ CONFIG PROHIBIT=P69;
 CONFIG PROHIBIT=P60;
 
 
-#Declare system_clk and timer_Clk as indpendant clk domains. 
+#Declare system_clk and timer_Clk as indpendant clk domains.
 ##NET system_clk TNM_NET = "sysclk";
 ##NET timer_clk  TNM_NET = "timerclk";
 ##TIMESPEC "TS_XDOMAINS_SYSTIME" = from "sysclk" to "timerclk" TIG;
@@ -37,11 +37,11 @@ CONFIG PROHIBIT=P60;
 
 NET sysclk_32m     LOC="P94"  | IOSTANDARD=LVTTL | PERIOD=31.25ns;               # CLK
 NET uart0_rxd      LOC="P101" | IOSTANDARD=LVTTL;                                # RX
-NET uart0_txd      LOC="P105" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW; 			# TX
+NET uart0_txd      LOC="P105" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW;          # TX
 
 #UART 1 at WING C Pins C15 and C14
 NET uart1_rxd      LOC="P133" | IOSTANDARD=LVTTL;                                # RX (C14)
-NET uart1_txd      LOC="P134" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW; 			# TX (C15)
+NET uart1_txd      LOC="P134" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW;          # TX (C15)
 
 NET I_RESET        LOC="P85"  | IOSTANDARD=LVTTL | PULLDOWN;                     # A11
 NET LED1           LOC="P112" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW;          # LED1

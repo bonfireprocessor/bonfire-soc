@@ -29,7 +29,7 @@ use STD.textio.all;
 
 entity sdram_model is
 generic (
-     RamFileName : string := "meminit.ram";
+     RamFileName : string := "";
      mode : string := "N";
      DRAM_pagesize : natural :=256
     );
@@ -98,7 +98,7 @@ end;
 
    begin
 
-       if mode="H" or mode="B" then
+       if (mode="H" or mode="B") and RamFileName'length>0 then
            file_open(RamFile,RamFileName,READ_MODE);
            I:=0;
            while not endfile(RamFile) loop
