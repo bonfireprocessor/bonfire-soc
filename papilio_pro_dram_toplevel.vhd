@@ -40,7 +40,8 @@ generic (
      EnableDCache : boolean := true;
      DCacheSizeWords : natural := 2048;
      MUL_ARCH: string := "spartandsp";
-     REG_RAM_STYLE : string := "block"
+     REG_RAM_STYLE : string := "block";
+     NUM_GPIO : natural := 25
 
    );
    port(
@@ -49,7 +50,7 @@ generic (
 
         -- GPIOs:
         -- 4x LEDs on Arcade Megawing
-        leds : out   std_logic_vector(3 downto 0);
+        --leds : out   std_logic_vector(3 downto 0);
 
 
         -- UART0 signals:
@@ -68,6 +69,9 @@ generic (
 
         -- LED on Papilio Pro Board
         led1 : out std_logic;
+
+        -- GPIO pads - assign with UCF File
+        gpio_pad : inout STD_LOGIC_VECTOR(NUM_GPIO-1 downto 0);
 
         -- SDRAM signals
         SDRAM_CLK     : out   STD_LOGIC;
@@ -174,33 +178,15 @@ signal      bram_adrb_o : std_logic_vector(ram_adr_width-1 downto 0);
 signal      bram_enb_o :  std_logic;
 
 
---TODO:Remove obsolete
+-- gpio ports
+-- GPIO module will always be configured with all 32 Bits
+signal gpio_t,gpio_o,gpio_i : std_logic_vector(31 downto 0);
 
----- lpc bus
---signal lpc_cyc,lpc_stb,lpc_stb0, lpc_we,lpc_ack : std_logic;
---signal lpc_sel :  std_logic_vector(3 downto 0);
---signal lpc_dat_rd,lpc_dat_wr : std_logic_vector(31 downto 0);
---signal lpc_adr : std_logic_vector(slave_adr_high downto 2);
 
---signal lpcio_adr : std_logic_vector(slave_adr_high downto 0);
---signal lpc_dat_rd8, lpc_dat_wr8 : std_logic_vector(7 downto 0);
-
----- lpc slaves
----- uart bus
---signal uart_cyc,uart_stb,uart_we,uart_ack : std_logic;
---signal uart_sel :  std_logic_vector(3 downto 0);
---signal uart_dat_rd,uart_dat_wr : std_logic_vector(7 downto 0);
---signal uart_adr : std_logic_vector(7 downto 0);
-
----- SPI Flash
---signal flash_cyc,flash_stb,flash_we,flash_ack : std_logic;
---signal flash_sel :  std_logic_vector(3 downto 0);
---signal flash_dat_rd,flash_dat_wr : std_logic_vector(7 downto 0);
---signal flash_adr : std_logic_vector(7 downto 0);
 
 signal irq_i : std_logic_vector(7 downto 0);
 
-signal leds_o : std_logic_vector(4 downto 0);
+--signal leds_o : std_logic_vector(4 downto 0);
 
   COMPONENT clkgen
     PORT(
@@ -220,9 +206,27 @@ signal leds_o : std_logic_vector(4 downto 0);
 
 begin
 
-   --irq_i <= (others=>'0'); -- currently no interrupts
-   led1<=leds_o(4);
-   leds<=leds_o(3 downto 0);
+   -- Assignment of IOBs for GPIO
+   
+   -- LED will be the highest bit of the gpio port 
+   led_pad: OBUF
+     port map(
+       I => gpio_o(gpio_o'high),
+       O => led1
+     );
+
+   gpio_pads: for i in gpio_pad'range generate
+     pad : IOBUF
+
+     port map (
+        O => gpio_i(i),     -- Buffer output
+        IO => gpio_pad(i),   -- Buffer inout port (connect directly to top-level port)
+        I => gpio_o(i),     -- Buffer input
+        T => gpio_t(i)      -- 3-state enable input, high=input, low=output
+     );
+
+   end generate;
+
 
 
 
@@ -510,7 +514,7 @@ Inst_dram_arbiter:  entity work.dram_arbiter PORT MAP(
 
 Inst_bonfire_soc_io: entity  work.bonfire_soc_io
 GENERIC MAP (
-  NUM_GPIO_BITS => leds_o'length,
+  NUM_GPIO_BITS => gpio_o'length,
   ADR_HIGH => io_adr'high
 
 )
@@ -519,9 +523,9 @@ PORT MAP(
         uart0_rxd => uart0_rxd,
         uart1_txd => uart1_txd,
         uart1_rxd => uart1_rxd,
-        gpio_o => leds_o ,
-        gpio_i => (others=>'0'),
-        gpio_t =>  open,
+        gpio_o => gpio_o ,
+        gpio_i => gpio_i,
+        gpio_t =>  gpio_t,
         flash_spi_cs => flash_spi_cs,
         flash_spi_clk => flash_spi_clk,
         flash_spi_mosi => flash_spi_mosi,
