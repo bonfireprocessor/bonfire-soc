@@ -41,7 +41,9 @@ generic (
      DCacheSizeWords : natural := 2048;
      MUL_ARCH: string := "spartandsp";
      REG_RAM_STYLE : string := "block";
-     NUM_GPIO : natural := 25
+     NUM_GPIO_A : natural := 8;
+     NUM_GPIO_C : natural := 8;
+     NUM_GPIO_B : natural := 4
 
    );
    port(
@@ -71,7 +73,9 @@ generic (
         led1 : out std_logic;
 
         -- GPIO pads - assign with UCF File
-        gpio_pad : inout STD_LOGIC_VECTOR(NUM_GPIO-1 downto 0);
+        WING_A : inout STD_LOGIC_VECTOR(NUM_GPIO_A-1 downto 0);
+        WING_B : inout STD_LOGIC_VECTOR(NUM_GPIO_B-1 downto 0);
+        WING_C : inout STD_LOGIC_VECTOR(NUM_GPIO_C-1 downto 0);
 
         -- SDRAM signals
         SDRAM_CLK     : out   STD_LOGIC;
@@ -179,6 +183,11 @@ signal      bram_enb_o :  std_logic;
 
 
 -- gpio ports
+
+constant SPECIAL_GPIO : natural := 1;
+constant TOTAL_GPIO : natural := NUM_GPIO_A + NUM_GPIO_B +
+                                 NUM_GPIO_C + SPECIAL_GPIO;
+
 -- GPIO module will always be configured with all 32 Bits
 signal gpio_t,gpio_o,gpio_i : std_logic_vector(31 downto 0);
 
@@ -186,7 +195,7 @@ signal gpio_t,gpio_o,gpio_i : std_logic_vector(31 downto 0);
 
 signal irq_i : std_logic_vector(7 downto 0);
 
---signal leds_o : std_logic_vector(4 downto 0);
+
 
   COMPONENT clkgen
     PORT(
@@ -205,24 +214,51 @@ signal irq_i : std_logic_vector(7 downto 0);
 
 
 begin
+   assert TOTAL_GPIO <= 32
+     report "Total number of gpio ports cannot exceed 32"
+     severity failure;
 
    -- Assignment of IOBs for GPIO
-   
-   -- LED will be the highest bit of the gpio port 
+
+   -- LED will be the highest bit of the gpio core
    led_pad: OBUF
      port map(
        I => gpio_o(gpio_o'high),
        O => led1
      );
 
-   gpio_pads: for i in gpio_pad'range generate
+   wing_a_pads: for i in WING_A'range generate
      pad : IOBUF
 
      port map (
         O => gpio_i(i),     -- Buffer output
-        IO => gpio_pad(i),   -- Buffer inout port (connect directly to top-level port)
+        IO => WING_A(i),   -- Buffer inout port (connect directly to top-level port)
         I => gpio_o(i),     -- Buffer input
         T => gpio_t(i)      -- 3-state enable input, high=input, low=output
+     );
+
+   end generate;
+
+   wing_b_pads: for i in WING_B'range generate
+     pad : IOBUF
+
+     port map (
+        O => gpio_i(i+WING_A'length),     -- Buffer output
+        IO => WING_B(i),   -- Buffer inout port (connect directly to top-level port)
+        I => gpio_o(i+WING_A'length),     -- Buffer input
+        T => gpio_t(i+WING_A'length)      -- 3-state enable input, high=input, low=output
+     );
+
+   end generate;
+
+   wing_c_pads: for i in WING_C'range generate
+     pad : IOBUF
+
+     port map (
+        O => gpio_i(i+WING_A'length+WING_B'length),     -- Buffer output
+        IO => WING_C(i),                            -- Buffer inout port (connect directly to top-level port)
+        I => gpio_o(i+WING_A'length+WING_B'length),     -- Buffer input
+        T => gpio_t(i+WING_A'length+WING_B'length)      -- 3-state enable input, high=input, low=output
      );
 
    end generate;

@@ -51,31 +51,33 @@ NET LED1           LOC="P112" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=SLOW;         
 #NET leds(2)         LOC="P66"  | IOSTANDARD=LVTTL | DRIVE=12;                                # A5
 #NET leds(1)         LOC="P67"  | IOSTANDARD=LVTTL | DRIVE=12;                                # A6
 #NET leds(0)         LOC="P75"  | IOSTANDARD=LVTTL | DRIVE=12;                                # A7
-NET gpio_pad(0)           LOC="P48"  | IOSTANDARD=LVTTL;                                # A0
-NET gpio_pad(1)           LOC="P51"  | IOSTANDARD=LVTTL;                                # A1
-NET gpio_pad(2)           LOC="P56"  | IOSTANDARD=LVTTL;                                # A2
-NET gpio_pad(3)           LOC="P58"  | IOSTANDARD=LVTTL;                                # A3
-NET gpio_pad(4)           LOC="P61"  | IOSTANDARD=LVTTL;                                # A4
-NET gpio_pad(5)           LOC="P66"  | IOSTANDARD=LVTTL;                                # A5
-NET gpio_pad(6)           LOC="P67"  | IOSTANDARD=LVTTL;                                # A6
-NET gpio_pad(7)           LOC="P75"  | IOSTANDARD=LVTTL;                                # A7
-NET gpio_pad(8)           LOC="P79"  | IOSTANDARD=LVTTL;                                # A8
-NET gpio_pad(9)           LOC="P81"  | IOSTANDARD=LVTTL;                                # A9
-NET gpio_pad(10)          LOC="P83"  | IOSTANDARD=LVTTL;                                # A10
-NET gpio_pad(11)           LOC="P114" | IOSTANDARD=LVTTL;                                # C0
-NET gpio_pad(12)           LOC="P115" | IOSTANDARD=LVTTL;                                # C1
-NET gpio_pad(13)           LOC="P116" | IOSTANDARD=LVTTL;                                # C2
-NET gpio_pad(14)           LOC="P117" | IOSTANDARD=LVTTL;                                # C3
-NET gpio_pad(15)           LOC="P118" | IOSTANDARD=LVTTL;                                # C4
-NET gpio_pad(16)           LOC="P119" | IOSTANDARD=LVTTL;                                # C5
-NET gpio_pad(17)           LOC="P120" | IOSTANDARD=LVTTL;                                # C6
-NET gpio_pad(18)           LOC="P121" | IOSTANDARD=LVTTL;                                # C7
-NET gpio_pad(19)           LOC="P123" | IOSTANDARD=LVTTL;                                # C8
-NET gpio_pad(20)           LOC="P124" | IOSTANDARD=LVTTL;                                # C9
-NET gpio_pad(21)          LOC="P126" | IOSTANDARD=LVTTL;                                # C10
-NET gpio_pad(22)          LOC="P127" | IOSTANDARD=LVTTL;                                # C11
-NET gpio_pad(23)          LOC="P131" | IOSTANDARD=LVTTL;                                # C12
-NET gpio_pad(24)          LOC="P132" | IOSTANDARD=LVTTL;                                # C13
+NET WING_A(0)           LOC="P48"  | IOSTANDARD=LVTTL ;                               # A0
+NET WING_A(1)           LOC="P51"  | IOSTANDARD=LVTTL ;                               # A1
+NET WING_A(2)           LOC="P56"  | IOSTANDARD=LVTTL ;                               # A2
+NET WING_A(3)           LOC="P58"  | IOSTANDARD=LVTTL ;                               # A3
+NET WING_A(4)           LOC="P61"  | IOSTANDARD=LVTTL ;                               # A4
+NET WING_A(5)           LOC="P66"  | IOSTANDARD=LVTTL ;                               # A5
+NET WING_A(6)           LOC="P67"  | IOSTANDARD=LVTTL ;                               # A6
+NET WING_A(7)           LOC="P75"  | IOSTANDARD=LVTTL ;                               # A7
+#NET gpio_pad(8)           LOC="P79"  | IOSTANDARD=LVTTL ;                               # A8
+#NET gpio_pad(9)           LOC="P81"  | IOSTANDARD=LVTTL ;                               # A9
+#NET gpio_pad(10)          LOC="P83"  | IOSTANDARD=LVTTL ;                               # A10
+
+NET WING_C(0)          LOC="P114" | IOSTANDARD=LVTTL ;                               # C0
+NET WING_C(1)          LOC="P115" | IOSTANDARD=LVTTL ;                               # C1
+NET WING_C(2)          LOC="P116" | IOSTANDARD=LVTTL ;                               # C2
+NET WING_C(3)          LOC="P117" | IOSTANDARD=LVTTL ;                               # C3
+NET WING_C(4)          LOC="P118" | IOSTANDARD=LVTTL ;                               # C4
+NET WING_C(5)          LOC="P119" | IOSTANDARD=LVTTL ;                               # C5
+NET WING_C(6)          LOC="P120" | IOSTANDARD=LVTTL ;                               # C6
+NET WING_C(7)          LOC="P121" | IOSTANDARD=LVTTL ;                               # C7
+
+NET WING_B(0)          LOC="P123" | IOSTANDARD=LVTTL ;                               # C8
+NET WING_B(1)          LOC="P124" | IOSTANDARD=LVTTL ;                               # C9
+NET WING_B(2)          LOC="P126" | IOSTANDARD=LVTTL ;                               # C10
+NET WING_B(3)          LOC="P127" | IOSTANDARD=LVTTL ;                               # C11
+#NET WING_B(23)          LOC="P131" | IOSTANDARD=LVTTL ;                               # C12
+#NET WING_B(24)          LOC="P132" | IOSTANDARD=LVTTL ;                               # C13
 
 
 # SPI flash on Papilio Pro (MX25L6445E)
