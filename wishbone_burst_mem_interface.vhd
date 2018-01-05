@@ -1,26 +1,15 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+
+-- Module Name:    wbs_memory_interface - Behavioral 
+
+-- The Bonfire Processor Project, (c) 2016,2017 Thomas Hornschuh
+
+-- License: See LICENSE or LICENSE.txt File in git project root. 
 -- 
--- Create Date:    20:29:10 09/04/2016 
--- Design Name: 
--- Module Name:    memory_interface - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---   Bonfire CPU 
---   (c) 2016,2017 Thomas Hornschuh
---   See license.md for License 
 --   
 --   Wishbone interface for Block RAMs with Wishbone Burst support
 --
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
+
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;

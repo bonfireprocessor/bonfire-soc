@@ -79,6 +79,10 @@ NET WING_B(3)          LOC="P127" | IOSTANDARD=LVTTL ;                          
 #NET WING_B(23)          LOC="P131" | IOSTANDARD=LVTTL ;                               # C12
 #NET WING_B(24)          LOC="P132" | IOSTANDARD=LVTTL ;                               # C13
 
+# Software I2C
+NET SCL          LOC="P98"  | IOSTANDARD=I2C | PULLUP;                               # A14
+NET SDA          LOC="P100" | IOSTANDARD=I2C | PULLUP;                               # A15
+
 
 # SPI flash on Papilio Pro (MX25L6445E)
 NET flash_spi_cs    LOC="P38"  | IOSTANDARD=LVTTL | SLEW=FAST;

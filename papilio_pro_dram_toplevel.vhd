@@ -1,20 +1,12 @@
 ----------------------------------------------------------------------------------
--- Company:
--- Engineer:
---
--- Create Date:    19:17:12 12/04/2016
--- Design Name:
+
 -- Module Name:    papilio_pro_dram_toplevel - Behavioral
--- Project Name:
--- Target Devices:
--- Tool versions:
--- Description:
---
--- Dependencies:
---
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
+
+-- The Bonfire Processor Project, (c) 2016,2017 Thomas Hornschuh
+
+-- Toplevel module for Papilio Pro with 8MB SDRAM 
+-- License: See LICENSE or LICENSE.txt File in git project root. 
+-- 
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -76,6 +68,10 @@ generic (
         WING_A : inout STD_LOGIC_VECTOR(NUM_GPIO_A-1 downto 0);
         WING_B : inout STD_LOGIC_VECTOR(NUM_GPIO_B-1 downto 0);
         WING_C : inout STD_LOGIC_VECTOR(NUM_GPIO_C-1 downto 0);
+        
+        -- Software I2C
+        SCL : inout STD_LOGIC;
+        SDA : inout STD_LOGIC;
 
         -- SDRAM signals
         SDRAM_CLK     : out   STD_LOGIC;
@@ -184,7 +180,7 @@ signal      bram_enb_o :  std_logic;
 
 -- gpio ports
 
-constant SPECIAL_GPIO : natural := 1;
+constant SPECIAL_GPIO : natural := 3; -- LED1 + SDA + SCL
 constant TOTAL_GPIO : natural := NUM_GPIO_A + NUM_GPIO_B +
                                  NUM_GPIO_C + SPECIAL_GPIO;
 
@@ -223,8 +219,25 @@ begin
    -- LED will be the highest bit of the gpio core
    led_pad: OBUF
      port map(
-       I => gpio_o(gpio_o'high),
+       I => gpio_o(31),
        O => led1
+     );
+     
+     
+   scl_pad : IOBUF
+      port map(
+       I => gpio_o(30),
+       O => gpio_i(30),
+       T => gpio_t(30),
+       IO => SCL
+     );
+     
+   sda_pad : IOBUF
+      port map(
+       I => gpio_o(29),
+       O => gpio_i(29),
+       T => gpio_t(29),
+       IO => SDA
      );
 
    wing_a_pads: for i in WING_A'range generate

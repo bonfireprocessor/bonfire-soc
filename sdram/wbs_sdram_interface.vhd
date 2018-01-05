@@ -1,26 +1,16 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    19:51:06 12/18/2016 
--- Design Name: 
+
 -- Module Name:    wbs_sdram_interface - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---   Bonfire CPU 
---   (c) 2016,2017 Thomas Hornschuh
---   See license.md for License 
+
+-- The Bonfire Processor Project, (c) 2016,2017 Thomas Hornschuh
+
+-- 
+-- License: See LICENSE or LICENSE.txt File in git project root. 
+-- 
 
 --   Wishbone Interface for Hamsterworks SDRAM Controller, Supports Wishbone Burst mode extensions
 --
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
+
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;

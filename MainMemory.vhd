@@ -1,7 +1,22 @@
+----------------------------------------------------------------------------------
+ 
+-- Module Name:    MainMemory - Behavioral 
+
+
+-- The Bonfire Processor Project, (c) 2016,2017 Thomas Hornschuh
+
+-- Toplevel module for Papilio Pro with 8MB SDRAM 
+-- License: See LICENSE or LICENSE.txt File in git project root. 
+
 -- Memory module to be synthesized as block RAM
 -- can be initalized with a file
 
 -- New "single process" version as recommended by Xilinx XST user guide
+
+----------------------------------------------------------------------------------
+
+
+
 
 
 library IEEE;
