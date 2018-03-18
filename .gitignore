@@ -22,4 +22,4 @@
 /fusesoc.log
 *.geany
 *.vhd.old
-
+/software/wildfire/monitor/spiflash_driver/
