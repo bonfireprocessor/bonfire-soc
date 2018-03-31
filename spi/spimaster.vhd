@@ -46,7 +46,7 @@ architecture Behavioral of spimaster is
 
     -- start up in idle state
     signal slave_cs_register  : std_logic := '1';
-    signal slave_clk_register : std_logic := '1'; 
+    signal slave_clk_register : std_logic := '1';
     signal slave_mosi_register: std_logic := '0';
     signal data_out_sr        : std_logic_vector(7 downto 0) := (others => '0'); -- shifted left ie MSB <- LSB
     signal data_in_sr         : std_logic_vector(7 downto 0) := (others => '0'); -- shifted left ie MSB <- LSB
@@ -60,17 +60,20 @@ architecture Behavioral of spimaster is
     signal status_data_out    : std_logic_vector(7 downto 0);
     signal data_out_enable    : std_logic;
 
+    signal selector : std_logic_vector(cpu_address'length downto 0); -- By intention 1 bit larger than cpu_address !
+
 begin
 
     chip_select_out <= "0000000" & slave_cs_register;
     status_data_out <= "0000000" & busy_sr(7);
     cpu_wait <= busy_sr(7);
-    
+
     --TH: Added logic to expose data to bus only when it is really needed
     -- I think it wastes energy when uneccesary signal value changes are avoided
     data_out_enable <= req_read and not busy_sr(7);
 
-    with cpu_address&data_out_enable select
+    selector<=cpu_address&data_out_enable;
+    with selector select
         data_out <=
             chip_select_out                     when "0001",
             status_data_out                     when "0011",
@@ -128,11 +131,11 @@ begin
                     if busy_sr(7) = '0' and cpu_was_idle = '1' then
                         cpu_was_idle <= '0';
                         case cpu_address is
-                            when "000" => 
+                            when "000" =>
                                 slave_cs_register <= data_in(0);
-                            when "010" => 
+                            when "010" =>
                             -- only allow writes when transmitter is idle
-                                data_out_sr <= data_in; 
+                                data_out_sr <= data_in;
                                 busy_sr <= (others => '1');
                             when "100" =>
                                 clk_divide_target <= unsigned(data_in);
